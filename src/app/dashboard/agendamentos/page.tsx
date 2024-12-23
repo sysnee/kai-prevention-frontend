@@ -49,8 +49,10 @@ export default function SchedulingList() {
             </div>
 
             <AppointmentDashboard
-                date={dateRange[0]?.toDate() || new Date()}
-                loading={loading}
+                dateRange={[
+                    dateRange[0]?.toDate() || null,
+                    dateRange[1]?.toDate() || null
+                ]}
             />
 
             <div className="mt-8 mb-6">
