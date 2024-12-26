@@ -163,7 +163,7 @@ export function CalendarView({ dateRange }: CalendarViewProps) {
               >
                 <Clock className={`w-4 h-4 mr-2 'text-gray-400'}`} />
                 <span className={`font-medium 'text-gray-600'}`}>
-                  {appointment.dateTime.split(', ')[1]}
+                  {appointment.dateTime}
                 </span>
               </div>
               <div className="p-2">
