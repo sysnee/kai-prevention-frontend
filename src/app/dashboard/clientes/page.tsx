@@ -31,9 +31,23 @@ export default function Clients() {
 
   const getClients = async () => {
     try {
-      const clientesResponse = await api.get('clients')
-      const clientesData = clientesResponse.data
-      setClientes(clientesData)
+      let allClients: any[] = []
+      let page = 1
+      let hasMoreData = true
+
+      while (hasMoreData) {
+        const clientesResponse = await api.get(`clients?page=${page}`)
+        const clientesData = clientesResponse.data
+
+        if (clientesData.length === 0) {
+          hasMoreData = false
+        } else {
+          allClients = [...allClients, ...clientesData]
+          page++
+        }
+      }
+
+      setClientes(allClients)
     } catch (err) {
       console.error('Erro ao buscar os dados:', err)
     } finally {
