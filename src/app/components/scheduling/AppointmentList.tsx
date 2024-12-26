@@ -175,7 +175,6 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
 
   // Definindo as colunas do DataGrid
   const columns: GridColDef[] = [
-    { field: 'dateTime', headerName: 'Horário', minWidth: 100, flex: 0.4 },
     {
       field: 'clientName',
       headerName: 'Paciente',
@@ -188,6 +187,7 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
       minWidth: 400,
       flex: 0.4
     },
+    { field: 'dateTime', headerName: 'Data e hora', minWidth: 100, flex: 0.4 },
     { field: 'examType', headerName: 'Exame', minWidth: 150, flex: 0.4 },
     {
       field: 'status',
@@ -209,12 +209,12 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
       field: 'actions',
       headerName: 'Ações',
       renderCell: (params) => (
-        <div className="flex">
+        <div className="flex items-center h-full">
           <button
-            className="p-2 mt-1.5 ml-1 bg-kai-primary rounded-lg hover:bg-kai-primary/70"
+            className="hover:opacity-70"
             onClick={() => handleSelectAppointment(params.row)}
           >
-            <Eye className="w-5 h-5" style={{ color: theme.palette.mode === 'light' ? "#fff" : "#000" }} />
+            <Eye className="w-5 h-5 text-kai-primary" />
           </button>
         </div>
       ),
@@ -227,7 +227,7 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
   const rows: GridRowsProp = filteredAppointments.map((appointment) => ({
     id: appointment.id,
     code: appointment.code,
-    dateTime: appointment.dateTime.split(', ')[1],
+    dateTime: appointment.dateTime,
     clientName: appointment.clientName,
     examType: appointment.examType,
     status: translateStatus(appointment.status),
@@ -245,6 +245,12 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
             '.MuiDataGrid-columnHeaders': {
               fontSize: '15px',
             },
+            '.MuiDataGrid-columnHeader': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            },
+            '.MuiDataGrid-columnHeaderTitle': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            },
             '.MuiDataGrid-footerContainer': {
               backgroundColor: 'transparent !important',
               fontSize: '15px',
@@ -252,6 +258,8 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
             '.MuiDataGrid-cell': {
               fontSize: '15px',
             },
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            borderColor: theme.palette.mode === 'dark' ? 'hsla(220, 20%, 25%, 0.6)' : 'inherit',
           }}
           rows={rows}
           columns={columns}

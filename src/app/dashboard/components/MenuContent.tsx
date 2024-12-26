@@ -75,11 +75,13 @@ export default function MenuContent() {
                     py: 0,
                     '& .MuiListItemIcon-root': {
                       minWidth: 30,
-                      color: 'orange'
+                      '& .MuiSvgIcon-root': {
+                        color: '#fff'
+                      }
                     },
                     '& .MuiTypography-root': {
                       fontSize: '0.95rem',
-                      color: 'gray'
+                      color: '#fff'
                     }
                   }}>
                   <ListItemIcon>{item.icon}</ListItemIcon>
@@ -99,8 +101,11 @@ export default function MenuContent() {
       {data?.user?.email === 'adm@onlineclinic.com.br' && (
         <Stack>
           <Stack direction={'row'} spacing={1} sx={{ px: 2, py: 1 }}>
-            <SecurityOutlined className='opacity-50' style={{ width: '20px' }} />
-            <p className='opacity-75' style={{ color: 'gray' }}>ADMINISTRATIVO</p>
+            <SecurityOutlined
+              className='opacity-50'
+              style={{ width: '20px', color: '#fff' }}
+            />
+            <p className='opacity-75' style={{ color: '#fff' }}>ADMINISTRATIVO</p>
           </Stack>
           <List>
             {secondaryListItems.map((item, index) => (
@@ -111,11 +116,13 @@ export default function MenuContent() {
                       py: 1.5,
                       '& .MuiListItemIcon-root': {
                         minWidth: 30,
-                        color: 'orange'
+                        '& .MuiSvgIcon-root': {
+                          color: '#fff'
+                        }
                       },
                       '& .MuiTypography-root': {
                         fontSize: '0.95rem',
-                        color: 'gray'
+                        color: '#fff'
                       }
                     }}>
                     <ListItemIcon>{item.icon}</ListItemIcon>
