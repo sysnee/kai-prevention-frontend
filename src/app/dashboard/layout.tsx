@@ -17,7 +17,6 @@ export default async function DashboardLayout({
   return (
     <BaseLayout>
       {children}
-      <ToastProvider />
     </BaseLayout>
   )
 }

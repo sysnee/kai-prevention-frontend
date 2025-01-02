@@ -1,8 +1,8 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { WorkflowColumn } from './WorkflowColumn';
 import { WorkflowCard } from './WorkflowCard';
-import { useWorkflowStore } from '../../stores/workflowStore';
+import { STAGE_ORDER, useWorkflowStore } from '../../stores/workflowStore';
 import {
   ClipboardList,
   Clock,
@@ -16,6 +16,8 @@ import {
   AlertOctagon,
   ClockIcon
 } from 'lucide-react';
+import { WorkflowConfirmationDialog } from './dialogs/WorkflowConfirmationDialog'
+import toast from 'react-hot-toast'
 
 export const WORKFLOW_STAGES = [
   {
@@ -113,7 +115,18 @@ export function WorkflowBoard({
   selectedDate
 }: WorkflowBoardProps) {
   const { serviceRequests, moveExam, setServiceRequests } = useWorkflowStore();
-
+  const [confirmationDialog, setConfirmationDialog] = useState<{
+    isOpen: boolean
+    examId: string
+    source: string
+    destination: string
+  }>({
+    isOpen: false,
+    examId: '',
+    source: '',
+    destination: ''
+  })
+  const [isMoving, setIsMoving] = useState(false)
 
   useEffect(() => {
     setServiceRequests(
@@ -137,18 +150,44 @@ export function WorkflowBoard({
   ])
 
   const handleDragEnd = async (result: any) => {
-    if (!result.destination) return;
+    if (!result.destination) return
 
-    const { source, destination, draggableId } = result;
+    const { source, destination, draggableId } = result
 
-    if (source.droppableId !== destination.droppableId) {
-      try {
-        await moveExam(draggableId, source.droppableId, destination.droppableId);
-      } catch (error) {
-        console.error('Error moving exam:', error);
-      }
+    // If not changing columns, do nothing
+    if (source.droppableId === destination.droppableId) return
+
+    // Check if trying to move backwards
+    if (STAGE_ORDER[destination.droppableId.toUpperCase()] < STAGE_ORDER[source.droppableId.toUpperCase()]) {
+      toast.error('Não é permitido mover exames para estágios anteriores', {
+        duration: 5000,
+      })
+      return
     }
-  };
+
+    // Show confirmation dialog for forward movement
+    setConfirmationDialog({
+      isOpen: true,
+      examId: draggableId,
+      source: source.droppableId,
+      destination: destination.droppableId
+    })
+  }
+
+  const handleConfirmMove = async () => {
+    const { examId, source, destination } = confirmationDialog
+
+    setIsMoving(true)
+    try {
+      await moveExam(examId, source, destination)
+      setConfirmationDialog(prev => ({ ...prev, isOpen: false }))
+    } catch (error) {
+      console.error('Error moving exam:', error)
+      toast.error('Erro ao mover o exame')
+    } finally {
+      setIsMoving(false)
+    }
+  }
 
   // const filteredExams = serviceRequests?.filter(sr => {
   //   // const matchesSearch = exam.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -164,6 +203,16 @@ export function WorkflowBoard({
         {/* <pre>
           {JSON.stringify(serviceRequests, null, 2)}
         </pre> */}
+        <WorkflowConfirmationDialog
+          isOpen={confirmationDialog.isOpen}
+          onClose={() => setConfirmationDialog(prev => ({ ...prev, isOpen: false }))}
+          onConfirm={handleConfirmMove}
+          title="Confirmar movimentação"
+          description="Esta ação é irreversível. Deseja prosseguir com a movimentação do exame?"
+          confirmText="Sim, mover"
+          cancelText="Cancelar"
+          isLoading={isMoving}
+        />
         <DragDropContext onDragEnd={handleDragEnd}>
           {WORKFLOW_STAGES.map((status) => (
             <div

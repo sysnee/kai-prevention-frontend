@@ -187,9 +187,9 @@ export function WorkflowCardModal({ exam, onClose }: WorkflowCardModalProps) {
             >
               <h3 className="text-lg font-medium mb-4">Status dos Exames</h3>
               <div className="space-y-3">
-                {exam.exams.map((ex: any) => (
+                {exam.exams.map((ex: any, index: number) => (
                   <ExamStatus
-                    key={ex.id}
+                    key={index}
                     examId={ex.id}
                     description={ex.description}
                     modality={ex.modality}
