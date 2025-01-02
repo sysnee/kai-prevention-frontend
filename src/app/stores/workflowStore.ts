@@ -5,6 +5,27 @@ import { WorkflowNote, WorkflowTransition } from '../types/workflow/workflow';
 import { ServiceStatus } from '../types/pemissions/permissions';
 import api from '@/lib/api';
 
+export const STAGE_ORDER = {
+  'PLANNED': 0,
+  'WAITING': 1,
+  'STARTED': 2,
+  'ON_HOLD': 3,
+  'COMPLETED': 4,
+  'IN_TRANSCRIPTION': 5,
+  'IN_REVISION': 6,
+  'SIGNED': 7,
+  'CANCELED': 8,
+  'planned': 0,
+  'waiting': 1,
+  'started': 2,
+  'on_hold': 3,
+  'completed': 4,
+  'in_transcription': 5,
+  'in_revision': 6,
+  'signed': 7,
+  'canceled': 8
+}
+
 interface Appointment {
   id: string;
   clientCpf: string;
@@ -20,9 +41,11 @@ export interface ServiceRequest {
   id: string;
   code: number;
   clientName: string;
+  clientBirthdate: string;
+  clientGender: string;
+  clientCpf: string;
   patientId: string;
   examType: string;
-  priority: 'low' | 'medium' | 'high';
   status: ServiceStatus | string;
   timeInStage: string;
   doctor: string;
@@ -33,8 +56,21 @@ export interface ServiceRequest {
   notes?: string;
   exams: Array<{
     id: string;
-    name: string;
+    modality: string;
+    description: string;
     room: string;
+    status: string;
+    reportId?: string;
+    report: {
+      id: string;
+      status: string;
+      createdAt: string;
+      updatedAt: string;
+      createdBy: {
+        id: string;
+        name: string;
+      }
+    }
   }>;
   workflowNotes: WorkflowNote[];
   transitions: WorkflowTransition[];
@@ -142,12 +178,12 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
 
           if (!response) {
             const errorMessage = await response.text();
-            throw new Error(`Erro da API: ${errorMessage}`);
+            throw new Error(`Erro: ${errorMessage}`);
           }
 
-          toast.success(`Exame movido para ${toStage} e atualizado na API`);
+          toast.success(`Exames atualizados com sucesso`);
         } catch (apiError) {
-          console.error("Erro ao atualizar o status na API:", apiError);
+          console.error("Erro ao atualizar:", apiError);
 
           // Reverter o status e as transições no caso de falha
           set((state) => ({
@@ -163,11 +199,11 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
           }));
 
           toast.error(
-            `Falha ao atualizar status para ${toStage} na API. O exame foi revertido.`
+            `Falha ao atualizar status. O exame foi revertido.`
           );
         }
       } else {
-        toast.success(`Exame movido para ${toStage}`);
+        toast.success(`Exames atualizados com sucesso`);
       }
     } catch (error) {
       console.error("Erro ao mover exame:", error);

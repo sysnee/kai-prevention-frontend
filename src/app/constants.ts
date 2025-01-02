@@ -1,74 +1,3 @@
-export const serviceExams = {
-    'HI-LIGHT': [
-        {
-            name: 'Ressonância de Corpo Inteiro',
-            room: 'Sala 02',
-            status: 'PENDING'
-        }
-    ],
-    'HI-AEROS': [
-        {
-            name: 'Ressonância corpo inteiro',
-            room: 'Sala 01',
-            status: 'PENDING'
-        },
-        {
-            name: 'Tomografia do Torax',
-            room: 'Sala 05',
-            status: 'PENDING'
-        }
-    ],
-    'HI-FOCUS': [
-        {
-            name: 'Tomografia do Torax',
-            room: 'Sala 03',
-            status: 'PENDING'
-        },
-        {
-            name: 'Angiotomografia Coronária',
-            room: 'Sala 04',
-            status: 'PENDING'
-        },
-        {
-            name: 'Ecocardiograma',
-            room: 'Sala 06',
-            status: 'PENDING'
-        },
-        {
-            name: 'Mamografia',
-            room: 'Sala 07',
-            status: 'PENDING'
-        }
-    ],
-    'HI-DEEP': [
-        {
-            name: 'Ressonância corpo inteiro',
-            room: 'Sala 01',
-            status: 'PENDING'
-        },
-        {
-            name: 'Tomografia do Torax',
-            room: 'Sala 03',
-            status: 'PENDING'
-        },
-        {
-            name: 'Angiotomografia Coronária',
-            room: 'Sala 04',
-            status: 'PENDING'
-        },
-        {
-            name: 'Ecocardiograma',
-            room: 'Sala 06',
-            status: 'PENDING'
-        },
-        {
-            name: 'Mamografia',
-            room: 'Sala 07',
-            status: 'PENDING'
-        }
-    ]
-}
-
 export const stages = [
     { id: 'PLANNED', label: 'Planejado' },
     { id: 'WAITING', label: 'Aguardando' },
@@ -78,4 +7,11 @@ export const stages = [
     { id: 'IN_TRANSCRIPTION', label: 'Em Transcrição' },
     { id: 'SIGNED', label: 'Laudado' },
     { id: 'CANCELED', label: 'Cancelado', time: '0min' }
+];
+
+export const modalities = [
+    { id: 'MR', label: 'Ressonância Magnética' },
+    { id: 'US', label: 'Ultrassonografia' },
+    { id: 'TC', label: 'Tomografia Computadorizada' },
+    { id: 'MG', label: 'Mamografia' }
 ];

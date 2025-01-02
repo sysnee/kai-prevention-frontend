@@ -60,7 +60,16 @@ export default function RolesTable({ roles, onView, onEdit, onDelete }: RolesTab
   const theme = useTheme();
 
   return (
-    <TableContainer component={Paper} sx={{ boxShadow: 'none' }}>
+    <TableContainer
+      component={Paper}
+      sx={{
+        boxShadow: 'none',
+        backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+        '& .MuiTable-root': {
+          backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+        }
+      }}
+    >
       <Table>
         <TableHead>
           <TableRow>
@@ -115,16 +124,41 @@ export default function RolesTable({ roles, onView, onEdit, onDelete }: RolesTab
                   )}
                 </Box>
               </TableCell>
-              <TableCell align='right' sx={{ verticalAlign: 'top', width: '120px' }}>
-                <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
-                  <IconButton size='small' onClick={() => onView(role)} className="bg-kai-primary hover:bg-kai-primary/70">
-                    <Eye size={20} style={{ color: theme.palette.mode === 'light' ? '#fff' : '#000' }} />
+              <TableCell
+                align='right'
+                sx={{
+                  verticalAlign: 'middle',
+                  width: '120px',
+                  height: '100%'
+                }}
+              >
+                <Box sx={{
+                  display: 'flex',
+                  gap: 2,
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  height: '100%'
+                }}>
+                  <IconButton
+                    size='small'
+                    onClick={() => onView(role)}
+                    sx={{ p: 0 }}
+                  >
+                    <Eye size={20} className="text-kai-primary hover:opacity-70" />
                   </IconButton>
-                  <IconButton size='small' onClick={() => onEdit(role)} className="bg-kai-primary hover:bg-kai-primary/70">
-                    <Edit2 size={20} style={{ color: theme.palette.mode === 'light' ? '#fff' : '#000' }} />
+                  <IconButton
+                    size='small'
+                    onClick={() => onEdit(role)}
+                    sx={{ p: 0 }}
+                  >
+                    <Edit2 size={20} className="text-kai-primary hover:opacity-70" />
                   </IconButton>
-                  <IconButton size='small' onClick={() => onDelete(role)} className="bg-kai-primary hover:bg-kai-primary/70">
-                    <Trash2 size={20} style={{ color: theme.palette.mode === 'light' ? '#fff' : '#000' }} />
+                  <IconButton
+                    size='small'
+                    onClick={() => onDelete(role)}
+                    sx={{ p: 0 }}
+                  >
+                    <Trash2 size={20} className="text-kai-primary hover:opacity-70" />
                   </IconButton>
                 </Box>
               </TableCell>

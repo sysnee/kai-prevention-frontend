@@ -2,7 +2,7 @@ import { RequestOptions } from 'http'
 import { getSession, signIn } from 'next-auth/react'
 import jwt from 'jsonwebtoken'
 
-let API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/v1'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/v1'
 
 async function handleResponse(response: any) {
   if (!response.ok) {
@@ -22,18 +22,16 @@ const apiCall = async (url: string, options: RequestOptions & { body?: any; para
 
   if (!session) {
     signIn('auth0')
+    throw new Error('No session found')
   }
 
   const queryString = new URLSearchParams(params).toString()
-  if (url[0] !== '/') {
-    url = '/' + url
-  }
+  const normalizedUrl = url.startsWith('/') ? url : `/${url}`
+  const normalizedBaseUrl = API_BASE_URL.endsWith('/')
+    ? API_BASE_URL.slice(0, -1)
+    : API_BASE_URL
 
-  if (API_BASE_URL[API_BASE_URL.length - 1] === '/') {
-    API_BASE_URL = API_BASE_URL.slice(0, -1)
-  }
-
-  const fullUrl = `${API_BASE_URL}${url}${queryString ? `?${queryString}` : ''}`
+  const fullUrl = `${normalizedBaseUrl}${normalizedUrl}${queryString ? `?${queryString}` : ''}`
   const sessionJwt = jwt.sign(session.user, 'any')
 
   const fetchOptions = {
@@ -56,7 +54,8 @@ const apiCall = async (url: string, options: RequestOptions & { body?: any; para
     const response = await fetch(fullUrl, fetchOptions as RequestInit)
     return await handleResponse(response)
   } catch (error: any) {
-    throw new Error(error.message || 'Network error')
+    const errorMessage = error.message || 'Network error'
+    throw new Error(`API Error: ${errorMessage}`)
   }
 }
 

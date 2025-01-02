@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Clock, User, Edit2, Trash2, CalendarX, Eye } from 'lucide-react';
 import { Box, Skeleton } from '@mui/material';
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid';
-import Link from 'next/link';
 import { ServiceRequest, useWorkflowStore } from '../../stores/workflowStore'
 import { useTheme } from '@mui/material';
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api';
+import { translateStatus } from '@/app/utils/translations';
 
 // Interface do componente
 interface AppointmentListProps {
@@ -32,22 +32,6 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
   const [loading, setLoading] = useState(true);
   const theme = useTheme();
   const router = useRouter()
-
-  // Função para traduzir status
-  const translateStatus = (status: string): string => {
-    const translations: { [key: string]: string } = {
-      PLANNED: "PLANEJADO",
-      WAITING: "AGUARDANDO",
-      STARTED: "INICIADO",
-      ON_HOLD: "PAUSADO",
-      COMPLETED: "CONCLUÍDO",
-      IN_TRANSCRIPTION: "EM TRANSCRIÇÃO",
-      SIGNED: "LAUDADO",
-      CANCELED: "CANCELADO",
-      IN_REVISION: "EM REVISÃO"
-    };
-    return translations[status] || status;
-  };
 
   const { setSelectedAppointment } = useWorkflowStore()
 
@@ -175,7 +159,6 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
 
   // Definindo as colunas do DataGrid
   const columns: GridColDef[] = [
-    { field: 'dateTime', headerName: 'Horário', minWidth: 100, flex: 0.4 },
     {
       field: 'clientName',
       headerName: 'Paciente',
@@ -188,6 +171,7 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
       minWidth: 400,
       flex: 0.4
     },
+    { field: 'dateTime', headerName: 'Data e hora', minWidth: 100, flex: 0.4 },
     { field: 'examType', headerName: 'Exame', minWidth: 150, flex: 0.4 },
     {
       field: 'status',
@@ -209,12 +193,12 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
       field: 'actions',
       headerName: 'Ações',
       renderCell: (params) => (
-        <div className="flex">
+        <div className="flex items-center h-full">
           <button
-            className="p-2 mt-1.5 ml-1 bg-kai-primary rounded-lg hover:bg-kai-primary/70"
+            className="hover:opacity-70"
             onClick={() => handleSelectAppointment(params.row)}
           >
-            <Eye className="w-5 h-5" style={{ color: theme.palette.mode === 'light' ? "#fff" : "#000" }} />
+            <Eye className="w-5 h-5 text-kai-primary" />
           </button>
         </div>
       ),
@@ -227,7 +211,7 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
   const rows: GridRowsProp = filteredAppointments.map((appointment) => ({
     id: appointment.id,
     code: appointment.code,
-    dateTime: appointment.dateTime.split(', ')[1],
+    dateTime: appointment.dateTime,
     clientName: appointment.clientName,
     examType: appointment.examType,
     status: translateStatus(appointment.status),
@@ -245,6 +229,12 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
             '.MuiDataGrid-columnHeaders': {
               fontSize: '15px',
             },
+            '.MuiDataGrid-columnHeader': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            },
+            '.MuiDataGrid-columnHeaderTitle': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            },
             '.MuiDataGrid-footerContainer': {
               backgroundColor: 'transparent !important',
               fontSize: '15px',
@@ -252,6 +242,8 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
             '.MuiDataGrid-cell': {
               fontSize: '15px',
             },
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            borderColor: theme.palette.mode === 'dark' ? 'hsla(220, 20%, 25%, 0.6)' : 'inherit',
           }}
           rows={rows}
           columns={columns}

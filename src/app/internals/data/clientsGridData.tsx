@@ -7,25 +7,19 @@ function ViewEditButtons({ onView, onEdit }: {
   onView: () => void
   onEdit: () => void
 }) {
-  const theme = useTheme()
-
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-4">
       <button
         onClick={onView}
-        className="p-2 rounded-lg bg-kai-primary hover:bg-kai-primary/70"
+        className="hover:opacity-70"
       >
-        <Eye className="w-5 h-5" style={{
-          color: theme.palette.mode === 'light' ? "#fff" : "#000"
-        }} />
+        <Eye className="w-5 h-5 text-kai-primary" />
       </button>
       <button
         onClick={onEdit}
-        className="p-2 rounded-lg bg-kai-primary hover:bg-kai-primary/70"
+        className="hover:opacity-70"
       >
-        <Edit2 className="w-5 h-5" style={{
-          color: theme.palette.mode === 'light' ? "#fff" : "#000"
-        }} />
+        <Edit2 className="w-5 h-5 text-kai-primary" />
       </button>
     </div>
   )
@@ -51,6 +45,7 @@ export const colum = (
             width: "100%",
             borderRight: `1px solid ${theme.palette.divider}`,
             boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
           })}
         >
           {params.row.name}
@@ -73,6 +68,7 @@ export const colum = (
             width: "100%",
             borderRight: `1px solid ${theme.palette.divider}`,
             boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
           })}
         >
           {params.row.cpf}
@@ -95,6 +91,7 @@ export const colum = (
             width: "100%",
             borderRight: `1px solid ${theme.palette.divider}`,
             boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
           })}
         >
           {params.row.email}
@@ -117,6 +114,7 @@ export const colum = (
             width: "100%",
             borderRight: `1px solid ${theme.palette.divider}`,
             boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
           })}
         >
           <ViewEditButtons

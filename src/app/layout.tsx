@@ -5,6 +5,7 @@ import { StyledEngineProvider } from '@mui/material/styles';
 import "./globals.css";
 import '@fontsource/inter';
 import { Providers } from './providers'
+import { ToastProvider } from "./providers/toast-provider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,6 +38,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
+          <ToastProvider />
           <AppRouterCacheProvider>
             <StyledEngineProvider injectFirst>
               {children}

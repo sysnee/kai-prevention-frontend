@@ -1,22 +1,24 @@
 import React from 'react';
-import { Calendar, CheckCircle2, Clock, XCircle, AlertCircle, TrendingUp } from 'lucide-react';
-import { formatCurrency } from '../../utils/format';
+import { Calendar, CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { Skeleton } from '@mui/material';
 import { useTheme } from '@mui/material';
+import { useQuery } from '@tanstack/react-query';
+import api from '@/lib/api';
+import { format } from 'date-fns';
 
-interface AppointmentDashboardProps {
-  date: Date;
-  loading?: boolean;
+interface ServiceRequestMetrics {
+  totalExams: number;
+  occupancyRate: number;
+  pendingExams: number;
+  confirmedExams: number;
+  confirmationRate: number;
+  canceledExams: number;
+  cancellationRate: number;
 }
 
-// Mock data - replace with actual API integration
-const getStats = (date: Date) => ({
-  totalAppointments: 13,
-  confirmedAppointments: 0,
-  pendingAppointments: 13,
-  canceledAppointments: 0,
-  occupancyRate: 87,
-});
+interface AppointmentDashboardProps {
+  dateRange: [Date | null, Date | null];
+}
 
 function DashboardSkeleton({ theme }: { theme: any }) {
   const CardSkeleton = () => (
@@ -55,11 +57,35 @@ function DashboardSkeleton({ theme }: { theme: any }) {
   );
 }
 
-export function AppointmentDashboard({ date, loading }: AppointmentDashboardProps) {
+export function AppointmentDashboard({ dateRange }: AppointmentDashboardProps) {
   const theme = useTheme();
-  const stats = getStats(date);
+  const [startDate, endDate] = dateRange;
 
-  if (loading) {
+  const formatDateForApi = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const { data: metrics, isLoading } = useQuery<ServiceRequestMetrics>({
+    queryKey: ['service-requests', 'metrics', startDate, endDate],
+    queryFn: async () => {
+      const formattedStartDate = startDate ? formatDateForApi(startDate) : '';
+      const formattedEndDate = endDate ? formatDateForApi(endDate) : '';
+
+      const response = await api.get('/service-requests/metrics', {
+        params: {
+          startDate: formattedStartDate,
+          endDate: formattedEndDate
+        }
+      });
+      return response;
+    },
+    enabled: !!startDate && !!endDate
+  });
+
+  if (isLoading) {
     return <DashboardSkeleton theme={theme} />;
   }
 
@@ -80,23 +106,20 @@ export function AppointmentDashboard({ date, loading }: AppointmentDashboardProp
             <p className="text-sm font-medium text-gray-500">Total de Exames</p>
             <div className="flex items-baseline">
               <h3 className="text-2xl font-bold text-kai-text-primary mr-2">
-                --
+                {metrics?.totalExams}
               </h3>
-              <span className="text-sm text-green-600 font-medium">
-                --%
-              </span>
             </div>
           </div>
         </div>
         <div className="mt-4">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-500">Taxa de ocupação</span>
-            <span className="font-medium text-gray-900">--%</span>
+            <span className="font-medium text-gray-900">{metrics?.occupancyRate ?? '--'}%</span>
           </div>
           <div className="mt-1 bg-kai-primary/10 rounded-full h-2">
             <div
               className="bg-kai-primary rounded-full h-2"
-              style={{ width: `${stats.occupancyRate}%` }}
+              style={{ width: `${metrics?.occupancyRate ?? 0}%` }}
             />
           </div>
         </div>
@@ -114,17 +137,17 @@ export function AppointmentDashboard({ date, loading }: AppointmentDashboardProp
             <CheckCircle2 className="w-6 h-6 text-kai-primary" />
           </div>
           <div className="ml-4">
-            <p className="text-sm font-medium text-gray-500">Confirmados</p>
+            <p className="text-sm font-medium text-gray-500">Iniciados</p>
             <h3 className="text-2xl font-bold tetext-kai-text-primary">
-              {stats.confirmedAppointments}
+              {metrics?.confirmedExams ?? '--'}
             </h3>
           </div>
         </div>
         <div className="mt-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-500">Taxa de confirmação</span>
+            <span className="text-gray-500">Taxa de concluidos</span>
             <span className="font-medium text-gray-900">
-              {Math.round((stats.confirmedAppointments / stats.totalAppointments) * 100)}%
+              {metrics?.confirmationRate ?? '--'}%
             </span>
           </div>
         </div>
@@ -144,7 +167,7 @@ export function AppointmentDashboard({ date, loading }: AppointmentDashboardProp
           <div className="ml-4">
             <p className="text-sm font-medium text-gray-500">Com Pendências</p>
             <h3 className="text-2xl font-bold text-kai-text-primary">
-              --
+              {metrics?.pendingExams ?? '--'}
             </h3>
           </div>
         </div>
@@ -172,7 +195,7 @@ export function AppointmentDashboard({ date, loading }: AppointmentDashboardProp
           <div className="ml-4">
             <p className="text-sm font-medium text-gray-500">Cancelados</p>
             <h3 className="text-2xl font-bold text-kai-text-primary">
-              {stats.canceledAppointments}
+              {metrics?.canceledExams ?? '--'}
             </h3>
           </div>
         </div>
@@ -180,7 +203,7 @@ export function AppointmentDashboard({ date, loading }: AppointmentDashboardProp
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-500">Taxa de cancelamento</span>
             <span className="font-medium text-gray-900">
-              {Math.round((stats.canceledAppointments / stats.totalAppointments) * 100)}%
+              {metrics?.cancellationRate ?? '--'}%
             </span>
           </div>
         </div>

@@ -77,25 +77,97 @@ export default function UserManagement() {
   }
 
   const columns: GridColDef[] = [
-    { field: 'fullName', headerName: 'Nome', flex: 0.4, minWidth: 250 },
-    { field: 'email', headerName: 'Email', flex: 0.4, minWidth: 250 },
+    {
+      field: 'fullName',
+      headerName: 'Nome',
+      flex: 0.4,
+      minWidth: 250,
+      renderCell: (params) => (
+        <Box
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
+        >
+          {params.row.fullName}
+        </Box>
+      ),
+    },
+    {
+      field: 'email',
+      headerName: 'Email',
+      flex: 0.4,
+      minWidth: 250,
+      renderCell: (params) => (
+        <Box
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
+        >
+          {params.row.email}
+        </Box>
+      ),
+    },
     {
       field: 'role',
       headerName: 'Perfil',
       flex: 0.4,
       minWidth: 150,
-      renderCell: (params: any) => {
-        return params.row.role?.name
-      }
+      renderCell: (params: any) => (
+        <Box
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
+        >
+          {params.row.role?.name}
+        </Box>
+      ),
     },
     {
       field: 'professionalType',
       headerName: 'Profissão',
       flex: 0.4,
       minWidth: 150,
-      renderCell: (params: GridRenderCellParams) => {
-        return getProfessionalTypeName(params.value)
-      }
+      renderCell: (params: GridRenderCellParams) => (
+        <Box
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
+        >
+          {getProfessionalTypeName(params.value)}
+        </Box>
+      ),
     },
     {
       field: 'actions',
@@ -104,13 +176,17 @@ export default function UserManagement() {
       minWidth: 200,
       renderCell: (params: GridRenderCellParams) => (
         <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 1,
-            height: '100%',
-          }}
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
         >
           <ActionButtons
             onView={() => handleView(params.row)}
@@ -204,6 +280,26 @@ export default function UserManagement() {
             pagination: { paginationModel: { pageSize: 10 } },
           }}
           disableRowSelectionOnClick
+          sx={{
+            '.MuiDataGrid-columnHeaders': {
+              fontSize: '15px',
+            },
+            '.MuiDataGrid-columnHeader': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            },
+            '.MuiDataGrid-columnHeaderTitle': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            },
+            '.MuiDataGrid-footerContainer': {
+              backgroundColor: 'transparent !important',
+              fontSize: '15px',
+            },
+            '.MuiDataGrid-cell': {
+              fontSize: '15px',
+            },
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            borderColor: theme.palette.mode === 'dark' ? 'hsla(220, 20%, 25%, 0.6)' : 'inherit',
+          }}
           localeText={{
             MuiTablePagination: {
               labelDisplayedRows: ({ from, to, count }) => `${from}–${to} de ${count !== -1 ? count : `mais que ${to}`}`,
