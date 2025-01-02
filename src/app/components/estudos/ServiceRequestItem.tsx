@@ -17,7 +17,8 @@ import {
     SvgIcon,
     SvgIconProps,
     Tooltip,
-    Badge
+    Badge,
+    Button
 } from '@mui/material'
 import { motion } from 'framer-motion'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
@@ -32,6 +33,13 @@ import DescriptionIcon from '@mui/icons-material/Description'
 import CommentIcon from '@mui/icons-material/Comment'
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital'
 import AssignmentIcon from '@mui/icons-material/Assignment'
+import SyncAltIcon from '@mui/icons-material/SyncAlt'
+import { maskCPF } from '@/app/utils/format'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import { CheckCircleIcon } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import api from '@/lib/api'
+import { showToast } from '@/lib/toast'
 
 interface ServiceRequestItemProps {
     request: ServiceRequest
@@ -68,6 +76,19 @@ function GenderSymbol({ gender }: { gender: string }) {
 }
 
 function ExamSummary({ modality, status, color }: ExamSummaryProps) {
+    const getColorValue = (colorName: "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning") => {
+        const colorMap = {
+            default: '#757575',
+            primary: '#1976d2',
+            secondary: '#9c27b0',
+            error: '#d32f2f',
+            info: '#0288d1',
+            success: '#2e7d32',
+            warning: '#ed6c02'
+        }
+        return colorMap[colorName]
+    }
+
     return (
         <Box
             sx={{
@@ -87,7 +108,7 @@ function ExamSummary({ modality, status, color }: ExamSummaryProps) {
                     width: 8,
                     height: 8,
                     borderRadius: '50%',
-                    bgcolor: theme => theme.palette[color].main,
+                    bgcolor: getColorValue(color),
                 }}
             />
             <Typography
@@ -105,28 +126,26 @@ function ExamSummary({ modality, status, color }: ExamSummaryProps) {
 }
 
 function ServiceRequestItem({ request }: ServiceRequestItemProps) {
+    const router = useRouter()
     const [open, setOpen] = useState(false)
+    const [isCreatingReport, setIsCreatingReport] = useState(false)
 
-    const getStatusColor = (status: string) => {
+    const getStatusColor = (status: string | undefined) => {
         const statusMap: Record<string, "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"> = {
-            WAITING: 'warning',
-            STARTED: 'info',
-            COMPLETED: 'success',
-            IN_REVISION: 'warning',
-            IN_TRANSCRIPTION: 'info',
+            DRAFT: 'info',
+            PENDING_REVIEW: 'warning',
+            REVIEWED: 'success',
             SIGNED: 'success',
             CANCELED: 'error',
-            PLANNED: 'default',
-            PENDING: 'warning'
         }
-        return statusMap[status] || 'default'
+        return statusMap[status || ''] || 'default'
     }
 
     const getExamsSummary = () => {
         return request.exams.map(exam => ({
             modality: exam.modality,
-            status: exam.status,
-            color: getStatusColor(exam.status)
+            status: exam.report?.status || 'Sem laudo',
+            color: getStatusColor(exam.report?.status)
         }))
     }
 
@@ -147,6 +166,27 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
         return `${age} anos`
     }
 
+    const handleCreateReport = async (examId: string) => {
+        try {
+            setIsCreatingReport(true)
+            const data = await api.post(`/reports`, {
+                examId,
+                status: 'DRAFT'
+            })
+
+            router.push(`/estudos/${data.id}`)
+        } catch (error: any) {
+            console.error('Error creating report:', error)
+            showToast.error(
+                error.message.includes('Network')
+                    ? 'Erro de conexão com o servidor'
+                    : error.message || 'Erro ao criar laudo'
+            )
+        } finally {
+            setIsCreatingReport(false)
+        }
+    }
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -155,6 +195,7 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
             key={request.id}
         >
             <Box
+                onClick={() => setOpen(!open)}
                 sx={{
                     mx: 1,
                     my: 0.5,
@@ -162,6 +203,10 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                     borderColor: 'divider',
                     borderRadius: 1,
                     overflow: 'hidden',
+                    cursor: 'pointer',
+                    '&:hover': {
+                        backgroundColor: 'rgba(255, 128, 70, 0.04)'
+                    }
                 }}
             >
                 <Box
@@ -173,6 +218,8 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                         gap: 3,
                     }}
                 >
+
+
                     <GenderSymbol gender={request.clientGender} />
 
                     <Stack spacing={0.5}>
@@ -189,12 +236,23 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                 {calculateAge(request.clientBirthdate)}
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                CPF: {request.clientCpf}
+                                CPF: {maskCPF(request.clientCpf)}
                             </Typography>
                         </Stack>
                     </Stack>
 
-                    <Stack direction="row" spacing={2} alignItems="center">
+                    <Stack direction="row" spacing={1}>
+                        {getExamsSummary().map((summary, index) => (
+                            <ExamSummary key={index} {...summary} />
+                        ))}
+                    </Stack>
+
+                    <Stack
+                        direction="row"
+                        spacing={2}
+                        alignItems="center"
+                        sx={{ ml: 'auto' }}
+                    >
                         <Tooltip title="Prescrição Médica">
                             <LocalHospitalIcon
                                 fontSize="small"
@@ -242,17 +300,34 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                 <CommentIcon fontSize="small" />
                             </Badge>
                         </Tooltip>
-                    </Stack>
-
-                    <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center', gap: 2 }}>
-                        <Stack direction="row" spacing={1}>
-                            {getExamsSummary().map((summary, index) => (
-                                <ExamSummary key={index} {...summary} />
-                            ))}
-                        </Stack>
+                        {/* <Tooltip title="Ver no Workflow">
+                            <IconButton
+                                size="small"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    window.location.href = `/dashboard/workflow?code=${request.code}`
+                                }}
+                                sx={{
+                                    backgroundColor: '#FF8046',
+                                    transition: 'all 0.2s ease-in-out',
+                                    '&:hover': {
+                                        backgroundColor: '#e5723f',
+                                        transform: 'scale(1.1)',
+                                    }
+                                }}
+                            >
+                                <SyncAltIcon
+                                    fontSize="small"
+                                    sx={{ color: '#fff' }}
+                                />
+                            </IconButton>
+                        </Tooltip> */}
                         <IconButton
                             size="small"
-                            onClick={() => setOpen(!open)}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                setOpen(!open)
+                            }}
                             sx={{
                                 transition: 'transform 0.3s ease-in-out',
                                 transform: open ? 'rotate(-180deg)' : 'rotate(0)',
@@ -261,7 +336,7 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                         >
                             <KeyboardArrowDownIcon />
                         </IconButton>
-                    </Box>
+                    </Stack>
                 </Box>
 
                 <Collapse in={open} timeout="auto" unmountOnExit>
@@ -277,10 +352,13 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                         Descrição
                                     </TableCell>
                                     <TableCell sx={{ fontWeight: 500, color: 'text.secondary', py: 1 }}>
-                                        Sala
+                                        Achados
                                     </TableCell>
                                     <TableCell align="right" sx={{ fontWeight: 500, color: 'text.secondary', py: 1 }}>
-                                        Status
+                                        Situação
+                                    </TableCell>
+                                    <TableCell align="right" sx={{ fontWeight: 500, color: 'text.secondary', py: 1 }}>
+                                        Ações
                                     </TableCell>
                                 </TableRow>
                             </TableHead>
@@ -296,17 +374,69 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                     >
                                         <TableCell>{exam.modality}</TableCell>
                                         <TableCell>{exam.description}</TableCell>
-                                        <TableCell>{exam.room}</TableCell>
+                                        <TableCell>Nenhum</TableCell>
                                         <TableCell align="right">
                                             <Chip
-                                                label={translateStatus(exam.status)}
-                                                color={getStatusColor(exam.status)}
+                                                label={exam.report?.status ? translateStatus(exam.report.status) : 'Sem laudo'}
+                                                color={getStatusColor(exam.report?.status)}
                                                 size="small"
                                                 sx={{
                                                     minWidth: 80,
                                                     fontWeight: 500
                                                 }}
                                             />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <Tooltip title={
+                                                exam.report?.status === 'SIGNED' ? 'Laudo já finalizado' :
+                                                    exam.report?.status === 'PENDING_REVIEW' ? 'Laudo em análise' :
+                                                        exam.report?.status === 'REVIEWED' ? 'Laudo em revisão' :
+                                                            exam.report?.status === 'DRAFT' ? 'Laudo em rascunho' :
+                                                                ''
+                                            }>
+                                                <span>
+                                                    <Button
+                                                        variant="contained"
+                                                        size="small"
+                                                        startIcon={<PlayArrowIcon />}
+                                                        disabled={exam.report?.status === 'SIGNED' || isCreatingReport}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            if (exam.report) {
+                                                                router.push(`/estudos/${exam.report.id}`)
+                                                            } else {
+                                                                handleCreateReport(exam.id)
+                                                            }
+                                                        }}
+                                                        sx={{
+                                                            background: 'linear-gradient(to bottom, #FF8046, #ff7339)',
+                                                            border: 'none',
+                                                            '&:hover': {
+                                                                background: 'linear-gradient(to bottom, #ff7339, #e5723f)',
+                                                                border: 'none',
+                                                            },
+                                                            '&.Mui-disabled': {
+                                                                background: '#ccc',
+                                                                color: '#666',
+                                                            },
+                                                            textTransform: 'none',
+                                                            fontWeight: 500,
+                                                            fontSize: '0.75rem',
+                                                            boxShadow: 'none',
+                                                            '&:active': {
+                                                                boxShadow: 'none',
+                                                                border: 'none',
+                                                            },
+                                                            '&.MuiButton-contained': {
+                                                                border: 'none',
+                                                            },
+                                                        }}
+                                                    >
+                                                        {isCreatingReport ? 'Criando...' :
+                                                            exam.report ? 'Continuar' : 'Iniciar laudo'}
+                                                    </Button>
+                                                </span>
+                                            </Tooltip>
                                         </TableCell>
                                     </TableRow>
                                 ))}

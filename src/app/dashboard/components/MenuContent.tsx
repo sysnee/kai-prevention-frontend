@@ -17,6 +17,8 @@ import { Groups2, MonitorHeart, SecurityOutlined, VerifiedUser } from '@mui/icon
 import { Divider } from '@mui/material'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
+import SyncAltIcon from '@mui/icons-material/SyncAlt'
+
 
 const mainListItems = [
   // {
@@ -36,7 +38,7 @@ const mainListItems = [
   },
   {
     text: 'Fluxo de trabalho',
-    icon: <MonitorHeart />,
+    icon: <SyncAltIcon />,
     path: '/dashboard/workflow'
   },
   {

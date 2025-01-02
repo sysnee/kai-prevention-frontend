@@ -5,7 +5,8 @@ import { ExamStatusEnum, ServiceStatus } from '@/app/types/pemissions/permission
 
 interface ExamStatusProps {
   examId: string;
-  name: string;
+  modality: string;
+  description: string;
   room: string;
   status: ServiceStatus;
   onStatusChange: (examId: string) => void;
@@ -14,7 +15,8 @@ interface ExamStatusProps {
 
 export function ExamStatus({
   examId,
-  name,
+  modality,
+  description,
   room,
   status,
   onStatusChange,
@@ -43,7 +45,7 @@ export function ExamStatus({
       }}
     >
       <div className="flex-1">
-        <h4 className="font-medium">{name}</h4>
+        <h4 className="font-medium">{description} - {modality}</h4>
         <div className="flex items-center mt-2">
           <span className="text-sm text-gray-500 mr-4">Sala:</span>
           <input

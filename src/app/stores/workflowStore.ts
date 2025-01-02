@@ -39,6 +39,17 @@ export interface ServiceRequest {
     description: string;
     room: string;
     status: string;
+    reportId?: string;
+    report: {
+      id: string;
+      status: string;
+      createdAt: string;
+      updatedAt: string;
+      createdBy: {
+        id: string;
+        name: string;
+      }
+    }
   }>;
   workflowNotes: WorkflowNote[];
   transitions: WorkflowTransition[];

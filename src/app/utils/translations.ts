@@ -1,5 +1,5 @@
 export const translateStatus = (status: string): string => {
-    const translations: { [key: string]: string } = {
+    const statusTranslations: Record<string, string> = {
         PLANNED: "PLANEJADO",
         WAITING: "AGUARDANDO",
         STARTED: "INICIADO",
@@ -12,6 +12,9 @@ export const translateStatus = (status: string): string => {
 
         // Exams
         PENDING: "PENDENTE",
+        DRAFT: 'Rascunho',
+        PENDING_REVIEW: 'Em revisão',
+        REVIEWED: 'Revisado',
     };
-    return translations[status] || status;
+    return statusTranslations[status] || status;
 };
