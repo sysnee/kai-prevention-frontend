@@ -2,7 +2,7 @@ import { RequestOptions } from 'http'
 import { getSession, signIn } from 'next-auth/react'
 import jwt from 'jsonwebtoken'
 
-let API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/v1'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/v1'
 
 async function handleResponse(response: any) {
   if (!response.ok) {
