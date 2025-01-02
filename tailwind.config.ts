@@ -17,7 +17,7 @@ export default {
         'frost-white': 'rgb(245, 255, 255)',
         'orange-icon': '#FF8046',
         kai: {
-          primary: '#FF8046',    // soft-blue for primary actions
+          primary: '#FF8046',
           secondary: 'rgb(67, 98, 117)',    // deep-blue for secondary elements
           accent: 'rgb(249, 255, 254)',     // seafoam-white for accents
           background: 'rgb(254, 255, 255)', // azure-white for backgrounds

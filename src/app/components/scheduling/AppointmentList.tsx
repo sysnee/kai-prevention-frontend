@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Clock, User, Edit2, Trash2, CalendarX, Eye } from 'lucide-react';
 import { Box, Skeleton } from '@mui/material';
 import { DataGrid, GridColDef, GridRowsProp } from '@mui/x-data-grid';
-import Link from 'next/link';
 import { ServiceRequest, useWorkflowStore } from '../../stores/workflowStore'
 import { useTheme } from '@mui/material';
 import { useRouter } from 'next/navigation'
 import api from '@/lib/api';
+import { translateStatus } from '@/app/utils/translations';
 
 // Interface do componente
 interface AppointmentListProps {
@@ -32,22 +32,6 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
   const [loading, setLoading] = useState(true);
   const theme = useTheme();
   const router = useRouter()
-
-  // Função para traduzir status
-  const translateStatus = (status: string): string => {
-    const translations: { [key: string]: string } = {
-      PLANNED: "PLANEJADO",
-      WAITING: "AGUARDANDO",
-      STARTED: "INICIADO",
-      ON_HOLD: "PAUSADO",
-      COMPLETED: "CONCLUÍDO",
-      IN_TRANSCRIPTION: "EM TRANSCRIÇÃO",
-      SIGNED: "LAUDADO",
-      CANCELED: "CANCELADO",
-      IN_REVISION: "EM REVISÃO"
-    };
-    return translations[status] || status;
-  };
 
   const { setSelectedAppointment } = useWorkflowStore()
 

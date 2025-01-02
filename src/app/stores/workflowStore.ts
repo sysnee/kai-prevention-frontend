@@ -20,9 +20,11 @@ export interface ServiceRequest {
   id: string;
   code: number;
   clientName: string;
+  clientBirthdate: string;
+  clientGender: string;
+  clientCpf: string;
   patientId: string;
   examType: string;
-  priority: 'low' | 'medium' | 'high';
   status: ServiceStatus | string;
   timeInStage: string;
   doctor: string;
@@ -33,8 +35,10 @@ export interface ServiceRequest {
   notes?: string;
   exams: Array<{
     id: string;
-    name: string;
+    modality: string;
+    description: string;
     room: string;
+    status: string;
   }>;
   workflowNotes: WorkflowNote[];
   transitions: WorkflowTransition[];
