@@ -25,11 +25,13 @@ export default function SideMenuMobile({ open, toggleDrawer }: SideMenuMobilePro
       open={open}
       onClose={toggleDrawer(false)}
       sx={{
-        zIndex: (theme) => theme.zIndex.drawer + 1,
-        [`& .${drawerClasses.paper}`]: {
-          backgroundImage: 'none',
-          backgroundColor: 'background.paper',
-        },
+        flexShrink: 0,
+        boxSizing: 'border-box',
+        '& .MuiDrawer-paper': {
+          border: theme => `1px solid ${theme.palette.divider}`,
+          backgroundColor: theme => theme.palette.mode === 'dark' ? '#867C74' : '#867C74',
+          color: theme => theme.palette.mode === 'dark' ? '#fff' : '#fff'
+        }
       }}
     >
       <Stack
