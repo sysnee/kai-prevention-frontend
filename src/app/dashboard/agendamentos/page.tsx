@@ -16,7 +16,10 @@ import { ptBR } from '@mui/x-date-pickers/locales';
 import { ptBR as ptBRCore } from '@mui/material/locale';
 
 export default function SchedulingList() {
-    const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([dayjs(), dayjs()]);
+    const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([
+        dayjs().subtract(2, 'day'),
+        dayjs().add(7, 'day')
+    ]);
     const [view, setView] = useState<'list' | 'calendar'>('list');
     const [loading, setLoading] = useState(true);
 

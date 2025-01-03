@@ -52,7 +52,6 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
   const fetchAppointments = async () => {
     setLoading(true)
     try {
-      // Formatar datas para a API
       const startDate = dateRange[0] ? formatDateForApi(dateRange[0]) : ''
       const endDate = dateRange[1] ? formatDateForApi(dateRange[1]) : ''
 
@@ -80,9 +79,7 @@ export function AppointmentList({ dateRange }: AppointmentListProps) {
 
   // Atualizar o useEffect para depender das datas
   useEffect(() => {
-    if (dateRange[0] && dateRange[1]) {
-      fetchAppointments()
-    }
+    fetchAppointments()
   }, [dateRange[0], dateRange[1]])
 
   const formattedDate = formatDate(dateRange[0] || new Date());
