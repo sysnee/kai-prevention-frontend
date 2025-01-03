@@ -22,21 +22,24 @@ export default function Workflow() {
   const [inRevision, setInRevision] = useState([])
   const [relevantFindings, setRelevantFindings] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [completedList, setCompletedList] = useState([])
 
   async function fetchWorkflowData() {
     try {
       setIsLoading(true)
-      const [planned, waiting, started, revision] = await Promise.all([
+      const [planned, waiting, started, revision, completed] = await Promise.all([
         api.get('service-requests?status=PLANNED&limit=20'),
         api.get('service-requests?status=WAITING&limit=20'),
         api.get('service-requests?status=STARTED&limit=20'),
-        api.get('service-requests?status=IN_REVISION&limit=20')
+        api.get('service-requests?status=IN_REVISION&limit=20'),
+        api.get('service-requests?status=COMPLETED&limit=20')
       ])
 
       setPlannedList(planned.data)
       setWaitingList(waiting.data)
       setStartedList(started.data)
       setInRevision(revision.data)
+      setCompletedList(completed.data)
       setRelevantFindings([])
     } catch (error) {
       console.error('Erro ao carregar dados do workflow:', error)
@@ -104,7 +107,7 @@ export default function Workflow() {
               waiting={waitingList}
               started={startedList}
               on_hold={[]}
-              completed={[]}
+              completed={completedList}
               transcription={[]}
               signed={[]}
               canceled={[]}

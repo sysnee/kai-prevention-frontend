@@ -51,6 +51,9 @@ export function WorkflowCard({ exam, index }: WorkflowCardProps) {
     }
   }
 
+  // Update the condition to hide pendencies for COMPLETED status
+  const shouldShowPendencies = hasDocumentsPending && exam.status !== 'COMPLETED';
+
   return (
     <Draggable draggableId={exam.id} index={index}>
       {(provided, snapshot) => (
@@ -65,7 +68,7 @@ export function WorkflowCard({ exam, index }: WorkflowCardProps) {
             style={{
               backgroundColor: theme.palette.background.default,
               border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)",
-              borderLeft: hasDocumentsPending && exam.stage !== 'started' ? '4px solid #F59E0B'
+              borderLeft: shouldShowPendencies ? '4px solid #F59E0B'
                 : (theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)")
             }}
           >
@@ -87,7 +90,7 @@ export function WorkflowCard({ exam, index }: WorkflowCardProps) {
               {exam.examType}
             </div>
 
-            {hasDocumentsPending && (exam.status !== 'COMPLETED' || exam.status !== 'STARTED') && (
+            {shouldShowPendencies && (
               <div className="mb-3 p-2 rounded-lg"
                 style={{
                   border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)"

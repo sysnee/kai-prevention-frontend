@@ -156,7 +156,8 @@ export function WorkflowBoard({
     planned,
     waiting,
     started,
-    in_revision
+    in_revision,
+    completed
   ])
 
   const handleDragEnd = async (result: any) => {
