@@ -87,7 +87,7 @@ export function WorkflowCard({ exam, index }: WorkflowCardProps) {
               {exam.examType}
             </div>
 
-            {hasDocumentsPending && exam.stage !== 'started' && (
+            {hasDocumentsPending && (exam.status !== 'COMPLETED' || exam.status !== 'STARTED') && (
               <div className="mb-3 p-2 rounded-lg"
                 style={{
                   border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)"
