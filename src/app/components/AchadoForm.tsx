@@ -67,6 +67,11 @@ export default function AchadoForm({
     onSubmit(formData);
   };
 
+  const getFormTitle = () => {
+    if (achadoToEdit) return achadoToEdit.titulo
+    return formData.severidade === "nenhuma" ? "Nova Observação" : "Novo Achado"
+  }
+
   return (
     <Box
       sx={(theme) => ({
@@ -84,7 +89,7 @@ export default function AchadoForm({
           marginBottom: "16px",
         }}
       >
-        {achadoToEdit ? achadoToEdit.titulo : "Novo achado"}
+        {getFormTitle()}
       </Typography>
 
       <Stack spacing={3}>
@@ -151,7 +156,10 @@ export default function AchadoForm({
             value={formData.severidade}
             onChange={handleChange}
           >
+            <FormControlLabel value="nenhuma" control={<Radio size="small" />} label="Nenhuma" />
             <FormControlLabel value="leve" control={<Radio size="small" />} label="Leve" />
+            <FormControlLabel value="normal" control={<Radio size="small" />} label="Normal" />
+            <FormControlLabel value="moderada" control={<Radio size="small" />} label="Moderada" />
             <FormControlLabel value="grave" control={<Radio size="small" />} label="Grave" />
           </RadioGroup>
         </FormControl>

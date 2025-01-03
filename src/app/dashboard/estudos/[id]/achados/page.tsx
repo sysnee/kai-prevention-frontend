@@ -88,22 +88,7 @@ export default function AchadosPage() {
                     wrap="wrap"
                     alignItems="flex-start"
                 >
-                    <Grid
-                        size={{ xs: 12, md: 5 }}
-                    >
-                        <Box>
-                            <Box
-                                component="img"
-                                src={db.estudos[0].imagens[0].link}
-                                alt="raio-x"
-                                sx={{
-                                    width: "100%",
-                                    height: "auto"
-                                }}
-                                className="rounded-lg cursor-pointer border"
-                            />
-                        </Box>
-                    </Grid>
+
 
                     <Grid
                         size={{ xs: 12, md: 7 }}
@@ -151,7 +136,7 @@ export default function AchadosPage() {
                                             fontSize: "12px"
                                         })}
                                     >
-                                        Exame normal
+                                        Nada a adicionar
                                     </Box>
                                 }
                             />
@@ -235,6 +220,22 @@ export default function AchadosPage() {
                                     </Typography>
                                 )}
                             </Stack>
+                        </Box>
+                    </Grid>
+                    <Grid
+                        size={{ xs: 12, md: 5 }}
+                    >
+                        <Box>
+                            <Box
+                                component="img"
+                                src={db.estudos[0].imagens[0].link}
+                                alt="raio-x"
+                                sx={{
+                                    width: "100%",
+                                    height: "auto"
+                                }}
+                                className="rounded-lg cursor-pointer border"
+                            />
                         </Box>
                     </Grid>
                 </Grid>

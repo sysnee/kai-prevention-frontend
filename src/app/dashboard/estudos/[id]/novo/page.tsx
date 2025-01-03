@@ -13,7 +13,7 @@ export default function EstudoDetailPage() {
     const { id } = useParams()
 
     const [estudo, setEstudo] = useState<Estudo | null>(null)
-    const [selectedImages, setSelectedImages] = useState<Imagem[]>([])
+    const [selectedImage, setSelectedImage] = useState<Imagem | null>(null)
 
     async function getEstudo() {
         try {
@@ -23,20 +23,17 @@ export default function EstudoDetailPage() {
                 throw new Error("Estudo não encontrado");
             }
 
-            // Filtrando imagens do estudo
-            // const images = db.imagens.filter(imagem => imagem.estudoId === estudoData.id)
             setEstudo(estudoData)
         } catch (error) {
             console.log("Erro ao buscar estudo: ", error)
         }
     }
 
-
     function handleImageSelection(imagem: Imagem, isSelected: boolean) {
         if (isSelected) {
-            setSelectedImages(prev => [...prev, imagem])
+            setSelectedImage(imagem)
         } else {
-            setSelectedImages(prev => prev.filter(img => img.id !== imagem.id));
+            setSelectedImage(null)
         }
     }
 
@@ -91,7 +88,7 @@ export default function EstudoDetailPage() {
                                 color: theme.palette.text.primary
                             })}
                         >
-                            Escolha as imagens para adicionar seus achados
+                            Selecione uma imagem para adicionar seus achados
                         </Box>
                     ) : (
                         <Box
@@ -112,31 +109,26 @@ export default function EstudoDetailPage() {
                     marginTop={1}
                     wrap="wrap"
                 >
-                    {estudo && (
-                        estudo.imagens.length > 0 && (
-                            estudo?.imagens.map(imagem => (
-                                <Grid
-                                    key={imagem.id}
-                                    size={{ xs: 3, sm: 2, md: 1.5, lg: 1 }}
-                                // xs={3}
-                                // sm={2}
-                                // md={1.5}
-                                // lg={1}
-                                >
-                                    <ImageEstudo
-                                        imagem={imagem}
-                                        onSelect={handleImageSelection}
-                                        width={400}
-                                        height={450}
-                                    />
-                                </Grid>
-                            ))
-                        )
+                    {estudo && estudo.imagens.length > 0 && (
+                        estudo.imagens.map(imagem => (
+                            <Grid
+                                key={imagem.id}
+                                size={{ xs: 3, sm: 2, md: 1.5, lg: 1 }}
+                            >
+                                <ImageEstudo
+                                    imagem={imagem}
+                                    onSelect={handleImageSelection}
+                                    width={400}
+                                    height={450}
+                                    isSelected={selectedImage?.id === imagem.id}
+                                />
+                            </Grid>
+                        ))
                     )}
                 </Grid>
             </Box>
 
-            {selectedImages.length > 0 && (
+            {selectedImage && (
                 <Box
                     sx={(theme) => ({
                         marginTop: "3em",
@@ -151,6 +143,7 @@ export default function EstudoDetailPage() {
                     })}
                 >
                     <Button
+                        onClick={() => setSelectedImage(null)}
                         sx={(theme) => ({
                             backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
                             border: "1px solid #e5e7eb"

@@ -4,18 +4,22 @@ import Image from "next/image";
 import { useState } from "react";
 import { Imagem } from "../types/types";
 
-export default function ImageEstudo({imagem, onSelect, width = 90, height = 90}: {imagem: Imagem, onSelect?: (imagem: Imagem, isSelected: boolean) => void, width?: number, height?: number}){
-    const [isSelected, setIsSelected] = useState(false)
+interface ImageEstudoProps {
+    imagem: Imagem
+    onSelect?: (imagem: Imagem, isSelected: boolean) => void
+    width?: number
+    height?: number
+    isSelected?: boolean
+}
 
-    function toggleSelection(){
-        const newSelectionState = !isSelected
-        setIsSelected(newSelectionState)
+export default function ImageEstudo({ imagem, onSelect, width = 90, height = 90, isSelected = false }: ImageEstudoProps) {
+    function toggleSelection() {
         if (onSelect) {
-            onSelect(imagem, newSelectionState)
+            onSelect(imagem, !isSelected)
         }
     }
 
-    return(
+    return (
         <Box
             sx={{
                 display: "flex",
@@ -30,7 +34,7 @@ export default function ImageEstudo({imagem, onSelect, width = 90, height = 90}:
                     fontSize: '12px',
                     color: theme.palette.text.primary,
                 })}
-                >
+            >
                 img {imagem.id}
             </Box>
             {isSelected ? (
@@ -58,9 +62,9 @@ export default function ImageEstudo({imagem, onSelect, width = 90, height = 90}:
                             top: 0,
                             right: 6
                         }}
-                     />
+                    />
                 </Box>
-            ): (
+            ) : (
                 <Box
                     sx={{
                         position: "relative",

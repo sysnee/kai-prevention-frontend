@@ -38,7 +38,6 @@ import { maskCPF } from '@/app/utils/format'
 import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { CheckCircleIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import api from '@/lib/api'
 import { showToast } from '@/lib/toast'
 
 interface ServiceRequestItemProps {
@@ -128,7 +127,6 @@ function ExamSummary({ modality, status, color }: ExamSummaryProps) {
 function ServiceRequestItem({ request }: ServiceRequestItemProps) {
     const router = useRouter()
     const [open, setOpen] = useState(false)
-    const [isCreatingReport, setIsCreatingReport] = useState(false)
 
     const getStatusColor = (status: string | undefined) => {
         const statusMap: Record<string, "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"> = {
@@ -166,25 +164,8 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
         return `${age} anos`
     }
 
-    const handleCreateReport = async (examId: string) => {
-        try {
-            setIsCreatingReport(true)
-            const data = await api.post(`/reports`, {
-                examId,
-                status: 'DRAFT'
-            })
-
-            router.push(`/estudos/${data.id}`)
-        } catch (error: any) {
-            console.error('Error creating report:', error)
-            showToast.error(
-                error.message.includes('Network')
-                    ? 'Erro de conexão com o servidor'
-                    : error.message || 'Erro ao criar laudo'
-            )
-        } finally {
-            setIsCreatingReport(false)
-        }
+    const handleStartReport = (examId: string) => {
+        router.push(`/dashboard/estudos/1/novo`)
     }
 
     return (
@@ -399,13 +380,13 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                                         variant="contained"
                                                         size="small"
                                                         startIcon={<PlayArrowIcon />}
-                                                        disabled={exam.report?.status === 'SIGNED' || isCreatingReport}
+                                                        disabled={exam.report?.status === 'SIGNED'}
                                                         onClick={(e) => {
                                                             e.stopPropagation()
                                                             if (exam.report) {
                                                                 router.push(`/estudos/${exam.report.id}`)
                                                             } else {
-                                                                handleCreateReport(exam.id)
+                                                                handleStartReport(exam.id)
                                                             }
                                                         }}
                                                         sx={{
@@ -432,8 +413,7 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                                             },
                                                         }}
                                                     >
-                                                        {isCreatingReport ? 'Criando...' :
-                                                            exam.report ? 'Continuar' : 'Iniciar laudo'}
+                                                        {exam.report ? 'Continuar' : 'Iniciar laudo'}
                                                     </Button>
                                                 </span>
                                             </Tooltip>
