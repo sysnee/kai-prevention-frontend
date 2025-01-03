@@ -14,7 +14,8 @@ import {
   FileCheck,
   XCircle,
   AlertOctagon,
-  ClockIcon
+  ClockIcon,
+  AlertCircle
 } from 'lucide-react';
 import { WorkflowConfirmationDialog } from './dialogs/WorkflowConfirmationDialog'
 import toast from 'react-hot-toast'
@@ -70,6 +71,13 @@ export const WORKFLOW_STAGES = [
     description: 'Exames em revisão'
   },
   {
+    id: 'RELEVANT_FINDINGS',
+    title: 'Achados Relevantes',
+    icon: AlertCircle,
+    color: 'text-rose-500',
+    description: 'Exames com achados importantes'
+  },
+  {
     id: 'SIGNED',
     title: 'Laudado',
     icon: FileCheck,
@@ -98,6 +106,7 @@ interface WorkflowBoardProps {
   searchQuery: string;
   selectedStatus: string | null;
   selectedDate: Date;
+  relevant_findings: any[];
 }
 
 export function WorkflowBoard({
@@ -112,7 +121,8 @@ export function WorkflowBoard({
   in_revision,
   searchQuery,
   selectedStatus,
-  selectedDate
+  selectedDate,
+  relevant_findings = []
 }: WorkflowBoardProps) {
   const { serviceRequests, moveExam, setServiceRequests } = useWorkflowStore();
   const [confirmationDialog, setConfirmationDialog] = useState<{

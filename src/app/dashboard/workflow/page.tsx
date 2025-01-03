@@ -20,6 +20,7 @@ export default function Workflow() {
   const [waitingList, setWaitingList] = useState([])
   const [startedList, setStartedList] = useState([])
   const [inRevision, setInRevision] = useState([])
+  const [relevantFindings, setRelevantFindings] = useState([])
   const [isLoading, setIsLoading] = useState(true)
 
   async function fetchWorkflowData() {
@@ -36,6 +37,7 @@ export default function Workflow() {
       setWaitingList(waiting.data)
       setStartedList(started.data)
       setInRevision(revision.data)
+      setRelevantFindings([])
     } catch (error) {
       console.error('Erro ao carregar dados do workflow:', error)
     } finally {
@@ -107,6 +109,7 @@ export default function Workflow() {
               signed={[]}
               canceled={[]}
               in_revision={inRevision}
+              relevant_findings={relevantFindings}
               searchQuery={searchQuery}
               selectedStatus={selectedStatus}
               selectedDate={selectedDate}

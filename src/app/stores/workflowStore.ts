@@ -6,25 +6,17 @@ import { ServiceStatus } from '../types/pemissions/permissions';
 import api from '@/lib/api';
 
 export const STAGE_ORDER = {
-  'PLANNED': 0,
-  'WAITING': 1,
-  'STARTED': 2,
-  'ON_HOLD': 3,
-  'COMPLETED': 4,
-  'IN_TRANSCRIPTION': 5,
-  'IN_REVISION': 6,
-  'SIGNED': 7,
-  'CANCELED': 8,
-  'planned': 0,
-  'waiting': 1,
-  'started': 2,
-  'on_hold': 3,
-  'completed': 4,
-  'in_transcription': 5,
-  'in_revision': 6,
-  'signed': 7,
-  'canceled': 8
-}
+  PLANNED: 0,
+  WAITING: 1,
+  STARTED: 2,
+  ON_HOLD: 3,
+  COMPLETED: 4,
+  IN_TRANSCRIPTION: 5,
+  IN_REVISION: 6,
+  RELEVANT_FINDINGS: 7,
+  SIGNED: 8,
+  CANCELED: 9
+} as const
 
 interface Appointment {
   id: string;
