@@ -39,6 +39,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { CheckCircleIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { showToast } from '@/lib/toast'
+import api from '@/lib/api'
 
 interface ServiceRequestItemProps {
     request: ServiceRequest
@@ -48,6 +49,12 @@ interface ExamSummaryProps {
     modality: string
     status: string
     color: "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"
+}
+
+interface CreateReportDto {
+    examId: string
+    status?: string
+    content?: string
 }
 
 // Instead of custom SVG icons, use Typography with Unicode symbols
@@ -164,8 +171,20 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
         return `${age} anos`
     }
 
-    const handleStartReport = (examId: string) => {
-        router.push(`/dashboard/estudos/1/novo`)
+    const handleStartReport = async (examId: string) => {
+        try {
+            const dto: CreateReportDto = {
+                examId
+            }
+
+            const response = await api.post('reports', dto)
+
+            // Navigate to the new report using the returned ID
+            router.push(`/dashboard/estudos/${response.id}/novo`)
+        } catch (error) {
+            showToast.error('Erro ao criar laudo')
+            console.error('Error creating report:', error)
+        }
     }
 
     return (
