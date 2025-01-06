@@ -43,12 +43,12 @@ export default function ImageEstudo({ imagem, onSelect, width = 90, height = 90,
                         alt="raio-x"
                         width={width}
                         height={height}
-                        className="rounded-md cursor-pointer border-2 border-green-500"
+                        className="rounded-md cursor-pointer border-2 border-[#FF8046]"
                     />
 
                     <CheckBox
                         sx={{
-                            color: "#00b875",
+                            color: "#FF8046",
                             position: "absolute",
                             top: 0,
                             right: 6
