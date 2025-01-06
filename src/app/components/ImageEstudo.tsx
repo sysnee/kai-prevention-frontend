@@ -28,15 +28,6 @@ export default function ImageEstudo({ imagem, onSelect, width = 90, height = 90,
                 gap: ".3em"
             }}
         >
-            <Box
-                component="span"
-                sx={(theme) => ({
-                    fontSize: '12px',
-                    color: theme.palette.text.primary,
-                })}
-            >
-                img {imagem.id}
-            </Box>
             {isSelected ? (
                 <Box
                     sx={{
