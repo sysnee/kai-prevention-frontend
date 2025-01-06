@@ -16,15 +16,19 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import { Imagem } from "@/app/types/types";
 
 export default function AchadoForm({
   onCancel,
   onSubmit,
-  achadoToEdit
+  achadoToEdit,
+  selectedImage
 }: {
   onCancel: () => void,
   onSubmit: (formData: any) => void,
-  achadoToEdit?: any
+  achadoToEdit?: any,
+  selectedImage?: Imagem | null
 }) {
 
   const theme = useTheme();
@@ -91,6 +95,21 @@ export default function AchadoForm({
       >
         {getFormTitle()}
       </Typography>
+
+      {selectedImage && (
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+            Imagem anexada:
+          </Typography>
+          <Image
+            src={selectedImage.link}
+            alt="Imagem anexada"
+            width={100}
+            height={100}
+            className="rounded-md mt-1"
+          />
+        </Box>
+      )}
 
       <Stack spacing={3}>
         <FormControl fullWidth>

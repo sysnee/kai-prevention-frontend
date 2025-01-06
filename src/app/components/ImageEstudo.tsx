@@ -1,5 +1,7 @@
-import CheckBox from "@mui/icons-material/CheckBox";
-import { Box } from "@mui/material";
+import { Checkbox } from "@mui/material";
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import { Box, Modal } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
 import { Imagem } from "../types/types";
@@ -10,70 +12,178 @@ interface ImageEstudoProps {
     width?: number
     height?: number
     isSelected?: boolean
+    showCheckbox?: boolean
 }
 
-export default function ImageEstudo({ imagem, onSelect, width = 90, height = 90, isSelected = false }: ImageEstudoProps) {
-    function toggleSelection() {
+export default function ImageEstudo({ imagem, onSelect, width = 90, height = 90, isSelected = false, showCheckbox = true }: ImageEstudoProps) {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    function toggleSelection(e: React.MouseEvent) {
+        e.stopPropagation();
         if (onSelect) {
             onSelect(imagem, !isSelected)
         }
     }
 
     return (
-        <Box
-            sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "start",
-                gap: ".3em"
-            }}
-        >
-            {isSelected ? (
-                <Box
-                    sx={{
-                        position: "relative",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                    }}
-                >
-                    <Image
-                        onClick={toggleSelection}
-                        src={imagem.link}
-                        alt="raio-x"
-                        width={width}
-                        height={height}
-                        className="rounded-md cursor-pointer border-2 border-[#FF8046]"
-                    />
-
-                    <CheckBox
+        <>
+            <Box
+                sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    gap: ".3em",
+                    transition: "all 0.3s ease-in-out",
+                    transform: isSelected ? "scale(1.05)" : "scale(1)",
+                    zIndex: isSelected ? 1 : 0,
+                    width: isSelected ? '100%' : 'auto',
+                    gridColumn: isSelected ? '1 / -1' : 'auto',
+                }}
+            >
+                {isSelected ? (
+                    <Box
+                        onClick={() => setIsModalOpen(true)}
                         sx={{
-                            color: "#FF8046",
-                            position: "absolute",
-                            top: 0,
-                            right: 6
+                            position: "relative",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            '&:hover': {
+                                transform: 'scale(1.02)',
+                                transition: 'transform 0.2s ease-in-out'
+                            }
                         }}
-                    />
-                </Box>
-            ) : (
+                    >
+                        <Image
+                            onClick={toggleSelection}
+                            src={imagem.link}
+                            alt="raio-x"
+                            width={width}
+                            height={height}
+                            className="rounded-md cursor-pointer border-2 border-[#FF8046]"
+                        />
+
+                        {showCheckbox && (
+                            <CheckBoxIcon
+                                onClick={toggleSelection}
+                                sx={{
+                                    color: "#FF8046",
+                                    position: "absolute",
+                                    top: 8,
+                                    right: 8,
+                                    fontSize: '28px',
+                                    animation: "fadeIn 0.3s ease-in-out",
+                                    "@keyframes fadeIn": {
+                                        "0%": {
+                                            opacity: 0,
+                                            transform: "scale(0.8)",
+                                        },
+                                        "100%": {
+                                            opacity: 1,
+                                            transform: "scale(1)",
+                                        },
+                                    },
+                                }}
+                            />
+                        )}
+                    </Box>
+                ) : (
+                    <Box
+                        onClick={() => setIsModalOpen(true)}
+                        sx={{
+                            position: "relative",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            width: '100px',
+                            height: '100px',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                                transition: 'transform 0.2s ease-in-out'
+                            }
+                        }}
+                    >
+                        <Image
+                            onClick={toggleSelection}
+                            src={imagem.link}
+                            alt="raio-x"
+                            width={100}
+                            height={100}
+                            className="rounded-md border border-gray-200 cursor-pointer transition-all duration-200 hover:border-[#FF8046]/50"
+                            style={{
+                                objectFit: 'cover',
+                                width: '100%',
+                                height: '100%'
+                            }}
+                        />
+                    </Box>
+                )}
+            </Box>
+
+            <Modal
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                aria-labelledby="image-modal"
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
                 <Box
                     sx={{
-                        position: "relative",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center"
+                        position: 'relative',
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 2,
+                        maxWidth: '90vw',
+                        maxHeight: '90vh',
+                        borderRadius: '8px',
+                        outline: 'none',
                     }}
                 >
                     <Image
-                        onClick={toggleSelection}
                         src={imagem.link}
                         alt="raio-x"
-                        width={width}
-                        height={height}
-                        className="rounded-md border border-gray-200 cursor-pointer"
+                        width={800}
+                        height={800}
+                        style={{
+                            objectFit: 'contain',
+                            width: '100%',
+                            height: 'auto',
+                            maxHeight: '80vh'
+                        }}
+                        className="rounded-md"
                     />
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            display: 'flex',
+                            gap: 1
+                        }}
+                    >
+                        <Checkbox
+                            checked={isSelected}
+                            onClick={(e) => {
+                                toggleSelection(e);
+                                setIsModalOpen(false);
+                            }}
+                            sx={{
+                                color: isSelected ? "#FF8046" : "gray",
+                                backgroundColor: 'white',
+                                borderRadius: '4px',
+                                '&:hover': {
+                                    backgroundColor: 'rgba(255, 255, 255, 0.9)'
+                                }
+                            }}
+                        />
+                    </Box>
                 </Box>
-            )}
-        </Box>
+            </Modal>
+        </>
     )
 }

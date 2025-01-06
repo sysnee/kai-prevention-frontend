@@ -8,7 +8,8 @@ import { Check, KeyboardArrowLeft } from "@mui/icons-material";
 import AddIcon from '@mui/icons-material/Add';
 import AchadoCard from "@/app/components/AchadoCard";
 import AchadoForm from "@/app/components/AchadoForm";
-import { Achado } from "@/app/types/types";
+import { Achado, Imagem } from "@/app/types/types";
+import ImageEstudo from "@/app/components/ImageEstudo";
 
 export default function AchadosPage() {
 
@@ -16,6 +17,7 @@ export default function AchadosPage() {
     const [isExamNormalChecked, setIsExamNormalChecked] = useState(false)
     const [editAchado, setEditAchado] = useState<Achado | null>(null);
     const [achados, setAchados] = useState<Achado[]>([]);
+    const [selectedImage, setSelectedImage] = useState<Imagem | null>(null);
 
     function handleAddAchado(achado: Achado) {
         const ultimoAchado = achados[achados.length - 1];
@@ -26,7 +28,7 @@ export default function AchadosPage() {
             id: novoId.toString(),
             titulo: `Achado ${novoId}`,
             laudoId: "1",
-            imageId: "1",
+            imageId: selectedImage?.id || "",
         }
 
         setAchados([...achados, novoAchado]);
@@ -40,6 +42,10 @@ export default function AchadosPage() {
         setAchados(updatedAchados);
         setEditAchado(null);
         setIsFormVisible(false);
+    }
+
+    function handleImageSelection(imagem: Imagem, isSelected: boolean) {
+        setSelectedImage(isSelected ? imagem : null);
     }
 
     return (
@@ -72,7 +78,7 @@ export default function AchadosPage() {
                         fontSize: "22px"
                     })}
                 >
-                    Img {db.achados[0].imagemId}
+                    Novos achados
                 </Box>
             </Box>
 
@@ -224,19 +230,76 @@ export default function AchadosPage() {
                     </Grid>
                     <Grid
                         size={{ xs: 12, md: 5 }}
+                        sx={(theme) => ({
+                            padding: 2,
+                            backgroundColor: theme.palette.mode === 'light' ? "#f5f6fa" : "transparent",
+                            borderRadius: "5px",
+                            border: theme.palette.mode === 'light' ? "none" : "1px solid hsla(220, 20%, 25%, 0.6)"
+                        })}
                     >
-                        <Box>
-                            <Box
-                                component="img"
-                                src={db.estudos[0].imagens[0].link}
-                                alt="raio-x"
+                        <Stack spacing={2}>
+                            <Typography
+                                sx={(theme) => ({
+                                    fontSize: "16px",
+                                    color: theme.palette.text.primary
+                                })}
+                            >
+                                Selecione uma <Box component="span" sx={{ color: '#FF8046' }}>imagem</Box> para anexar ao achado:
+                            </Typography>
+
+                            {selectedImage && (
+                                <Box
+                                    sx={(theme) => ({
+                                        padding: 2,
+                                        backgroundColor: theme.palette.mode === 'light' ? "#fff" : "transparent",
+                                        borderRadius: "8px",
+                                        border: "1px solid rgba(0, 0, 0, 0.1)",
+                                        marginBottom: 2
+                                    })}
+                                >
+                                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                        Imagem selecionada:
+                                    </Typography>
+                                    <ImageEstudo
+                                        imagem={selectedImage}
+                                        onSelect={handleImageSelection}
+                                        width={400}
+                                        height={200}
+                                        isSelected={true}
+                                        showCheckbox={false}
+                                    />
+                                </Box>
+                            )}
+
+                            <Grid
+                                container
+                                spacing={1.5}
                                 sx={{
-                                    width: "100%",
-                                    height: "auto"
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
+                                    gap: '12px',
                                 }}
-                                className="rounded-lg cursor-pointer border"
-                            />
-                        </Box>
+                            >
+                                {db.estudos[0].imagens
+                                    .filter(imagem => imagem.id !== selectedImage?.id)
+                                    .map(imagem => (
+                                        <Grid
+                                            key={imagem.id}
+                                            sx={{
+                                                width: '100%',
+                                            }}
+                                        >
+                                            <ImageEstudo
+                                                imagem={imagem}
+                                                onSelect={handleImageSelection}
+                                                width={150}
+                                                height={150}
+                                                isSelected={selectedImage?.id === imagem.id}
+                                            />
+                                        </Grid>
+                                    ))}
+                            </Grid>
+                        </Stack>
                     </Grid>
                 </Grid>
             </Box>
