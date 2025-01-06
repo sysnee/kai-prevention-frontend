@@ -105,7 +105,7 @@ export default function AchadoForm({
           {getFormTitle()}
         </Typography>
 
-        {selectedImage && (
+        {selectedImage ? (
           <Typography
             variant="caption"
             sx={{
@@ -129,23 +129,32 @@ export default function AchadoForm({
             />
             Imagem anexada
           </Typography>
+        ) : (
+          <Typography
+            variant="caption"
+            sx={{
+              backgroundColor: '#FFF3DC',
+              color: '#FFB020',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: '#FFB020',
+              }}
+            />
+            Sem imagem anexada
+          </Typography>
         )}
       </Box>
-
-      {selectedImage && (
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            Imagem anexada:
-          </Typography>
-          <Image
-            src={selectedImage.link}
-            alt="Imagem anexada"
-            width={100}
-            height={100}
-            className="rounded-md mt-1"
-          />
-        </Box>
-      )}
 
       <Stack spacing={3}>
         <FormControl fullWidth>
