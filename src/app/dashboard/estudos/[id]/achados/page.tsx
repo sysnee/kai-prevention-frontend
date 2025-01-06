@@ -46,6 +46,9 @@ export default function AchadosPage() {
 
     function handleImageSelection(imagem: Imagem, isSelected: boolean) {
         setSelectedImage(isSelected ? imagem : null);
+        if (isSelected) {
+            setIsFormVisible(true);
+        }
     }
 
     return (
@@ -194,6 +197,7 @@ export default function AchadosPage() {
                                         setEditAchado(null)
                                     }}
                                     onSubmit={editAchado ? handleEditAchado : handleAddAchado}
+                                    selectedImage={selectedImage}
                                 />
                             </Box>
                         )}

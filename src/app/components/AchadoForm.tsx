@@ -23,12 +23,14 @@ export default function AchadoForm({
   onCancel,
   onSubmit,
   achadoToEdit,
-  selectedImage
+  selectedImage,
+  showCheckbox = true
 }: {
   onCancel: () => void,
   onSubmit: (formData: any) => void,
   achadoToEdit?: any,
-  selectedImage?: Imagem | null
+  selectedImage?: Imagem | null,
+  showCheckbox?: boolean
 }) {
 
   const theme = useTheme();
@@ -86,15 +88,49 @@ export default function AchadoForm({
         backgroundColor: theme.palette.mode === 'light' ? "#fff" : "transparent",
       })}
     >
-      <Typography
+      <Box
         sx={{
-          fontSize: "20px",
-          fontWeight: "bold",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           marginBottom: "16px",
         }}
       >
-        {getFormTitle()}
-      </Typography>
+        <Typography
+          sx={{
+            fontSize: "20px",
+            fontWeight: "bold",
+          }}
+        >
+          {getFormTitle()}
+        </Typography>
+
+        {selectedImage && (
+          <Typography
+            variant="caption"
+            sx={{
+              backgroundColor: '#FF804620',
+              color: '#FF8046',
+              padding: '4px 8px',
+              borderRadius: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: '#FF8046',
+              }}
+            />
+            Imagem anexada
+          </Typography>
+        )}
+      </Box>
 
       {selectedImage && (
         <Box sx={{ mb: 2 }}>
