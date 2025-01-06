@@ -2,14 +2,15 @@
 
 import { useState } from "react"
 import db from "../../../../../../db.json"
-import { Box, Button, Checkbox, FormControlLabel, Grid2 as Grid, Stack, Typography } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Grid2 as Grid, Stack, Typography, Modal } from "@mui/material";
 import Link from "next/link";
-import { Check, KeyboardArrowLeft } from "@mui/icons-material";
+import { Check, KeyboardArrowLeft, Close, ZoomIn } from "@mui/icons-material";
 import AddIcon from '@mui/icons-material/Add';
 import AchadoCard from "@/app/components/AchadoCard";
 import AchadoForm from "@/app/components/AchadoForm";
 import { Achado, Imagem } from "@/app/types/types";
 import ImageEstudo from "@/app/components/ImageEstudo";
+import Image from "next/image";
 
 export default function AchadosPage() {
 
@@ -18,6 +19,7 @@ export default function AchadosPage() {
     const [editAchado, setEditAchado] = useState<Achado | null>(null);
     const [achados, setAchados] = useState<Achado[]>([]);
     const [selectedImage, setSelectedImage] = useState<Imagem | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     function handleAddAchado(achado: Achado) {
         const ultimoAchado = achados[achados.length - 1];
@@ -248,7 +250,7 @@ export default function AchadosPage() {
                                     color: theme.palette.text.primary
                                 })}
                             >
-                                Selecione uma <Box component="span" sx={{ color: '#FF8046' }}>imagem</Box> para anexar ao achado:
+                                Selecione uma <Box component="span" sx={{ color: '#FF8046' }}>imagem chave</Box> para anexar ao achado:
                             </Typography>
 
                             {selectedImage && (
@@ -264,14 +266,90 @@ export default function AchadosPage() {
                                     <Typography variant="subtitle2" sx={{ mb: 1 }}>
                                         Imagem selecionada:
                                     </Typography>
-                                    <ImageEstudo
-                                        imagem={selectedImage}
-                                        onSelect={handleImageSelection}
-                                        width={400}
-                                        height={200}
-                                        isSelected={true}
-                                        showCheckbox={false}
-                                    />
+                                    <Box
+                                        sx={{
+                                            position: 'relative',
+                                            width: '100%',
+                                            height: '100%',
+                                            '&:hover .action-buttons': {
+                                                opacity: 1,
+                                            },
+                                        }}
+                                    >
+                                        <ImageEstudo
+                                            imagem={selectedImage}
+                                            onSelect={handleImageSelection}
+                                            width={400}
+                                            height={200}
+                                            isSelected={true}
+                                            showCheckbox={false}
+                                            onZoom={() => setIsModalOpen(true)}
+                                        />
+                                        <Box
+                                            className="action-buttons"
+                                            sx={{
+                                                position: 'absolute',
+                                                left: -5,
+                                                right: -5,
+                                                bottom: -5,
+                                                display: 'flex',
+                                                flexDirection: 'row',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                gap: 2,
+                                                padding: '16px',
+                                                opacity: 0,
+                                                transition: 'opacity 0.2s ease-in-out',
+                                                '&::before': {
+                                                    content: '""',
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    right: 0,
+                                                    bottom: 0,
+                                                    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+                                                    filter: 'blur(8px)',
+                                                    backdropFilter: 'blur(4px)',
+                                                    WebkitBackdropFilter: 'blur(4px)',
+                                                },
+                                                '& > *': {
+                                                    position: 'relative',
+                                                    zIndex: 1
+                                                }
+                                            }}
+                                        >
+
+                                            <Button
+                                                onClick={() => setIsModalOpen(true)}
+                                                size="small"
+                                                startIcon={<ZoomIn sx={{ color: '#FF8046' }} />}
+                                                sx={{
+                                                    backgroundColor: 'transparent',
+                                                    color: '#FF8046',
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                                    }
+                                                }}
+                                            >
+                                                Zoom
+                                            </Button>
+
+                                            <Button
+                                                onClick={() => setSelectedImage(null)}
+                                                size="small"
+                                                startIcon={<Close sx={{ color: '#FF8046' }} />}
+                                                sx={{
+                                                    backgroundColor: 'transparent',
+                                                    color: '#FF8046',
+                                                    '&:hover': {
+                                                        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                                                    }
+                                                }}
+                                            >
+                                                Remover anexo
+                                            </Button>
+                                        </Box>
+                                    </Box>
                                 </Box>
                             )}
 
@@ -299,6 +377,7 @@ export default function AchadosPage() {
                                                 width={150}
                                                 height={150}
                                                 isSelected={selectedImage?.id === imagem.id}
+                                                onZoom={() => setIsModalOpen(true)}
                                             />
                                         </Grid>
                                     ))}
@@ -307,6 +386,44 @@ export default function AchadosPage() {
                     </Grid>
                 </Grid>
             </Box>
+
+            <Modal
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                aria-labelledby="image-modal"
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                }}
+            >
+                <Box
+                    sx={{
+                        position: 'relative',
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 2,
+                        maxWidth: '90vw',
+                        maxHeight: '90vh',
+                        borderRadius: '8px',
+                        outline: 'none',
+                    }}
+                >
+                    <Image
+                        src={selectedImage?.link || ''}
+                        alt="Imagem ampliada"
+                        width={800}
+                        height={800}
+                        style={{
+                            objectFit: 'contain',
+                            width: '100%',
+                            height: 'auto',
+                            maxHeight: '80vh'
+                        }}
+                        className="rounded-md"
+                    />
+                </Box>
+            </Modal>
         </Box>
     )
 }

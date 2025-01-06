@@ -73,9 +73,14 @@ export default function AchadoForm({
     onSubmit(formData);
   };
 
-  const getFormTitle = () => {
-    if (achadoToEdit) return achadoToEdit.titulo
-    return formData.severidade === "nenhuma" ? "Nova Observação" : "Novo Achado"
+  function getFormTitle() {
+    if (achadoToEdit) return achadoToEdit.titulo;
+    return formData.severidade === "nenhuma" ? "Nova Observação" : "Novo Achado";
+  }
+
+  function getButtonText() {
+    if (achadoToEdit) return "Salvar alterações";
+    return formData.severidade === "nenhuma" ? "Salvar observação" : "Salvar achado";
   }
 
   return (
@@ -276,7 +281,7 @@ export default function AchadoForm({
             <Typography sx={(theme) => ({
               color: theme.palette.mode === 'light' ? '#fff' : '#000'
             })}>
-              {achadoToEdit ? "Salvar alterações" : "Salvar achado"}
+              {getButtonText()}
             </Typography>
           </Button>
         </Stack>
