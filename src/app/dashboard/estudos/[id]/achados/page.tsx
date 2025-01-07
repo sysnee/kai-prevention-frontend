@@ -225,13 +225,15 @@ export default function AchadosPage() {
                                         }}
                                     />
                                 ))) : (
-                                    <Typography
-                                        sx={{
-                                            fontSize: "13px"
-                                        }}
-                                    >
-                                        Não foram encontrados achados.
-                                    </Typography>
+                                    !isFormVisible && (
+                                        <Typography
+                                            sx={{
+                                                fontSize: "13px"
+                                            }}
+                                        >
+                                            Não foram encontrados achados.
+                                        </Typography>
+                                    )
                                 )}
                             </Stack>
                         </Box>
