@@ -28,6 +28,10 @@ const autocompleteStyles = {
   backgroundColor: "transparent",
   '& .MuiOutlinedInput-root': {
     padding: '4px',
+    '& .MuiInputBase-input': {
+      padding: '7.5px 4px',
+      lineHeight: '1.4',
+    },
     '& .MuiAutocomplete-endAdornment': {
       '& .MuiButtonBase-root': {
         color: '#FF8046',
@@ -55,6 +59,12 @@ const autocompleteStyles = {
           border: 'none'
         }
       }
+    }
+  },
+  '& .MuiFormLabel-root': {
+    transform: 'translate(14px, 14px) scale(1)',
+    '&.Mui-focused, &.MuiFormLabel-filled': {
+      transform: 'translate(14px, -9px) scale(0.75)',
     }
   }
 };
@@ -244,6 +254,15 @@ export default function AchadoForm({
                 {...params}
                 label="Sistema"
                 placeholder="Selecione o sistema"
+                InputProps={{
+                  ...params.InputProps,
+                  sx: {
+                    '& input::placeholder': {
+                      lineHeight: '1.4',
+                      verticalAlign: 'middle'
+                    }
+                  }
+                }}
               />
             )}
             sx={autocompleteStyles}
@@ -279,6 +298,15 @@ export default function AchadoForm({
                 {...params}
                 label="Órgão"
                 placeholder="Selecione o órgão"
+                InputProps={{
+                  ...params.InputProps,
+                  sx: {
+                    '& input::placeholder': {
+                      lineHeight: '1.4',
+                      verticalAlign: 'middle'
+                    }
+                  }
+                }}
               />
             )}
             sx={autocompleteStyles}
@@ -315,6 +343,15 @@ export default function AchadoForm({
                 {...params}
                 label="Patologias"
                 placeholder={formData.patologias.length > 0 ? "" : "Selecione as patologias"}
+                InputProps={{
+                  ...params.InputProps,
+                  sx: {
+                    '& input::placeholder': {
+                      lineHeight: '1.4',
+                      verticalAlign: 'middle'
+                    }
+                  }
+                }}
               />
             )}
             sx={{
