@@ -12,12 +12,14 @@ import {
   Stack,
   TextareaAutosize,
   Typography,
-  useTheme
+  useTheme,
+  TextField
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Imagem } from "@/app/types/types";
+import { humanBodyData } from "../constants/human-body-data";
 
 export default function AchadoForm({
   onCancel,
@@ -46,6 +48,11 @@ export default function AchadoForm({
     observacoes: "",
   });
 
+  const [availableOrgans, setAvailableOrgans] = useState<string[]>([]);
+  const [availablePatologies, setAvailablePatologies] = useState<string[]>([]);
+  const [filteredPatologies, setFilteredPatologies] = useState<string[]>([]);
+  const [searchText, setSearchText] = useState('');
+
   useEffect(() => {
     if (achadoToEdit) {
       setFormData({
@@ -61,6 +68,27 @@ export default function AchadoForm({
       });
     }
   }, [achadoToEdit]);
+
+  // Update organs when sistema changes
+  useEffect(() => {
+    if (formData.sistema) {
+      const organs = Object.keys(humanBodyData[formData.sistema as keyof typeof humanBodyData] || {});
+      setAvailableOrgans(organs);
+      // Clear organ and patologies when sistema changes
+      setFormData(prev => ({ ...prev, orgao: "", patologias: [] }));
+    }
+  }, [formData.sistema]);
+
+  // Update patologies when orgao changes
+  useEffect(() => {
+    if (formData.sistema && formData.orgao) {
+      const patologies = humanBodyData[formData.sistema as keyof typeof humanBodyData]?.[formData.orgao] || [];
+      setAvailablePatologies(patologies);
+      setFilteredPatologies(patologies);
+      // Clear patologies when orgao changes
+      setFormData(prev => ({ ...prev, patologias: [] }));
+    }
+  }, [formData.sistema, formData.orgao]);
 
   //Validações
 
@@ -173,12 +201,15 @@ export default function AchadoForm({
               backgroundColor: "transparent"
             }}
           >
-            <MenuItem value="Sistema Nervoso">Sistema Nervoso</MenuItem>
-            <MenuItem value="Sistema Cardiovascular">Sistema Cardiovascular</MenuItem>
+            {Object.keys(humanBodyData).map((sistema) => (
+              <MenuItem key={sistema} value={sistema}>
+                {sistema}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth>
+        <FormControl fullWidth disabled={!formData.sistema}>
           <InputLabel id="inputOrgao">Órgão</InputLabel>
           <Select
             labelId="inputOrgao"
@@ -189,12 +220,15 @@ export default function AchadoForm({
               backgroundColor: "transparent"
             }}
           >
-            <MenuItem value="Coração">Coração</MenuItem>
-            <MenuItem value="Fígado">Fígado</MenuItem>
+            {availableOrgans.map((orgao) => (
+              <MenuItem key={orgao} value={orgao}>
+                {orgao}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth>
+        <FormControl fullWidth disabled={!formData.orgao}>
           <InputLabel id="inputPatologias">Patologias</InputLabel>
           <Select
             labelId="inputPatologias"
@@ -205,9 +239,58 @@ export default function AchadoForm({
             sx={{
               backgroundColor: "transparent"
             }}
+            MenuProps={{
+              PaperProps: {
+                style: {
+                  maxHeight: 300
+                }
+              }
+            }}
+            onClose={() => {
+              setSearchText('');
+              setFilteredPatologies(availablePatologies);
+            }}
+            renderValue={(selected) => (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                {(selected as string[]).map((value) => (
+                  <Typography
+                    key={value}
+                    sx={{
+                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                      borderRadius: '16px',
+                      padding: '2px 8px',
+                      fontSize: '0.8125rem'
+                    }}
+                  >
+                    {value}
+                  </Typography>
+                ))}
+              </Box>
+            )}
           >
-            <MenuItem value="Valvopatia">Valvopatia</MenuItem>
-            <MenuItem value="Aneurisma">Aneurisma</MenuItem>
+            <MenuItem disabled value="">
+              <TextField
+                size="small"
+                placeholder="Buscar patologias..."
+                value={searchText}
+                onChange={(e) => {
+                  const text = e.target.value.toLowerCase();
+                  setSearchText(text);
+                  setFilteredPatologies(
+                    availablePatologies.filter(
+                      (patology) => patology.toLowerCase().includes(text)
+                    )
+                  );
+                }}
+                onClick={(e) => e.stopPropagation()}
+                sx={{ width: '100%' }}
+              />
+            </MenuItem>
+            {filteredPatologies.map((patologia) => (
+              <MenuItem key={patologia} value={patologia}>
+                {patologia}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
