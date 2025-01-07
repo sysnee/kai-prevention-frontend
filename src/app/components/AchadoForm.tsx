@@ -369,7 +369,6 @@ export default function AchadoForm({
           >
             <FormControlLabel value="nenhuma" control={<Radio size="small" />} label="Nenhuma" />
             <FormControlLabel value="leve" control={<Radio size="small" />} label="Leve" />
-            <FormControlLabel value="normal" control={<Radio size="small" />} label="Normal" />
             <FormControlLabel value="moderada" control={<Radio size="small" />} label="Moderada" />
             <FormControlLabel value="grave" control={<Radio size="small" />} label="Grave" />
           </RadioGroup>
@@ -388,7 +387,7 @@ export default function AchadoForm({
             style={{
               width: "100%",
               padding: ".5em",
-              borderRadius: "10px",
+              borderRadius: "5px",
               fontSize: "14px",
               border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)",
               backgroundColor: theme.palette.background.default
