@@ -404,23 +404,75 @@ export default function AchadoForm({
             value={formData.severidade}
             onChange={handleChange}
           >
-            <FormControlLabel value="nenhuma" control={<Radio size="small" />} label="Nenhuma" />
-            <FormControlLabel value="leve" control={<Radio size="small" />} label="Leve" />
-            <FormControlLabel value="moderada" control={<Radio size="small" />} label="Moderada" />
-            <FormControlLabel value="grave" control={<Radio size="small" />} label="Grave" />
+            <FormControlLabel
+              value="nenhuma"
+              control={
+                <Radio
+                  size="small"
+                  sx={{
+                    '&.Mui-checked': {
+                      color: '#FF8046'
+                    }
+                  }}
+                />
+              }
+              label="Nenhuma"
+            />
+            <FormControlLabel
+              value="leve"
+              control={
+                <Radio
+                  size="small"
+                  sx={{
+                    '&.Mui-checked': {
+                      color: '#FF8046'
+                    }
+                  }}
+                />
+              }
+              label="Leve"
+            />
+            <FormControlLabel
+              value="moderada"
+              control={
+                <Radio
+                  size="small"
+                  sx={{
+                    '&.Mui-checked': {
+                      color: '#FF8046'
+                    }
+                  }}
+                />
+              }
+              label="Moderada"
+            />
+            <FormControlLabel
+              value="grave"
+              control={
+                <Radio
+                  size="small"
+                  sx={{
+                    '&.Mui-checked': {
+                      color: '#FF8046'
+                    }
+                  }}
+                />
+              }
+              label="Grave"
+            />
           </RadioGroup>
         </FormControl>
 
         <FormControl fullWidth>
           <Typography variant="body1" gutterBottom>
-            Observações gerais
+            Detalhes e Recomendações
           </Typography>
           <TextareaAutosize
             name="observacoes"
             value={formData.observacoes}
             onChange={(e) => handleChange(e)}
             minRows={4}
-            placeholder="Descreva as observações aqui..."
+            placeholder="Descreva a condição do paciente aqui"
             style={{
               width: "100%",
               padding: ".5em",
