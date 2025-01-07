@@ -92,8 +92,11 @@ export default function AchadoForm({
     imageId: "",
     sistema: "",
     orgao: "",
-    patologias: [],
-    severidade: "",
+    patologias: [] as string[],
+    patologiasDetalhes: {} as Record<string, {
+      descricao: string,
+      severidade: 'nenhuma' | 'leve' | 'moderada' | 'grave'
+    }>,
     observacoes: "",
   });
 
@@ -112,7 +115,7 @@ export default function AchadoForm({
         sistema: achadoToEdit.sistema || "",
         orgao: achadoToEdit.orgao || "",
         patologias: achadoToEdit.patologias || [],
-        severidade: achadoToEdit.severidade || "",
+        patologiasDetalhes: achadoToEdit.patologiasDetalhes || {},
         observacoes: achadoToEdit.observacoes || "",
       });
     }
@@ -134,8 +137,12 @@ export default function AchadoForm({
       const patologies = humanBodyData[formData.sistema as keyof typeof humanBodyData]?.[formData.orgao] || [];
       setAvailablePatologies(patologies);
       setFilteredPatologies(patologies);
-      // Clear patologies when orgao changes
-      setFormData(prev => ({ ...prev, patologias: [] }));
+      // Clear patologies and their details when orgao changes
+      setFormData(prev => ({
+        ...prev,
+        patologias: [],
+        patologiasDetalhes: {}
+      }));
     }
   }, [formData.sistema, formData.orgao]);
 
@@ -152,12 +159,26 @@ export default function AchadoForm({
 
   function getFormTitle() {
     if (achadoToEdit) return achadoToEdit.titulo;
-    return formData.severidade === "nenhuma" ? "Nova Observação" : "Novo Achado";
+
+    // Verifica se todas as patologias têm severidade "nenhuma"
+    const todasSeveridadesNenhuma = formData.patologias.length > 0 &&
+      formData.patologias.every(patologia =>
+        formData.patologiasDetalhes[patologia]?.severidade === 'nenhuma'
+      );
+
+    return todasSeveridadesNenhuma ? "Nova Observação" : "Novo Achado";
   }
 
   function getButtonText() {
     if (achadoToEdit) return "Salvar alterações";
-    return formData.severidade === "nenhuma" ? "Salvar observação" : "Salvar achado";
+
+    // Verifica se todas as patologias têm severidade "nenhuma"
+    const todasSeveridadesNenhuma = formData.patologias.length > 0 &&
+      formData.patologias.every(patologia =>
+        formData.patologiasDetalhes[patologia]?.severidade === 'nenhuma'
+      );
+
+    return todasSeveridadesNenhuma ? "Salvar observação" : "Salvar achado";
   }
 
   return (
@@ -362,9 +383,19 @@ export default function AchadoForm({
             value={formData.patologias}
             disabled={!formData.orgao}
             onChange={(_, newValue) => {
+              // Encontrar patologias que foram removidas
+              const removedPatologias = formData.patologias.filter(p => !newValue.includes(p));
+
+              // Criar novo objeto de detalhes sem as patologias removidas
+              const newPatologiasDetalhes = { ...formData.patologiasDetalhes };
+              removedPatologias.forEach(p => {
+                delete newPatologiasDetalhes[p];
+              });
+
               setFormData(prev => ({
                 ...prev,
-                patologias: newValue
+                patologias: newValue,
+                patologiasDetalhes: newPatologiasDetalhes
               }));
             }}
             renderInput={(params) => (
@@ -424,89 +455,152 @@ export default function AchadoForm({
           />
         </FormControl>
 
-        <FormControl>
-          <Typography
+        {formData.patologias.map((patologia) => (
+          <Box
+            key={patologia}
             sx={{
-              fontSize: "18px"
+              border: '1px solid rgba(229,231,235,255)',
+              borderRadius: '8px',
+              padding: '1em',
+              marginBottom: '1em'
             }}
           >
-            Severidade
-          </Typography>
-          <RadioGroup
-            row
-            name="severidade"
-            value={formData.severidade}
-            onChange={handleChange}
-          >
-            <FormControlLabel
-              value="nenhuma"
-              control={
-                <Radio
-                  size="small"
-                  sx={{
-                    '&.Mui-checked': {
-                      color: '#FF8046'
+            <FormLabel
+              sx={{
+                fontSize: "16px",
+                fontWeight: 'bold',
+                color: '#FF8046',
+                display: 'block',
+                marginBottom: '1em'
+              }}
+            >
+              {patologia}
+            </FormLabel>
+
+            <FormControl fullWidth sx={{ marginBottom: '1em' }}>
+              <FormLabel sx={{ fontSize: "14px", marginBottom: '0.5em' }}>
+                Severidade
+              </FormLabel>
+              <RadioGroup
+                row
+                value={formData.patologiasDetalhes[patologia]?.severidade || 'nenhuma'}
+                onChange={(e) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    patologiasDetalhes: {
+                      ...prev.patologiasDetalhes,
+                      [patologia]: {
+                        descricao: prev.patologiasDetalhes[patologia]?.descricao || '',
+                        severidade: e.target.value as 'nenhuma' | 'leve' | 'moderada' | 'grave'
+                      }
                     }
-                  }}
+                  }));
+                }}
+              >
+                <FormControlLabel
+                  value="nenhuma"
+                  control={
+                    <Radio
+                      size="small"
+                      sx={{
+                        '&.Mui-checked': {
+                          color: '#FF8046'
+                        }
+                      }}
+                    />
+                  }
+                  label="Nenhuma"
                 />
-              }
-              label="Nenhuma"
-            />
-            <FormControlLabel
-              value="leve"
-              control={
-                <Radio
-                  size="small"
-                  sx={{
-                    '&.Mui-checked': {
-                      color: '#FF8046'
+                <FormControlLabel
+                  value="leve"
+                  control={
+                    <Radio
+                      size="small"
+                      sx={{
+                        '&.Mui-checked': {
+                          color: '#FF8046'
+                        }
+                      }}
+                    />
+                  }
+                  label="Leve"
+                />
+                <FormControlLabel
+                  value="moderada"
+                  control={
+                    <Radio
+                      size="small"
+                      sx={{
+                        '&.Mui-checked': {
+                          color: '#FF8046'
+                        }
+                      }}
+                    />
+                  }
+                  label="Moderada"
+                />
+                <FormControlLabel
+                  value="grave"
+                  control={
+                    <Radio
+                      size="small"
+                      sx={{
+                        '&.Mui-checked': {
+                          color: '#FF8046'
+                        }
+                      }}
+                    />
+                  }
+                  label="Grave"
+                />
+              </RadioGroup>
+            </FormControl>
+
+            <FormControl fullWidth>
+              <FormLabel sx={{ fontSize: "14px", marginBottom: '0.5em' }}>
+                Detalhes e Recomendações
+              </FormLabel>
+              <TextareaAutosize
+                value={formData.patologiasDetalhes[patologia]?.descricao || ''}
+                onChange={(e) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    patologiasDetalhes: {
+                      ...prev.patologiasDetalhes,
+                      [patologia]: {
+                        descricao: e.target.value,
+                        severidade: prev.patologiasDetalhes[patologia]?.severidade || 'nenhuma'
+                      }
                     }
-                  }}
-                />
-              }
-              label="Leve"
-            />
-            <FormControlLabel
-              value="moderada"
-              control={
-                <Radio
-                  size="small"
-                  sx={{
-                    '&.Mui-checked': {
-                      color: '#FF8046'
-                    }
-                  }}
-                />
-              }
-              label="Moderada"
-            />
-            <FormControlLabel
-              value="grave"
-              control={
-                <Radio
-                  size="small"
-                  sx={{
-                    '&.Mui-checked': {
-                      color: '#FF8046'
-                    }
-                  }}
-                />
-              }
-              label="Grave"
-            />
-          </RadioGroup>
-        </FormControl>
+                  }));
+                }}
+                minRows={3}
+                placeholder={`Descreva os detalhes específicos para ${patologia}`}
+                style={{
+                  width: "100%",
+                  padding: ".5em",
+                  borderRadius: "5px",
+                  fontSize: "14px",
+                  border: theme.palette.mode === 'light'
+                    ? "1px solid rgba(229,231,235,255)"
+                    : "1px solid hsla(220, 20%, 25%, 0.6)",
+                  backgroundColor: theme.palette.background.default
+                }}
+              />
+            </FormControl>
+          </Box>
+        ))}
 
         <FormControl fullWidth>
           <Typography variant="body1" gutterBottom>
-            Detalhes e Recomendações
+            Detalhes e Recomendações Gerais
           </Typography>
           <TextareaAutosize
             name="observacoes"
             value={formData.observacoes}
             onChange={(e) => handleChange(e)}
             minRows={4}
-            placeholder="Descreva a condição do paciente aqui"
+            placeholder="Descreva a condição do paciente e as recomendações gerais"
             style={{
               width: "100%",
               padding: ".5em",
