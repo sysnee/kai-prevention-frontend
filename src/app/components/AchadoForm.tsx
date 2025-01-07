@@ -15,7 +15,8 @@ import {
   useTheme,
   TextField,
   Autocomplete,
-  Chip
+  Chip,
+  FormLabel
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
@@ -353,6 +354,7 @@ export default function AchadoForm({
         </FormControl>
 
         <FormControl fullWidth disabled={!formData.orgao}>
+          <FormLabel sx={{ fontSize: "11px", ml: "1em", mt: "-0.7em" }}>Patologias</FormLabel>
           <Autocomplete
             multiple
             id="patologias"
@@ -368,14 +370,19 @@ export default function AchadoForm({
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Patologias"
-                placeholder={formData.patologias.length > 0 ? "" : "Selecione as patologias"}
+                // label={formData.patologias.length === 0 ? "Patologias" : undefined}
+                placeholder="Selecione as patologias"
                 InputProps={{
                   ...params.InputProps,
                   sx: {
-                    '& input::placeholder': {
-                      lineHeight: '1.4',
-                      verticalAlign: 'middle'
+                    '& input': {
+                      opacity: formData.patologias.length > 0 ? 0 : 1,
+                      height: formData.patologias.length > 0 ? '0px' : 'auto',
+                      padding: formData.patologias.length > 0 ? '0px' : '7.5px 4px',
+                      '&::placeholder': {
+                        lineHeight: '1.4',
+                        verticalAlign: 'middle'
+                      }
                     }
                   }
                 }}
