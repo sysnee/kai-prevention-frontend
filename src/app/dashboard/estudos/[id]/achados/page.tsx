@@ -15,7 +15,6 @@ import Image from "next/image";
 export default function AchadosPage() {
 
     const [isFormVisible, setIsFormVisible] = useState(false)
-    const [isExamNormalChecked, setIsExamNormalChecked] = useState(false)
     const [editAchado, setEditAchado] = useState<Achado | null>(null);
     const [achados, setAchados] = useState<Achado[]>([]);
     const [selectedImage, setSelectedImage] = useState<Imagem | null>(null);
@@ -123,53 +122,18 @@ export default function AchadosPage() {
                                 justifyContent: "space-between",
                             }}
                         >
-                            <FormControlLabel
-                                sx={(theme) => ({
-                                    color: theme.palette.mode === 'light' ? "#0b0e14" : "#fff",
-                                    display: "flex",
-                                    justifyContent: "start"
-                                })}
-                                control={
-                                    <Checkbox
-                                        size="small"
-                                        checked={isExamNormalChecked}
-                                        onChange={() => {
-                                            setIsExamNormalChecked(!isExamNormalChecked)
-                                            if (!isExamNormalChecked) {
-                                                setAchados([])
-                                                setIsFormVisible(false)
-                                            }
+                            <Box>
+                                {!isFormVisible && achados.length === 0 && (
+                                    <Typography
+                                        sx={{
+                                            fontSize: "13px"
                                         }}
-                                    />
-                                }
-                                label={
-                                    <Box
-                                        sx={(theme) => ({
-                                            color: theme.palette.text.primary,
-                                            fontSize: "12px"
-                                        })}
                                     >
-                                        Nada a adicionar
-                                    </Box>
-                                }
-                            />
-
-
-                            {isExamNormalChecked ? (
-                                <Button
-                                    className="bg-kai-primary hover:bg-kai-primary/70 flex items-center"
-                                >
-                                    <Check sx={(theme) => ({
-                                        color: theme.palette.mode === 'light' ? '#fff' : '#000',
-                                        fontSize: "18px"
-                                    })} />
-                                    <Typography sx={(theme) => ({
-                                        color: theme.palette.mode === 'light' ? '#fff' : '#000'
-                                    })}>
-                                        Concluir
+                                        Nenhum achado adicionado ainda.
                                     </Typography>
-                                </Button>
-                            ) : (
+                                )}
+                            </Box>
+                            {!isFormVisible && (
                                 <Button
                                     onClick={() => setIsFormVisible(true)}
                                     className="bg-kai-primary hover:bg-kai-primary/70 flex items-center"
@@ -215,7 +179,7 @@ export default function AchadosPage() {
                                 spacing={2}
                                 marginTop={2}
                             >
-                                {achados.length > 0 ? (achados.map(achado => (
+                                {achados.length > 0 && achados.map(achado => (
                                     <AchadoCard
                                         key={achado.id}
                                         achado={achado}
@@ -224,17 +188,7 @@ export default function AchadosPage() {
                                             setIsFormVisible(true)
                                         }}
                                     />
-                                ))) : (
-                                    !isFormVisible && (
-                                        <Typography
-                                            sx={{
-                                                fontSize: "13px"
-                                            }}
-                                        >
-                                            Não foram encontrados achados.
-                                        </Typography>
-                                    )
-                                )}
+                                ))}
                             </Stack>
                         </Box>
                     </Grid>
