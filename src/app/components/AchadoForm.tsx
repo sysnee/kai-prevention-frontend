@@ -187,29 +187,56 @@ export default function AchadoForm({
         </Typography>
 
         {selectedImage ? (
-          <Typography
-            variant="caption"
+          <Box
             sx={{
-              backgroundColor: '#FF804620',
-              color: '#FF8046',
-              padding: '4px 8px',
-              borderRadius: '4px',
               display: 'flex',
               alignItems: 'center',
-              gap: '4px',
+              gap: '8px',
+              backgroundColor: '#FF804620',
+              padding: '4px 8px',
+              borderRadius: '4px',
             }}
           >
             <Box
-              component="span"
               sx={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                backgroundColor: '#FF8046',
+                position: 'relative',
+                width: '24px',
+                height: '24px',
+                overflow: 'hidden',
+                borderRadius: '4px',
+                border: '1px solid #FF8046',
               }}
-            />
-            Imagem anexada
-          </Typography>
+            >
+              <Image
+                src={selectedImage.link}
+                alt="Preview"
+                fill
+                style={{
+                  objectFit: 'cover',
+                }}
+              />
+            </Box>
+            <Typography
+              variant="caption"
+              sx={{
+                color: '#FF8046',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              <Box
+                component="span"
+                sx={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: '#FF8046',
+                }}
+              />
+              Imagem anexada
+            </Typography>
+          </Box>
         ) : (
           <Typography
             variant="caption"

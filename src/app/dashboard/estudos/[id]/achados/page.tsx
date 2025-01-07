@@ -221,9 +221,7 @@ export default function AchadosPage() {
                                         marginBottom: 2
                                     })}
                                 >
-                                    <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                                        Imagem selecionada:
-                                    </Typography>
+
                                     <Box
                                         sx={{
                                             position: 'relative',
@@ -232,6 +230,7 @@ export default function AchadosPage() {
                                             '&:hover .action-buttons': {
                                                 opacity: 1,
                                             },
+                                            marginBottom: "1em"
                                         }}
                                     >
                                         <ImageEstudo
@@ -308,6 +307,9 @@ export default function AchadosPage() {
                                             </Button>
                                         </Box>
                                     </Box>
+                                    <Typography variant="caption" sx={{ mt: 2 }}>
+                                        * A imagem acima será usada como imagem chave para o achado.
+                                    </Typography>
                                 </Box>
                             )}
 
