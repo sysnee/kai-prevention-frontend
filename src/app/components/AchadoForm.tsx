@@ -160,24 +160,30 @@ export default function AchadoForm({
   function getFormTitle() {
     if (achadoToEdit) return achadoToEdit.titulo;
 
-    // Verifica se todas as patologias têm severidade "nenhuma"
     const todasSeveridadesNenhuma = formData.patologias.length > 0 &&
       formData.patologias.every(patologia =>
         formData.patologiasDetalhes[patologia]?.severidade === 'nenhuma'
       );
 
+    // Usa plural se houver mais de uma patologia
+    if (formData.patologias.length > 1) {
+      return todasSeveridadesNenhuma ? "Novas Observações" : "Novos Achados";
+    }
     return todasSeveridadesNenhuma ? "Nova Observação" : "Novo Achado";
   }
 
   function getButtonText() {
     if (achadoToEdit) return "Salvar alterações";
 
-    // Verifica se todas as patologias têm severidade "nenhuma"
     const todasSeveridadesNenhuma = formData.patologias.length > 0 &&
       formData.patologias.every(patologia =>
         formData.patologiasDetalhes[patologia]?.severidade === 'nenhuma'
       );
 
+    // Usa plural se houver mais de uma patologia
+    if (formData.patologias.length > 1) {
+      return todasSeveridadesNenhuma ? "Salvar observações" : "Salvar achados";
+    }
     return todasSeveridadesNenhuma ? "Salvar observação" : "Salvar achado";
   }
 
