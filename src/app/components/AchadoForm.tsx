@@ -268,24 +268,6 @@ export default function AchadoForm({
               </Box>
             )}
           >
-            <MenuItem disabled value="">
-              <TextField
-                size="small"
-                placeholder="Buscar patologias..."
-                value={searchText}
-                onChange={(e) => {
-                  const text = e.target.value.toLowerCase();
-                  setSearchText(text);
-                  setFilteredPatologies(
-                    availablePatologies.filter(
-                      (patology) => patology.toLowerCase().includes(text)
-                    )
-                  );
-                }}
-                onClick={(e) => e.stopPropagation()}
-                sx={{ width: '100%' }}
-              />
-            </MenuItem>
             {filteredPatologies.map((patologia) => (
               <MenuItem key={patologia} value={patologia}>
                 {patologia}
