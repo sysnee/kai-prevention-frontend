@@ -35,6 +35,7 @@ export default function AchadosPage() {
 
         setAchados([...achados, novoAchado]);
         setIsFormVisible(false);
+        setSelectedImage(null);
     };
 
     function handleEditAchado(updatedAchado: Achado) {
@@ -44,6 +45,7 @@ export default function AchadosPage() {
         setAchados(updatedAchados);
         setEditAchado(null);
         setIsFormVisible(false);
+        setSelectedImage(null);
     }
 
     function handleImageSelection(imagem: Imagem, isSelected: boolean) {
