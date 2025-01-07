@@ -13,13 +13,51 @@ import {
   TextareaAutosize,
   Typography,
   useTheme,
-  TextField
+  TextField,
+  Autocomplete,
+  Chip
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Imagem } from "@/app/types/types";
 import { humanBodyData } from "../constants/human-body-data";
+
+// Add this common style object for all Autocompletes
+const autocompleteStyles = {
+  backgroundColor: "transparent",
+  '& .MuiOutlinedInput-root': {
+    padding: '4px',
+    '& .MuiAutocomplete-endAdornment': {
+      '& .MuiButtonBase-root': {
+        color: '#FF8046',
+        border: 'none',
+        backgroundColor: 'transparent',
+        '&:hover': {
+          backgroundColor: 'transparent',
+          border: 'none'
+        },
+        '& .MuiSvgIcon-root': {
+          fontSize: '1.2rem'
+        },
+        '&.Mui-disabled': {
+          color: 'rgba(0, 0, 0, 0.26)',
+          border: 'none',
+          backgroundColor: 'transparent'
+        }
+      },
+      '& .MuiAutocomplete-clearIndicator': {
+        color: '#FF8046',
+        border: 'none',
+        backgroundColor: 'transparent',
+        '&:hover': {
+          backgroundColor: 'transparent',
+          border: 'none'
+        }
+      }
+    }
+  }
+};
 
 export default function AchadoForm({
   onCancel,
@@ -191,89 +229,128 @@ export default function AchadoForm({
 
       <Stack spacing={3}>
         <FormControl fullWidth>
-          <InputLabel id="inputSistema">Sistema</InputLabel>
-          <Select
-            labelId="inputSistema"
-            name="sistema"
+          <Autocomplete
+            id="sistema"
+            options={Object.keys(humanBodyData)}
             value={formData.sistema}
-            onChange={(e) => handleChange(e)}
-            sx={{
-              backgroundColor: "transparent"
+            onChange={(_, newValue) => {
+              setFormData(prev => ({
+                ...prev,
+                sistema: newValue || ''
+              }));
             }}
-          >
-            {Object.keys(humanBodyData).map((sistema) => (
-              <MenuItem key={sistema} value={sistema}>
-                {sistema}
-              </MenuItem>
-            ))}
-          </Select>
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Sistema"
+                placeholder="Selecione o sistema"
+              />
+            )}
+            sx={autocompleteStyles}
+            filterOptions={(options, { inputValue }) => {
+              const searchText = inputValue.toLowerCase();
+              return options.filter(option =>
+                option.toLowerCase().includes(searchText)
+              ).sort((a, b) => {
+                const aStartsWith = a.toLowerCase().startsWith(searchText);
+                const bStartsWith = b.toLowerCase().startsWith(searchText);
+                if (aStartsWith && !bStartsWith) return -1;
+                if (!aStartsWith && bStartsWith) return 1;
+                return a.localeCompare(b);
+              });
+            }}
+          />
         </FormControl>
 
         <FormControl fullWidth disabled={!formData.sistema}>
-          <InputLabel id="inputOrgao">Órgão</InputLabel>
-          <Select
-            labelId="inputOrgao"
-            name="orgao"
+          <Autocomplete
+            id="orgao"
+            options={availableOrgans}
             value={formData.orgao}
-            onChange={(e) => handleChange(e)}
-            sx={{
-              backgroundColor: "transparent"
+            disabled={!formData.sistema}
+            onChange={(_, newValue) => {
+              setFormData(prev => ({
+                ...prev,
+                orgao: newValue || ''
+              }));
             }}
-          >
-            {availableOrgans.map((orgao) => (
-              <MenuItem key={orgao} value={orgao}>
-                {orgao}
-              </MenuItem>
-            ))}
-          </Select>
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Órgão"
+                placeholder="Selecione o órgão"
+              />
+            )}
+            sx={autocompleteStyles}
+            filterOptions={(options, { inputValue }) => {
+              const searchText = inputValue.toLowerCase();
+              return options.filter(option =>
+                option.toLowerCase().includes(searchText)
+              ).sort((a, b) => {
+                const aStartsWith = a.toLowerCase().startsWith(searchText);
+                const bStartsWith = b.toLowerCase().startsWith(searchText);
+                if (aStartsWith && !bStartsWith) return -1;
+                if (!aStartsWith && bStartsWith) return 1;
+                return a.localeCompare(b);
+              });
+            }}
+          />
         </FormControl>
 
         <FormControl fullWidth disabled={!formData.orgao}>
-          <InputLabel id="inputPatologias">Patologias</InputLabel>
-          <Select
-            labelId="inputPatologias"
-            name="patologias"
-            value={formData.patologias}
-            onChange={(e) => handleChange(e)}
+          <Autocomplete
             multiple
-            sx={{
-              backgroundColor: "transparent"
+            id="patologias"
+            options={availablePatologies}
+            value={formData.patologias}
+            disabled={!formData.orgao}
+            onChange={(_, newValue) => {
+              setFormData(prev => ({
+                ...prev,
+                patologias: newValue
+              }));
             }}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 300
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Patologias"
+                placeholder={formData.patologias.length > 0 ? "" : "Selecione as patologias"}
+              />
+            )}
+            sx={{
+              ...autocompleteStyles,
+              '& .MuiOutlinedInput-root': {
+                ...autocompleteStyles['& .MuiOutlinedInput-root'],
+                '& .MuiChip-root': {
+                  backgroundColor: 'transparent',
+                  border: '1px solid #FF8046',
+                  color: '#FF8046',
+                  borderRadius: '16px',
+                  '& .MuiChip-label': {
+                    fontSize: '0.8125rem'
+                  },
+                  '& .MuiChip-deleteIcon': {
+                    color: '#FF8046',
+                    '&:hover': {
+                      color: '#FF8046'
+                    }
+                  }
                 }
               }
             }}
-            onClose={() => {
-              setSearchText('');
-              setFilteredPatologies(availablePatologies);
+            filterOptions={(options, { inputValue }) => {
+              const searchText = inputValue.toLowerCase();
+              return options.filter(option =>
+                option.toLowerCase().includes(searchText)
+              ).sort((a, b) => {
+                const aStartsWith = a.toLowerCase().startsWith(searchText);
+                const bStartsWith = b.toLowerCase().startsWith(searchText);
+                if (aStartsWith && !bStartsWith) return -1;
+                if (!aStartsWith && bStartsWith) return 1;
+                return a.localeCompare(b);
+              });
             }}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {(selected as string[]).map((value) => (
-                  <Typography
-                    key={value}
-                    sx={{
-                      backgroundColor: 'rgba(0, 0, 0, 0.08)',
-                      borderRadius: '16px',
-                      padding: '2px 8px',
-                      fontSize: '0.8125rem'
-                    }}
-                  >
-                    {value}
-                  </Typography>
-                ))}
-              </Box>
-            )}
-          >
-            {filteredPatologies.map((patologia) => (
-              <MenuItem key={patologia} value={patologia}>
-                {patologia}
-              </MenuItem>
-            ))}
-          </Select>
+          />
         </FormControl>
 
         <FormControl>
