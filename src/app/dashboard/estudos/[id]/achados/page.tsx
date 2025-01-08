@@ -2,49 +2,97 @@
 
 import { useState } from "react"
 import db from "../../../../../../db.json"
-import { Box, Button, Checkbox, FormControlLabel, Grid2 as Grid, Stack, Typography, Modal } from "@mui/material";
+import { Box, Button, Checkbox, FormControlLabel, Grid2 as Grid, Stack, Typography, Modal, Alert, CircularProgress } from "@mui/material";
 import Link from "next/link";
 import { Check, KeyboardArrowLeft, Close, ZoomIn } from "@mui/icons-material";
 import AddIcon from '@mui/icons-material/Add';
 import AchadoCard from "@/app/components/AchadoCard";
 import AchadoForm from "@/app/components/AchadoForm";
-import { Achado, Imagem } from "@/app/types/types";
+import { Imagem } from "@/app/types/types"
+import { Achado, Finding } from "@/types/findings"
 import ImageEstudo from "@/app/components/ImageEstudo";
 import Image from "next/image";
+import { useParams } from 'next/navigation'
+import { createFinding, getFindingsByReportId, updateFinding, deleteFinding } from '@/services/findings'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { mapAchadosToFindings, mapFindingToAchado } from '@/utils/findings-mapper'
 
 export default function AchadosPage() {
+    const params = useParams()
+    const reportId = params.id as string
+    const queryClient = useQueryClient()
+
+    const {
+        data: findings = [],
+        isLoading,
+        error
+    } = useQuery({
+        queryKey: ['findings', reportId],
+        queryFn: () => getFindingsByReportId(reportId)
+    })
+
+    const achados = mapAchadosToFindings(findings)
+
+    const createFindingMutation = useMutation({
+        mutationFn: createFinding,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['findings', reportId] })
+            setIsFormVisible(false)
+            setSelectedImage(null)
+        }
+    })
+
+    const updateFindingMutation = useMutation({
+        mutationFn: ({ id, finding }: { id: string, finding: any }) =>
+            updateFinding(reportId, id, finding),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['findings', reportId] })
+            setEditAchado(null)
+            setIsFormVisible(false)
+            setSelectedImage(null)
+        }
+    })
+
+    const deleteFindingMutation = useMutation({
+        mutationFn: (id: string) => deleteFinding(reportId, id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['findings', reportId] })
+        }
+    })
 
     const [isFormVisible, setIsFormVisible] = useState(false)
-    const [editAchado, setEditAchado] = useState<Achado | null>(null);
-    const [achados, setAchados] = useState<Achado[]>([]);
+    const [editAchado, setEditAchado] = useState<Finding | null>(null);
     const [selectedImage, setSelectedImage] = useState<Imagem | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    function handleAddAchado(achado: Achado) {
-        const ultimoAchado = achados[achados.length - 1];
-        const novoId = ultimoAchado ? parseInt(ultimoAchado.id) + 1 : 1;
+    function handleAddAchado(achado: any) {
+        createFindingMutation.mutate({
+            system: achado.sistema,
+            organ: achado.orgao,
+            pathology: achado.patologias[0],
+            image_url: selectedImage?.link,
+            observations: achado.observacoes,
+            report_id: reportId
+        })
+    }
 
-        const novoAchado = {
-            ...achado,
-            id: novoId.toString(),
-            titulo: `Achado ${novoId}`,
-            laudoId: "1",
-            imageId: selectedImage?.id || "",
-        }
+    function handleEditAchado(updatedAchado: any) {
+        if (!editAchado?.id) return
 
-        setAchados([...achados, novoAchado]);
-        setIsFormVisible(false);
-        setSelectedImage(null);
-    };
+        updateFindingMutation.mutate({
+            id: editAchado.id,
+            finding: {
+                system: updatedAchado.sistema,
+                organ: updatedAchado.orgao,
+                pathology: updatedAchado.patologias[0],
+                image_url: selectedImage?.link,
+                observations: updatedAchado.observacoes
+            }
+        })
+    }
 
-    function handleEditAchado(updatedAchado: Achado) {
-        const updatedAchados = achados.map(achado =>
-            achado.id === updatedAchado.id ? updatedAchado : achado
-        );
-        setAchados(updatedAchados);
-        setEditAchado(null);
-        setIsFormVisible(false);
-        setSelectedImage(null);
+    function handleDeleteAchado(id: string) {
+        deleteFindingMutation.mutate(id)
     }
 
     function handleImageSelection(imagem: Imagem, isSelected: boolean) {
@@ -52,6 +100,29 @@ export default function AchadosPage() {
         if (isSelected) {
             setIsFormVisible(true);
         }
+    }
+
+    function handleEdit(finding: Finding) {
+        setEditAchado(finding)
+        setIsFormVisible(true)
+    }
+
+    if (isLoading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+            </Box>
+        )
+    }
+
+    if (error) {
+        return (
+            <Box sx={{ p: 4 }}>
+                <Alert severity="error">
+                    Erro ao carregar achados: {(error as Error).message}
+                </Alert>
+            </Box>
+        )
     }
 
     return (
@@ -166,6 +237,7 @@ export default function AchadosPage() {
                                     }}
                                     onSubmit={editAchado ? handleEditAchado : handleAddAchado}
                                     selectedImage={selectedImage}
+                                    isLoading={createFindingMutation.isPending || updateFindingMutation.isPending}
                                 />
                             </Box>
                         )}
@@ -183,10 +255,8 @@ export default function AchadosPage() {
                                     <AchadoCard
                                         key={achado.id}
                                         achado={achado}
-                                        onEdit={() => {
-                                            setEditAchado(achado)
-                                            setIsFormVisible(true)
-                                        }}
+                                        onEdit={() => handleEdit(achado)}
+                                        onDelete={() => handleDeleteAchado(achado.id)}
                                     />
                                 ))}
                             </Stack>
@@ -384,6 +454,19 @@ export default function AchadosPage() {
                     />
                 </Box>
             </Modal>
+
+            {(createFindingMutation.isError || updateFindingMutation.isError || deleteFindingMutation.isError) && (
+                <Alert
+                    severity="error"
+                    sx={{ mb: 2 }}
+                >
+                    Erro ao processar operação: {
+                        (createFindingMutation.error as Error)?.message ||
+                        (updateFindingMutation.error as Error)?.message ||
+                        (deleteFindingMutation.error as Error)?.message
+                    }
+                </Alert>
+            )}
         </Box>
     )
 }

@@ -1,3 +1,5 @@
+export type { Achado } from '@/types/findings'
+
 export type Estudo = {
   id: string
   nome: string
@@ -20,16 +22,4 @@ export type Medico = {
   id: string
   nome: string
   avatar: string
-}
-
-export type Achado = {
-  id: string
-  laudoId: string
-  imagemId: string
-  titulo: string
-  orgao: string
-  sistema: string
-  patologias: string[]
-  severidade: string
-  observacoes: string
 }

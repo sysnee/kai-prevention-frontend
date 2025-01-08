@@ -16,7 +16,8 @@ import {
   TextField,
   Autocomplete,
   Chip,
-  FormLabel
+  FormLabel,
+  CircularProgress
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
@@ -75,13 +76,15 @@ export default function AchadoForm({
   onSubmit,
   achadoToEdit,
   selectedImage,
-  showCheckbox = true
+  showCheckbox = true,
+  isLoading
 }: {
   onCancel: () => void,
   onSubmit: (formData: any) => void,
   achadoToEdit?: any,
   selectedImage?: Imagem | null,
-  showCheckbox?: boolean
+  showCheckbox?: boolean,
+  isLoading?: boolean
 }) {
 
   const theme = useTheme();
@@ -621,6 +624,7 @@ export default function AchadoForm({
         <Stack direction="row" spacing={2} justifyContent="flex-start">
           <Button
             onClick={onCancel}
+            disabled={isLoading}
             sx={(theme) => ({
               backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
               border: "1px solid #e5e7eb"
@@ -632,16 +636,21 @@ export default function AchadoForm({
           </Button>
           <Button
             onClick={handleSubmit}
+            disabled={isLoading}
             className="bg-kai-primary hover:bg-kai-primary/70 flex items-center"
             sx={(theme) => ({
               color: theme.palette.mode === 'light' ? '#fff' : '#000'
             })}
           >
-            <Check sx={(theme) => ({
-              color: theme.palette.mode === 'light' ? '#fff' : '#000',
-              fontSize: "17px",
-              marginRight: ".2em"
-            })} />
+            {isLoading ? (
+              <CircularProgress size={20} sx={{ mr: 1 }} />
+            ) : (
+              <Check sx={(theme) => ({
+                color: theme.palette.mode === 'light' ? '#fff' : '#000',
+                fontSize: "17px",
+                marginRight: ".2em"
+              })} />
+            )}
             <Typography sx={(theme) => ({
               color: theme.palette.mode === 'light' ? '#fff' : '#000'
             })}>
