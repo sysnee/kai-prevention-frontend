@@ -159,16 +159,8 @@ export default function AchadosPage() {
                 width: "100%"
             }}
         >
-            <Box
-                sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "1.5em",
-                    width: "100%"
-                }}
-            >
-                <Box sx={{ display: "flex", alignItems: "center", gap: "1.5em" }}>
+            <Stack spacing={1} sx={{ mb: 4 }}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                     <Link href={`/`}>
                         <Button className="bg-kai-primary hover:bg-kai-primary/70">
                             <KeyboardArrowLeft sx={(theme) => ({
@@ -176,27 +168,14 @@ export default function AchadosPage() {
                             })} />
                         </Button>
                     </Link>
-
-                    <Box
-                        component="h2"
-                        sx={(theme) => ({
-                            color: theme.palette.text.primary,
-                            fontSize: "22px"
-                        })}
-                    >
-                        Criar achados
+                    <Box>
+                        <Typography variant="h5">Criar achados</Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                            {report?.exam.description} • {report?.exam.client.name}
+                        </Typography>
                     </Box>
                 </Box>
-
-                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                    <Typography variant="body2" color="text.secondary">
-                        {report?.exam.description}
-                    </Typography>
-                    <Typography variant="body1">
-                        {report?.exam.client.name}
-                    </Typography>
-                </Box>
-            </Box>
+            </Stack>
 
             <Box
                 sx={{
