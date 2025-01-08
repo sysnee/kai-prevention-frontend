@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 function getSeverityLabel(severity: Severity) {
     const labels = {
-        [Severity.NONE]: 'Normal',
+        [Severity.NONE]: 'Informativo',
         [Severity.LOW]: 'Leve',
         [Severity.MEDIUM]: 'Moderada',
         [Severity.HIGH]: 'Alta',

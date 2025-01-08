@@ -188,13 +188,13 @@ export default function AchadosPage() {
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
-                            backgroundColor: theme.palette.mode === 'light' ? "#fff" : "transparent",
+                            backgroundColor: theme.palette.mode === 'light' ? "#f5f6fa" : "transparent",
                             borderRadius: "5px",
                             border: theme.palette.mode === 'light' ? "none" : "1px solid hsla(220, 20%, 25%, 0.6)"
                         })}
                     >
-                        <Box sx={{ width: "100%", backgroundColor: "#f5f6fa", padding: "1em" }}>
-                            <Box className="flex items-center justify-between mb-6">
+                        <Box sx={{ width: "100%" }}>
+                            <Box className="flex items-center justify-between">
                                 <p className="text-sm text-slate-500">
                                     Adicione os achados encontrados no exame.
                                 </p>
@@ -211,7 +211,7 @@ export default function AchadosPage() {
 
 
                             {isFormVisible && (
-                                <Box className="mb-8">
+                                <Box className="mb-8 mt-4">
                                     <AchadoForm
                                         achadoToEdit={editAchado}
                                         onCancel={() => {
@@ -226,7 +226,7 @@ export default function AchadosPage() {
                             )}
 
                         </Box>
-                        <Stack spacing={2} sx={{ marginTop: "5em", width: "100%" }}>
+                        {/* <Stack spacing={2} sx={{ marginTop: "5em", width: "100%" }}>
                             <div>
                                 <h2 className="text-lg font-medium text-slate-900">Últimos adicionados</h2>
                                 <p className="text-sm text-slate-500">
@@ -241,7 +241,7 @@ export default function AchadosPage() {
                                     onDelete={() => handleDeleteAchado(achado.id)}
                                 />
                             ))}
-                        </Stack>
+                        </Stack> */}
 
                     </Grid>
 

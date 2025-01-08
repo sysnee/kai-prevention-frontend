@@ -113,107 +113,14 @@ export default function EstudoResumoPage() {
             <Box sx={{ marginTop: "3em" }}>
                 <Grid container spacing={1.5} justifyContent="start" marginTop={1} wrap="wrap">
                     <Grid size={8}>
-                        <Stack spacing={3}>
+                        <Stack spacing={2}>
                             {findings.map((finding) => (
-                                <Stack key={finding.id} spacing={3} direction={'row'}>
-                                    <Box width={'100%'}>
-                                        <Box sx={(theme) => ({
-                                            backgroundColor: theme.palette.mode === 'light' ? "#fff" : "transparent",
-                                            border: theme.palette.mode === 'light' ? "none" : "1px solid #333b4d",
-                                            padding: "2em",
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            gap: "1em",
-                                            borderRadius: "10px",
-                                            boxShadow: "2px 2px 4px rgba(0, 0, 0, 0.1)",
-                                            height: finding.image_url ? '225px' : 'auto',
-                                        })}>
-                                            <Stack width={finding.image_url ? '70%' : '100%'}>
-                                                <Box component="h1" sx={(theme) => ({
-                                                    color: theme.palette.text.primary,
-                                                    fontWeight: "bold",
-                                                    fontSize: "22px"
-                                                })}>
-                                                    {finding.pathology}
-                                                </Box>
-                                                <Grid container marginY={1} spacing={4}>
-                                                    <Grid size={3}>
-                                                        <Stack>
-                                                            <Box component="h1" sx={(theme) => ({
-                                                                color: theme.palette.text.primary,
-                                                                fontWeight: "bold",
-                                                                fontSize: "14px"
-                                                            })}>
-                                                                Sistema
-                                                            </Box>
-                                                            <Box component="h1" sx={(theme) => ({
-                                                                color: theme.palette.text.primary,
-                                                                fontSize: "14px"
-                                                            })}>
-                                                                {finding.system}
-                                                            </Box>
-                                                        </Stack>
-                                                    </Grid>
-                                                    <Grid size={3}>
-                                                        <Stack>
-                                                            <Box component="h1" sx={(theme) => ({
-                                                                color: theme.palette.text.primary,
-                                                                fontWeight: "bold",
-                                                                fontSize: "14px"
-                                                            })}>
-                                                                Orgão
-                                                            </Box>
-                                                            <Box component="h1" sx={(theme) => ({
-                                                                color: theme.palette.text.primary,
-                                                                fontSize: "14px"
-                                                            })}>
-                                                                {finding.organ}
-                                                            </Box>
-                                                        </Stack>
-                                                    </Grid>
-                                                    <Grid size={5}>
-                                                        <Stack>
-                                                            <Box component="h1" sx={(theme) => ({
-                                                                color: theme.palette.text.primary,
-                                                                fontWeight: "bold",
-                                                                fontSize: "14px"
-                                                            })}>
-                                                                Observações
-                                                            </Box>
-                                                            <Box component="h1" sx={(theme) => ({
-                                                                color: theme.palette.text.primary,
-                                                                fontSize: "14px"
-                                                            })}>
-                                                                {finding.observations}
-                                                            </Box>
-                                                        </Stack>
-                                                    </Grid>
-                                                </Grid>
-                                            </Stack>
-
-                                            {finding.image_url && (
-                                                <Box sx={{
-                                                    width: '250px',
-                                                    flexShrink: 0,
-                                                    display: 'flex',
-                                                    alignItems: 'center'
-                                                }}>
-                                                    <Image
-                                                        src={finding.image_url}
-                                                        alt="imagem-achado"
-                                                        width={250}
-                                                        height={250}
-                                                        className="rounded-lg cursor-pointer border object-cover"
-                                                        style={{
-                                                            maxHeight: '180px',
-                                                            width: '100%'
-                                                        }}
-                                                    />
-                                                </Box>
-                                            )}
-                                        </Box>
-                                    </Box>
-                                </Stack>
+                                <AchadoCard
+                                    key={finding.id}
+                                    achado={finding}
+                                    onEdit={() => { }} // Empty function since editing is not available in resumo
+                                    onDelete={() => { }} // Empty function since deletion is not available in resumo
+                                />
                             ))}
                         </Stack>
                     </Grid>
