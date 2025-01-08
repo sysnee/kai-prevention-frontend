@@ -16,6 +16,8 @@ import { useParams } from 'next/navigation'
 import { createFinding, getFindingsByReportId, updateFinding, deleteFinding } from '@/services/findings'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { mapAchadosToFindings, mapFindingToAchado } from '@/utils/findings-mapper'
+import { getReportById } from '@/services/reports'
+import { Report } from '@/types/reports'
 
 export default function AchadosPage() {
     const params = useParams()
@@ -23,13 +25,25 @@ export default function AchadosPage() {
     const queryClient = useQueryClient()
 
     const {
+        data: report,
+        isLoading: isLoadingReport,
+        error: reportError
+    } = useQuery<Report>({
+        queryKey: ['report', reportId],
+        queryFn: () => getReportById(reportId)
+    })
+
+    const {
         data: findings = [],
-        isLoading,
-        error
+        isLoading: isLoadingFindings,
+        error: findingsError
     } = useQuery({
         queryKey: ['findings', reportId],
         queryFn: () => getFindingsByReportId(reportId)
     })
+
+    const isLoading = isLoadingReport || isLoadingFindings
+    const error = reportError || findingsError
 
     const achados = mapAchadosToFindings(findings)
 
@@ -131,7 +145,7 @@ export default function AchadosPage() {
         return (
             <Box sx={{ p: 4 }}>
                 <Alert severity="error">
-                    Erro ao carregar achados: {(error as Error).message}
+                    Erro ao carregar dados: {(error as Error).message}
                 </Alert>
             </Box>
         )
@@ -149,25 +163,38 @@ export default function AchadosPage() {
                 sx={{
                     display: "flex",
                     alignItems: "center",
-                    gap: "1.5em"
+                    justifyContent: "space-between",
+                    gap: "1.5em",
+                    width: "100%"
                 }}
             >
-                <Link href={`/`}>
-                    <Button className="bg-kai-primary hover:bg-kai-primary/70">
-                        <KeyboardArrowLeft sx={(theme) => ({
-                            color: theme.palette.mode === 'light' ? '#fff' : '#000'
-                        })} />
-                    </Button>
-                </Link>
+                <Box sx={{ display: "flex", alignItems: "center", gap: "1.5em" }}>
+                    <Link href={`/`}>
+                        <Button className="bg-kai-primary hover:bg-kai-primary/70">
+                            <KeyboardArrowLeft sx={(theme) => ({
+                                color: theme.palette.mode === 'light' ? '#fff' : '#000'
+                            })} />
+                        </Button>
+                    </Link>
 
-                <Box
-                    component="h2"
-                    sx={(theme) => ({
-                        color: theme.palette.text.primary,
-                        fontSize: "22px"
-                    })}
-                >
-                    Novos achados
+                    <Box
+                        component="h2"
+                        sx={(theme) => ({
+                            color: theme.palette.text.primary,
+                            fontSize: "22px"
+                        })}
+                    >
+                        Criar achados
+                    </Box>
+                </Box>
+
+                <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                    <Typography variant="body2" color="text.secondary">
+                        {report?.exam.description}
+                    </Typography>
+                    <Typography variant="body1">
+                        {report?.exam.client.name}
+                    </Typography>
                 </Box>
             </Box>
 
