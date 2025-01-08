@@ -27,10 +27,11 @@ import { maskCPF, maskPhone } from '@/app/utils/format'
 
 interface UserFormProps {
   user: User | null
-  onSave: (user: User) => void
-  onCancel: () => void
   roles: Role[]
+  onCancel: () => void
   onSubmit: (data: User) => Promise<void>
+  readOnly?: boolean
+  formErrors: { cpf?: string; email?: string }
 }
 
 const userFormSchema = z.object({
@@ -56,7 +57,7 @@ const userFormSchema = z.object({
 
 type UserFormData = z.infer<typeof userFormSchema>
 
-export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
+export function UserForm({ user, roles, onCancel, onSubmit, readOnly = false, formErrors }: UserFormProps) {
   const [isHealthcareProfessional, setIsHealthcareProfessional] = useState(user?.isHealthcareProfessional ?? false)
   const [isOtherProfessional, setIsOtherProfessional] = useState(!user?.isHealthcareProfessional || false)
 
@@ -85,7 +86,7 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
     mode: 'onBlur'
   })
 
-  const onSubmit = async (data: UserFormData) => {
+  const handleFormSubmit = async (data: UserFormData) => {
     try {
       const baseUser = {
         fullName: data.fullName,
@@ -101,7 +102,7 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
         registrationNumber: data.registrationNumber
       }
 
-      await onSave(baseUser)
+      await onSubmit(baseUser)
     } catch (error) {
       console.error('Error submitting form:', error)
     }
@@ -130,8 +131,10 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
 
   return (
     <Dialog open onClose={onCancel} maxWidth='md' fullWidth>
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
-        <DialogTitle>{user ? 'Editar Usuário' : 'Novo Usuário'}</DialogTitle>
+      <form onSubmit={handleSubmit(handleFormSubmit)} noValidate>
+        <DialogTitle>
+          {readOnly ? 'Visualizar Usuário' : user ? 'Editar Usuário' : 'Novo Usuário'}
+        </DialogTitle>
         <DialogContent>
           <Box sx={{ mt: 2 }}>
             <Stack spacing={2}>
@@ -140,7 +143,16 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                   name='fullName'
                   control={control}
                   render={({ field, fieldState: { error } }) => (
-                    <TextField {...field} label='Nome Completo' fullWidth error={!!error} helperText={error?.message} />
+                    <TextField
+                      {...field}
+                      label='Nome Completo'
+                      fullWidth
+                      error={!!error}
+                      helperText={error?.message}
+                      InputProps={{
+                        readOnly: readOnly
+                      }}
+                    />
                   )}
                 />
 
@@ -148,7 +160,16 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                   name='email'
                   control={control}
                   render={({ field, fieldState: { error } }) => (
-                    <TextField {...field} label='Email' fullWidth error={!!error} helperText={error?.message} />
+                    <TextField
+                      {...field}
+                      label='Email'
+                      fullWidth
+                      error={!!error || !!formErrors.email}
+                      helperText={error?.message || formErrors.email}
+                      InputProps={{
+                        readOnly: readOnly
+                      }}
+                    />
                   )}
                 />
               </Box>
@@ -166,6 +187,9 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                       InputLabelProps={{ shrink: true }}
                       error={!!error}
                       helperText={error?.message}
+                      InputProps={{
+                        readOnly: readOnly
+                      }}
                     />
                   )}
                 />
@@ -176,7 +200,10 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                   render={({ field }) => (
                     <FormControl fullWidth>
                       <InputLabel>Gênero</InputLabel>
-                      <Select {...field}>
+                      <Select
+                        {...field}
+                        disabled={readOnly}
+                      >
                         <MenuItem value='male'>Masculino</MenuItem>
                         <MenuItem value='female'>Feminino</MenuItem>
                         <MenuItem value='other'>Outro</MenuItem>
@@ -200,9 +227,12 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                       }}
                       label='CPF'
                       fullWidth
-                      error={!!error}
-                      helperText={error?.message}
+                      error={!!error || !!formErrors.cpf}
+                      helperText={error?.message || formErrors.cpf}
                       inputProps={{ maxLength: 14 }}
+                      InputProps={{
+                        readOnly: readOnly
+                      }}
                     />
                   )}
                 />
@@ -223,6 +253,9 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                       error={!!error}
                       helperText={error?.message}
                       inputProps={{ maxLength: 15 }}
+                      InputProps={{
+                        readOnly: readOnly
+                      }}
                     />
                   )}
                 />
@@ -235,7 +268,7 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                   render={({ field }) => (
                     <FormControl fullWidth>
                       <InputLabel>Status</InputLabel>
-                      <Select {...field}>
+                      <Select {...field} readOnly={readOnly}>
                         <MenuItem value='active'>Ativo</MenuItem>
                         <MenuItem value='inactive'>Inativo</MenuItem>
                       </Select>
@@ -252,7 +285,9 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                       <Select
                         {...field}
                         value={field.value || ''}
-                        onChange={e => field.onChange(String(e.target.value))}>
+                        onChange={e => field.onChange(String(e.target.value))}
+                        disabled={readOnly}
+                      >
                         {roles.map(role => (
                           <MenuItem key={role.id} value={String(role.id)}>
                             {role.name}
@@ -272,6 +307,7 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                       checked={isHealthcareProfessional}
                       onChange={handleProfessionalTypeChange}
                       name='isHealthcareProfessional'
+                      disabled={readOnly}
                     />
                   }
                   label='Profissional de Saúde'
@@ -282,6 +318,7 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                       checked={isOtherProfessional}
                       onChange={handleProfessionalTypeChange}
                       name='isOtherProfessional'
+                      disabled={readOnly}
                     />
                   }
                   label='Outro Profissional'
@@ -300,9 +337,9 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                           {...field}
                           value={field.value || ''}
                           defaultValue={field.value || ''}
-                          onChange={e => {
-                            field.onChange(e)
-                          }}>
+                          onChange={e => field.onChange(e)}
+                          disabled={readOnly}
+                        >
                           {PROFESSIONAL_TYPES.map(type => (
                             <MenuItem key={type.id} value={type.id}>
                               {type.name}
@@ -323,6 +360,9 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                         fullWidth
                         error={!!error}
                         helperText={error?.message}
+                        InputProps={{
+                          readOnly: readOnly
+                        }}
                       />
                     )}
                   />
@@ -340,9 +380,9 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
                         {...field}
                         value={field.value || ''}
                         defaultValue={field.value || ''}
-                        onChange={e => {
-                          field.onChange(e)
-                        }}>
+                        onChange={e => field.onChange(e)}
+                        disabled={readOnly}
+                      >
                         {OTHER_PROFESSIONAL_ROLES.map(type => (
                           <MenuItem key={type.id} value={type.id}>
                             {type.name}
@@ -356,21 +396,31 @@ export function UserForm({ user, onSave, onCancel, roles }: UserFormProps) {
             </Stack>
           </Box>
         </DialogContent>
+
         <DialogActions>
           <Button
             onClick={onCancel}
-            disabled={isSubmitting}
             sx={(theme) => ({
               backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
               border: "1px solid #e5e7eb"
             })}
             className="text-kai-primary transition-colors hover:bg-kai-primary/10"
           >
-            <span className="text-kai-primary">Cancelar</span>
+            <span className="text-kai-primary">
+              {readOnly ? 'Fechar' : 'Cancelar'}
+            </span>
           </Button>
-          <Button type='submit' className="bg-kai-primary hover:bg-kai-primary/70" disabled={isSubmitting}>
-            <span style={{ color: theme.palette.mode === 'light' ? '#fff' : '#000' }}>{isSubmitting ? 'Salvando...' : 'Salvar'}</span>
-          </Button>
+          {!readOnly && (
+            <Button
+              type='submit'
+              className="bg-kai-primary hover:bg-kai-primary/70"
+              disabled={isSubmitting}
+            >
+              <span style={{ color: theme.palette.mode === 'light' ? '#fff' : '#000' }}>
+                {isSubmitting ? 'Salvando...' : 'Salvar'}
+              </span>
+            </Button>
+          )}
         </DialogActions>
       </form>
     </Dialog>
