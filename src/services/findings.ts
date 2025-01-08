@@ -23,6 +23,14 @@ export async function deleteFinding(reportId: string, id: string) {
     return api.delete(`/reports/${reportId}/findings/${id}`)
 }
 
-export async function getFindingsByReportId(reportId: string) {
-    return api.get(`/reports/${reportId}/findings`)
+export async function getFindingsByReportId(reportId: string, options?: { limit?: number }) {
+    const params = new URLSearchParams()
+    if (options?.limit) {
+        params.append('limit', options.limit.toString())
+    }
+
+    const queryString = params.toString()
+    const url = `/reports/${reportId}/findings${queryString ? `?${queryString}` : ''}`
+
+    return api.get(url)
 } 

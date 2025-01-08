@@ -38,8 +38,8 @@ export default function AchadosPage() {
         isLoading: isLoadingFindings,
         error: findingsError
     } = useQuery({
-        queryKey: ['findings', reportId],
-        queryFn: () => getFindingsByReportId(reportId)
+        queryKey: ['findings', reportId, 'recent'],
+        queryFn: () => getFindingsByReportId(reportId, { limit: 3 })
     })
 
     const isLoading = isLoadingReport || isLoadingFindings
@@ -212,14 +212,27 @@ export default function AchadosPage() {
                             }}
                         >
                             <Box>
-                                {!isFormVisible && achados.length === 0 && (
-                                    <Typography
-                                        sx={{
-                                            fontSize: "13px"
-                                        }}
-                                    >
-                                        Nenhum achado adicionado ainda.
-                                    </Typography>
+                                {!isFormVisible && (
+                                    <Stack spacing={0.5}>
+                                        <Typography
+                                            sx={(theme) => ({
+                                                fontSize: "14px",
+                                                color: theme.palette.text.secondary
+                                            })}
+                                        >
+                                            {achados.length} {achados.length === 1 ? 'achado' : 'achados'} adicionados
+                                        </Typography>
+                                        <Typography
+                                            variant="caption"
+                                            sx={(theme) => ({
+                                                fontSize: "12px",
+                                                color: theme.palette.text.secondary,
+                                                opacity: 0.8
+                                            })}
+                                        >
+                                            Exibindo os 3 últimos achados
+                                        </Typography>
+                                    </Stack>
                                 )}
                             </Box>
                             {!isFormVisible && (
