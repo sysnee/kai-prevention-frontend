@@ -126,27 +126,30 @@ export default function AchadoCard({
                 <Box sx={{ display: 'flex', gap: 1 }}>
                     <Button
                         onClick={onEdit}
-                        sx={(theme) => ({
-                            backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
-                            border: "1px solid #e5e7eb"
-                        })}
-                        className="text-kai-primary transition-colors hover:bg-kai-primary/10"
+                        sx={{
+                            minWidth: 'auto',
+                            padding: '8px',
+                            color: '#FF8046',
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 128, 70, 0.1)',
+                            }
+                        }}
                     >
-                        <EditIcon sx={{ fontSize: "16px", marginRight: ".2em" }} />
-                        Editar achado
+                        <EditIcon sx={{ fontSize: "20px" }} />
                     </Button>
 
                     <Button
                         onClick={onDelete}
-                        sx={(theme) => ({
-                            backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
-                            border: "1px solid #e5e7eb",
-                            color: 'error.main'
-                        })}
-                        className="transition-colors hover:bg-error-light"
+                        sx={{
+                            minWidth: 'auto',
+                            padding: '8px',
+                            color: '#FF8046',
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 128, 70, 0.1)',
+                            }
+                        }}
                     >
-                        <DeleteIcon sx={{ fontSize: "16px", marginRight: ".2em" }} />
-                        Excluir
+                        <DeleteIcon sx={{ fontSize: "20px" }} />
                     </Button>
                 </Box>
             </Stack>
