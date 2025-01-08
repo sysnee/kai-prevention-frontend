@@ -27,21 +27,29 @@ interface Client {
 }
 
 interface ClientFormProps {
-  client?: Client
-  onCreate: (data: Client) => Promise<void>
-  onEdit?: (data: Client) => Promise<void>
+  client?: any
+  onSubmit: (data: any) => Promise<void>
   onCancel?: () => void
   readOnly?: boolean
-  cpfError?: string
-  emailError?: string
+  formErrors?: {
+    cpf?: string
+    email?: string
+  }
+  isSubmitting?: boolean
 }
 
-export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = false, cpfError, emailError }: ClientFormProps) {
+export function ClientForm({
+  client,
+  onSubmit,
+  onCancel,
+  readOnly = false,
+  formErrors = {},
+  isSubmitting = false
+}: ClientFormProps) {
   const theme = useTheme();
   const [isLoadingCep, setIsLoadingCep] = useState(false);
   const [cepError, setCepError] = useState('');
   const [selectedQuestionnaire, setSelectedQuestionnaire] = useState<any>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const formatCEP = (cep: string) => {
     return cep.replace(/\D/g, '').replace(/(\d{5})(\d{3})/, '$1-$2');
@@ -157,78 +165,18 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
     return value.replace(/\D/g, '');
   };
 
-  const validateForm = () => {
-    try {
-      const cleanedData = {
-        ...formData,
-        zipcode: removeFormatting(formData.zipcode),
-        cpf: removeFormatting(formData.cpf),
-        phone: removeFormatting(formData.phone),
-      }
-
-      clientSchema.parse(cleanedData)
-      return true
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        error.errors.forEach(err => {
-          toast.error(err.message)
-        })
-      }
-      return false
-    }
-  }
-
-  const handleSubmitCreate = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('handleSubmitCreate', formData)
 
-    if (!validateForm()) return
-
-    setIsSubmitting(true)
-    try {
-      const cleanedData = {
-        ...formData,
-        zipcode: removeFormatting(formData.zipcode),
-        cpf: removeFormatting(formData.cpf),
-        phone: removeFormatting(formData.phone),
-      }
-
-      await onCreate(cleanedData)
-      toast.success('Cliente criado com sucesso!')
-      onCancel?.()
-    } catch (error) {
-      console.error('Erro ao criar cliente:', error)
-      toast.error('Erro ao criar cliente. Tente novamente.')
-    } finally {
-      setIsSubmitting(false)
+    const cleanedData = {
+      ...formData,
+      zipcode: removeFormatting(formData.zipcode),
+      cpf: removeFormatting(formData.cpf),
+      phone: removeFormatting(formData.phone),
     }
-  }
 
-  const handleSubmitEdit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log('handleSubmitEdit', formData)
-
-    if (!validateForm()) return
-
-    setIsSubmitting(true)
-    try {
-      const cleanedData = {
-        ...formData,
-        id: client?.id,
-        zipcode: removeFormatting(formData.zipcode),
-        cpf: removeFormatting(formData.cpf),
-        phone: removeFormatting(formData.phone),
-      }
-
-      await onEdit(cleanedData)
-      toast.success('Cliente atualizado com sucesso!')
-      onCancel?.()
-    } catch (error) {
-      console.error('Erro ao atualizar cliente:', error)
-      toast.error('Erro ao atualizar cliente. Tente novamente.')
-    } finally {
-      setIsSubmitting(false)
-    }
+    console.log(cleanedData)
+    await onSubmit(cleanedData)
   }
 
   const renderQuestionnaireHistory = () => {
@@ -316,7 +264,7 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
           </button>
         </div>
 
-        <form onSubmit={client ? handleSubmitEdit : handleSubmitCreate} className="flex-1 overflow-y-auto">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-2 gap-6">
               {/* Informações Pessoais */}
@@ -394,10 +342,14 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
                       className={`w-full px-3 py-2 rounded-md ${readOnly ? '' : 'focus:ring-2 focus:ring-kai-primary focus:border-transparent'
                         }`}
                       style={{
-                        border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)",
+                        border: formErrors.cpf
+                          ? "1px solid #dc2626"
+                          : theme.palette.mode === 'light'
+                            ? "1px solid rgba(229,231,235,255)"
+                            : "1px solid hsla(220, 20%, 25%, 0.6)",
                       }}
                     />
-                    {cpfError && <p className="mt-1 text-sm text-red-600">{cpfError}</p>}
+                    {formErrors.cpf && <p className="mt-1 text-sm text-red-600">{formErrors.cpf}</p>}
                   </div>
                 </div>
               </div>
@@ -443,10 +395,14 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
                       className={`w-full px-3 py-2 rounded-md ${readOnly ? '' : 'focus:ring-2 focus:ring-kai-primary focus:border-transparent'
                         }`}
                       style={{
-                        border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)",
+                        border: formErrors.email
+                          ? "1px solid #dc2626"
+                          : theme.palette.mode === 'light'
+                            ? "1px solid rgba(229,231,235,255)"
+                            : "1px solid hsla(220, 20%, 25%, 0.6)",
                       }}
                     />
-                    {emailError && <p className="mt-1 text-sm text-red-600">{emailError}</p>}
+                    {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
                   </div>
 
                   <div>
@@ -612,6 +568,9 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
                   type="submit"
                   disabled={isSubmitting}
                   className="bg-kai-primary hover:bg-kai-primary/70"
+                  style={{
+                    color: theme.palette.mode === 'light' ? '#fff' : '#000'
+                  }}
                 >
                   {isSubmitting ? (
                     <span className="flex items-center">

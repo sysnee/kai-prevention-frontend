@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useState } from 'react'
-import { CheckIcon, Plus, Search, Users } from 'lucide-react'
+import { Plus, Search, Users } from 'lucide-react'
 import { ClientForm } from '../../components/clients/ClientForm'
 import ClientsGrid from '../../components/clients/ClientsGrid'
-import { Alert, AlertColor, useTheme, Box, Skeleton } from '@mui/material'
-import { ConfirmationModal } from '../../components/shared/ConfirmationModal'
+import { useTheme, Box, Skeleton } from '@mui/material'
 import api from '@/lib/api'
+import toast from 'react-hot-toast'
 
 export default function Clients() {
   const [showForm, setShowForm] = useState(false)
@@ -15,19 +15,9 @@ export default function Clients() {
   const [selectedClient, setSelectedClient] = useState<any>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [formMode, setFormMode] = useState<'edit' | 'view' | 'create'>('create')
-  const [errorCPF, setErrorCPF] = useState('')
-  const [errorEmail, setErrorEmail] = useState('')
-  const [deleteModal, setDeleteModal] = useState(false)
-  const [alertInfo, setAlertInfo] = useState<{
-    visible: boolean
-    message: string
-    severity: AlertColor | undefined
-  }>({
-    visible: false,
-    message: '',
-    severity: undefined
-  })
   const theme = useTheme()
+  const [formErrors, setFormErrors] = useState<{ cpf?: string; email?: string }>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const getClients = async () => {
     try {
@@ -59,18 +49,6 @@ export default function Clients() {
     getClients()
   }, [])
 
-  const showAlert = (message: string, severity: AlertColor) => {
-    setAlertInfo({
-      visible: true,
-      message,
-      severity
-    })
-
-    setTimeout(() => {
-      setAlertInfo({ visible: false, message: '', severity: undefined })
-    }, 3000)
-  }
-
   const handleView = (client: any) => {
     setSelectedClient(client)
     setFormMode('view')
@@ -83,97 +61,47 @@ export default function Clients() {
     setShowForm(true)
   }
 
-  const handleDelete = (client: any) => {
-    setDeleteModal(true)
-    setSelectedClient(client)
-  }
-
   const handleClose = () => {
     setShowForm(false)
     setSelectedClient(null)
     setFormMode('create')
-    setErrorCPF('')
-    setErrorEmail('')
+    setFormErrors({})
   }
 
-  const handleCloseModal = () => {
-    setDeleteModal(false)
-    selectedClient(null)
-  }
-
-  const handleCreateClient = async (data: any) => {
-    console.log('handleCreateClient', data)
+  const handleSave = async (data: any) => {
+    setFormErrors({})
     try {
-      setErrorCPF('')
-      setErrorEmail('')
-      const response = await api.post('clients', data)
+      setIsSubmitting(true)
 
-      if (response.status === 200 || response.status === 201) {
-        showAlert('Cliente cadastrado com sucesso.', 'success')
-        setSelectedClient(null)
-        setErrorCPF('')
-        setErrorEmail('')
-        handleClose()
+      if (selectedClient) {
+        await api.put(`/clients/${selectedClient.id}`, data)
+      } else {
+        await api.post('/clients', data)
       }
-    } catch (error: unknown | any | Error) {
-      console.error('Erro ao enviar a requisição:', error)
-      if (error.response) {
-        const errorMessage = error.response.data.message.message
-        if (errorMessage === 'CPF already exists') {
-          setErrorCPF('CPF já cadastrado.')
+
+      toast.success(`Cliente ${selectedClient ? 'atualizado' : 'cadastrado'} com sucesso.`)
+      setSelectedClient(null)
+      handleClose()
+      getClients()
+
+    } catch (error: any) {
+      try {
+        const parsedError = JSON.parse(error.message.replace('API Error: ', ''));
+        const errorMessage = parsedError.message?.message || 'Erro desconhecido';
+
+        if (errorMessage.includes('CPF already exists')) {
+          setFormErrors({ cpf: 'CPF já cadastrado' })
+        } else if (errorMessage.includes('Email already exists')) {
+          setFormErrors({ email: 'Email já cadastrado' })
+        } else {
+          toast.error(errorMessage);
         }
-        if (errorMessage === 'Email already exists') {
-          setErrorEmail('Email já cadastrado.')
-        }
+      } catch (parseError) {
+        console.error('Erro ao interpretar a mensagem de erro:', parseError);
+        toast.error(`Erro inesperado ao ${selectedClient ? 'atualizar' : 'salvar'} cliente`);
       }
     } finally {
-      getClients()
-    }
-  }
-
-  const handleEditClient = async (data: any) => {
-    try {
-      setErrorCPF('')
-      setErrorEmail('')
-      const { id, ...dataWithoutId } = data
-      const response = await api.put(`clients/${data.id}`, dataWithoutId)
-
-      if (response.status === 200 || response.status === 201) {
-        showAlert('Cliente atualizado com sucesso.', 'success')
-        handleClose()
-        setSelectedClient(null)
-        setErrorCPF('')
-        setErrorEmail('')
-      }
-    } catch (error: unknown | any | Error) {
-      console.error('Erro ao enviar a requisição:', error)
-      if (error.response) {
-        const errorMessage = error.response.data.message.message
-        if (errorMessage === 'CPF already exists') {
-          setErrorCPF('CPF já cadastrado.')
-        }
-        if (errorMessage === 'Email already exists') {
-          setErrorEmail('Email já cadastrado.')
-        }
-      }
-    } finally {
-      getClients()
-    }
-  }
-
-  const handleDeleteClient = async () => {
-    try {
-      const response = await api.delete(`clients/${selectedClient.id}`)
-
-      if (response.status === 200 || response.status === 201) {
-        showAlert('Cliente excluído com sucesso.', 'success')
-        setDeleteModal(false)
-        setSelectedClient(null)
-      }
-    } catch (error) {
-      console.error('Erro ao enviar a requisição:', error)
-    } finally {
-      getClients()
+      setIsSubmitting(false)
     }
   }
 
@@ -183,16 +111,6 @@ export default function Clients() {
       style={{
         width: '100%'
       }}>
-      <div
-        style={{
-          marginBottom: '1em'
-        }}>
-        {alertInfo.visible && alertInfo.severity && (
-          <Alert variant='filled' icon={<CheckIcon fontSize='inherit' />} severity={alertInfo.severity}>
-            {alertInfo.message}
-          </Alert>
-        )}
-      </div>
       <div className='flex justify-between items-center mb-8 gap-6'>
         <h1 className='text-3xl font-bold'>Cadastro de Clientes</h1>
         <button
@@ -265,22 +183,11 @@ export default function Clients() {
       {showForm && (
         <ClientForm
           client={selectedClient}
-          onCreate={handleCreateClient}
-          onEdit={handleEditClient}
+          onSubmit={handleSave}
           onCancel={handleClose}
-          readOnly={false}
-          cpfError={errorCPF}
-          emailError={errorEmail}
-        />
-      )}
-
-      {deleteModal && (
-        <ConfirmationModal
-          isOpen={deleteModal}
-          onClose={handleCloseModal}
-          onConfirm={handleDeleteClient}
-          itemName={selectedClient?.name}
-          itemType='perfil'
+          readOnly={formMode === 'view'}
+          formErrors={formErrors}
+          isSubmitting={isSubmitting}
         />
       )}
     </div>
