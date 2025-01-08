@@ -1,9 +1,11 @@
 import api from '@/lib/api'
+import { Severity } from '@/types/findings'
 
-interface CreateFindingDto {
+export interface CreateFindingDto {
     system: string
     organ: string
     pathology: string
+    severity: Severity
     image_url?: string
     observations?: string
     report_id: string

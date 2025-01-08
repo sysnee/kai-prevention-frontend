@@ -24,6 +24,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Imagem } from "@/app/types/types";
 import { humanBodyData } from "../constants/human-body-data";
+import { Severity } from '@/types/findings'
 
 // Add this common style object for all Autocompletes
 const autocompleteStyles = {
@@ -88,18 +89,28 @@ export default function AchadoForm({
 }) {
 
   const theme = useTheme();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    id: string
+    titulo: string
+    laudoId: string
+    imageId: string
+    sistema: string
+    orgao: string
+    patologias: string[]
+    patologiasDetalhes: Record<string, {
+      descricao: string
+      severidade: Severity
+    }>
+    observacoes: string
+  }>({
     id: "",
     titulo: "",
     laudoId: "",
     imageId: "",
     sistema: "",
     orgao: "",
-    patologias: [] as string[],
-    patologiasDetalhes: {} as Record<string, {
-      descricao: string,
-      severidade: 'nenhuma' | 'leve' | 'moderada' | 'grave'
-    }>,
+    patologias: [],
+    patologiasDetalhes: {},
     observacoes: "",
   });
 
@@ -165,7 +176,7 @@ export default function AchadoForm({
 
     const todasSeveridadesNenhuma = formData.patologias.length > 0 &&
       formData.patologias.every(patologia =>
-        formData.patologiasDetalhes[patologia]?.severidade === 'nenhuma'
+        formData.patologiasDetalhes[patologia]?.severidade === Severity.NONE
       );
 
     // Usa plural se houver mais de uma patologia
@@ -180,7 +191,7 @@ export default function AchadoForm({
 
     const todasSeveridadesNenhuma = formData.patologias.length > 0 &&
       formData.patologias.every(patologia =>
-        formData.patologiasDetalhes[patologia]?.severidade === 'nenhuma'
+        formData.patologiasDetalhes[patologia]?.severidade === Severity.NONE
       );
 
     // Usa plural se houver mais de uma patologia
@@ -492,7 +503,7 @@ export default function AchadoForm({
               </FormLabel>
               <RadioGroup
                 row
-                value={formData.patologiasDetalhes[patologia]?.severidade || 'nenhuma'}
+                value={formData.patologiasDetalhes[patologia]?.severidade || Severity.NONE}
                 onChange={(e) => {
                   setFormData(prev => ({
                     ...prev,
@@ -500,14 +511,14 @@ export default function AchadoForm({
                       ...prev.patologiasDetalhes,
                       [patologia]: {
                         descricao: prev.patologiasDetalhes[patologia]?.descricao || '',
-                        severidade: e.target.value as 'nenhuma' | 'leve' | 'moderada' | 'grave'
+                        severidade: e.target.value as Severity
                       }
                     }
                   }));
                 }}
               >
                 <FormControlLabel
-                  value="nenhuma"
+                  value={Severity.NONE}
                   control={
                     <Radio
                       size="small"
@@ -521,7 +532,7 @@ export default function AchadoForm({
                   label="Nenhuma"
                 />
                 <FormControlLabel
-                  value="leve"
+                  value={Severity.LOW}
                   control={
                     <Radio
                       size="small"
@@ -535,7 +546,7 @@ export default function AchadoForm({
                   label="Leve"
                 />
                 <FormControlLabel
-                  value="moderada"
+                  value={Severity.MEDIUM}
                   control={
                     <Radio
                       size="small"
@@ -549,7 +560,21 @@ export default function AchadoForm({
                   label="Moderada"
                 />
                 <FormControlLabel
-                  value="grave"
+                  value={Severity.HIGH}
+                  control={
+                    <Radio
+                      size="small"
+                      sx={{
+                        '&.Mui-checked': {
+                          color: '#FF8046'
+                        }
+                      }}
+                    />
+                  }
+                  label="Alta"
+                />
+                <FormControlLabel
+                  value={Severity.SEVERE}
                   control={
                     <Radio
                       size="small"
@@ -578,7 +603,7 @@ export default function AchadoForm({
                       ...prev.patologiasDetalhes,
                       [patologia]: {
                         descricao: e.target.value,
-                        severidade: prev.patologiasDetalhes[patologia]?.severidade || 'nenhuma'
+                        severidade: prev.patologiasDetalhes[patologia]?.severidade || Severity.NONE
                       }
                     }
                   }));

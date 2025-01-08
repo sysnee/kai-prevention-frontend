@@ -1,4 +1,4 @@
-import { Finding, Achado } from '@/types/findings'
+import { Finding, Achado, Severity } from '@/types/findings'
 
 export function mapFindingToAchado(finding: Finding): Achado {
     return {
@@ -10,12 +10,13 @@ export function mapFindingToAchado(finding: Finding): Achado {
         patologiasDetalhes: {
             [finding.pathology]: {
                 descricao: finding.observations || '',
-                severidade: 'nenhuma'
+                severidade: finding.severity
             }
         },
         observacoes: finding.observations || '',
         imageId: finding.image_url,
-        laudoId: finding.report.id
+        laudoId: finding.report.id,
+        severidade: finding.severity
     }
 }
 

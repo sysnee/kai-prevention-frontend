@@ -1,3 +1,11 @@
+export enum Severity {
+    NONE = 'none',
+    LOW = 'low',
+    MEDIUM = 'medium',
+    HIGH = 'high',
+    SEVERE = 'severe',
+}
+
 interface User {
     id: string
     fullName: string
@@ -17,6 +25,7 @@ export interface Finding {
     system: string
     organ: string
     pathology: string
+    severity: Severity
     image_url?: string
     observations?: string
     created_at: string
@@ -33,11 +42,11 @@ export interface Achado {
     patologias: string[]
     patologiasDetalhes: Record<string, {
         descricao: string
-        severidade: 'nenhuma' | 'leve' | 'moderada' | 'grave'
+        severidade: Severity
     }>
     observacoes: string
     imageId?: string
     imagemId?: string
-    severidade?: string
+    severidade?: Severity
     laudoId: string
 } 

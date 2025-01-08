@@ -1,8 +1,30 @@
-import { Avatar, Box, Button, Card, CardContent, Stack, Typography } from "@mui/material";
+import { Avatar, Box, Button, Card, CardContent, Stack, Typography, Chip } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Finding } from "@/types/findings";
+import { Finding, Severity } from "@/types/findings";
 import { formatDate } from "@/utils/format-date";
+
+function getSeverityColor(severity: Severity) {
+    const colors = {
+        [Severity.NONE]: 'default',
+        [Severity.LOW]: 'success',
+        [Severity.MEDIUM]: 'warning',
+        [Severity.HIGH]: 'error',
+        [Severity.SEVERE]: 'error'
+    } as const;
+    return colors[severity];
+}
+
+function getSeverityLabel(severity: Severity) {
+    const labels = {
+        [Severity.NONE]: 'Normal',
+        [Severity.LOW]: 'Leve',
+        [Severity.MEDIUM]: 'Moderada',
+        [Severity.HIGH]: 'Alta',
+        [Severity.SEVERE]: 'Grave'
+    };
+    return labels[severity];
+}
 
 export default function AchadoCard({
     achado,
@@ -24,9 +46,23 @@ export default function AchadoCard({
             })}
         >
             <CardContent>
-                <Typography variant="h4">
-                    {achado.pathology}
-                </Typography>
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography variant="h4">
+                        {achado.pathology}
+                    </Typography>
+                    <Chip
+                        label={getSeverityLabel(achado.severity)}
+                        color={getSeverityColor(achado.severity)}
+                        size="small"
+                        sx={{
+                            height: '20px',
+                            '& .MuiChip-label': {
+                                fontSize: '0.75rem',
+                                px: 1
+                            }
+                        }}
+                    />
+                </Stack>
             </CardContent>
 
             <Stack

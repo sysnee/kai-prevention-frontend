@@ -9,7 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import AchadoCard from "@/app/components/AchadoCard";
 import AchadoForm from "@/app/components/AchadoForm";
 import { Imagem } from "@/app/types/types"
-import { Achado, Finding } from "@/types/findings"
+import { Achado, Finding, Severity } from "@/types/findings"
 import ImageEstudo from "@/app/components/ImageEstudo";
 import Image from "next/image";
 import { useParams } from 'next/navigation'
@@ -66,27 +66,39 @@ export default function AchadosPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     function handleAddAchado(achado: any) {
-        createFindingMutation.mutate({
+        // Create a finding for each pathology
+        const findings = achado.patologias.map(pathology => ({
             system: achado.sistema,
             organ: achado.orgao,
-            pathology: achado.patologias[0],
+            pathology,
+            severity: achado.patologiasDetalhes[pathology]?.severidade || Severity.NONE,
             image_url: selectedImage?.link,
-            observations: achado.observacoes,
+            observations: `${achado.patologiasDetalhes[pathology]?.descricao || ''}\n\n${achado.observacoes || ''}`.trim(),
             report_id: reportId
-        })
+        }))
+
+        // Create all findings in parallel and wait for all to complete
+        Promise.all(findings.map(finding => createFindingMutation.mutateAsync(finding)))
+            .then(() => {
+                queryClient.invalidateQueries({ queryKey: ['findings', reportId] })
+                setIsFormVisible(false)
+                setSelectedImage(null)
+            })
     }
 
     function handleEditAchado(updatedAchado: any) {
         if (!editAchado?.id) return
 
+        // When editing, we only update the single finding
         updateFindingMutation.mutate({
             id: editAchado.id,
             finding: {
                 system: updatedAchado.sistema,
                 organ: updatedAchado.orgao,
                 pathology: updatedAchado.patologias[0],
+                severity: updatedAchado.patologiasDetalhes[updatedAchado.patologias[0]]?.severidade || Severity.NONE,
                 image_url: selectedImage?.link,
-                observations: updatedAchado.observacoes
+                observations: `${updatedAchado.patologiasDetalhes[updatedAchado.patologias[0]]?.descricao || ''}\n\n${updatedAchado.observacoes || ''}`.trim()
             }
         })
     }
