@@ -10,6 +10,7 @@ interface ConfirmationModalProps {
   title?: string
   itemName: string
   itemType: string
+  isDeleting?: boolean
 }
 
 export function ConfirmationModal({
@@ -18,7 +19,8 @@ export function ConfirmationModal({
   onConfirm,
   title = 'Confirmar Exclusão',
   itemName,
-  itemType
+  itemType,
+  isDeleting = false
 }: ConfirmationModalProps) {
   const theme = useTheme()
 
@@ -73,6 +75,7 @@ export function ConfirmationModal({
           }}>
           <Button
             onClick={onClose}
+            disabled={isDeleting}
             sx={(theme) => ({
               backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
               border: "1px solid #e5e7eb"
@@ -81,11 +84,15 @@ export function ConfirmationModal({
           >
             <Typography>Cancelar</Typography>
           </Button>
-          <Button className="bg-kai-primary hover:bg-kai-primary/70">
+          <Button
+            onClick={onConfirm}
+            disabled={isDeleting}
+            className="bg-kai-primary hover:bg-kai-primary/70"
+          >
             <Typography sx={(theme) => ({
               color: theme.palette.mode === 'light' ? '#fff' : '#000'
             })}>
-              Excluir
+              {isDeleting ? 'Excluindo...' : 'Excluir'}
             </Typography>
           </Button>
         </Box>

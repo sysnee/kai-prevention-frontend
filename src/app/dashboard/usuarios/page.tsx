@@ -8,20 +8,25 @@ import { Box, Typography, TextField, Button, CircularProgress } from '@mui/mater
 import { DataGrid, GridRowsProp, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { User } from '../../types/user'
 import { Role } from '../../types/permissions'
-import { showToast } from '../../../lib/toast'
+import toast from 'react-hot-toast'
 import { useTheme } from '@mui/system'
 import { getProfessionalTypeName } from '../../constants/translations'; // Ajuste o caminho conforme necessário
 import ActionButtons from '../permissions/components/ActionButtons'
 import { Plus, Search } from 'lucide-react'
 import { PlusOne } from '@mui/icons-material'
+import { ConfirmationModal } from '../../components/shared/ConfirmationModal'
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [showUserForm, setShowUserForm] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [formMode, setFormMode] = useState<'edit' | 'view' | 'create'>('create')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [formErrors, setFormErrors] = useState<{ cpf?: string; email?: string }>({})
 
   useEffect(() => {
     fetchUsers()
@@ -58,21 +63,43 @@ export default function UserManagement() {
 
   const handleView = (user: User) => {
     setSelectedUser(user)
+    setFormMode('view')
     setShowUserForm(true)
   }
 
   const handleEdit = (user: User) => {
     setSelectedUser(user)
+    setFormMode('edit')
     setShowUserForm(true)
   }
 
-  const handleDelete = async (userId: number) => {
+  const handleClose = () => {
+    setShowUserForm(false)
+    setFormErrors({})
+    setSelectedUser(null)
+    setFormMode('create')
+  }
+
+  const handleDeleteClick = (user: User) => {
+    setSelectedUser(user)
+    setShowConfirmationModal(true)
+  }
+
+  const handleConfirmDelete = async () => {
     try {
-      await api.delete(`/users/${userId}`)
-      showToast.success('Usuário deletado com sucesso')
+      if (!selectedUser?.id) return
+      setIsDeleting(true)
+
+      await api.delete(`/users/${selectedUser.id}`)
+      toast.success('Usuário deletado com sucesso')
       fetchUsers()
+      setShowConfirmationModal(false)
+      setSelectedUser(null)
     } catch (error) {
       console.error('Erro ao deletar usuário:', error)
+      toast.error('Erro ao deletar usuário')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -171,10 +198,10 @@ export default function UserManagement() {
     },
     {
       field: 'actions',
-      headerName: '',
+      headerName: 'Ações',
       flex: 0.4,
       minWidth: 200,
-      renderCell: (params: GridRenderCellParams) => (
+      renderCell: (params) => (
         <Box
           sx={(theme) => ({
             padding: "0 .8em",
@@ -191,7 +218,7 @@ export default function UserManagement() {
           <ActionButtons
             onView={() => handleView(params.row)}
             onEdit={() => handleEdit(params.row)}
-            onDelete={() => handleDelete(params.row.id)}
+            onDelete={() => handleDeleteClick(params.row)}
           />
         </Box>
       ),
@@ -199,43 +226,39 @@ export default function UserManagement() {
   ]
 
   const handleSave = async (user: User) => {
+    setFormErrors({})
     try {
       if (selectedUser) {
-        await api.patch(`/users/${selectedUser.id}`, user);
+        await api.patch(`/users/${selectedUser.id}`, user)
       } else {
-        await api.post('/users', user);
+        await api.post('/users', user)
       }
 
-      showToast.success('Usuário salvo com sucesso');
-      fetchUsers();
-      setShowUserForm(false);
-      setSelectedUser(null);
-    } catch (error) {
-      console.error('Erro ao salvar usuário:', error);
-    }
-  };
+      toast.success('Usuário salvo com sucesso')
+      fetchUsers()
+      setFormErrors({})
+      setShowUserForm(false)
+      setSelectedUser(null)
+    } catch (error: any) {
+      console.error('Erro ao salvar usuário:', error)
 
-  const onSubmit = async (data: User) => {
-    try {
-      const submitData = {
-        fullName: data.fullName,
-        birthDate: data.birthDate,
-        gender: data.gender,
-        cpf: data.cpf,
-        phone: data.phone,
-        email: data.email,
-        status: data.status,
-        roleId: data.roleId,
-        isHealthcareProfessional: data.isHealthcareProfessional,
-        professionalType: data.professionalType,
-        registrationNumber: data.isHealthcareProfessional ? data.registrationNumber : null
-      };
+      try {
+        const parsedError = JSON.parse(error.message.replace('API Error: ', ''));
+        const errorMessage = parsedError.message?.message || 'Erro desconhecido';
 
-      await handleSave(submitData);
-    } catch (error) {
-      console.error('Erro ao submeter formulário:', error);
+        if (errorMessage.includes('CPF already exists')) {
+          setFormErrors({ cpf: 'CPF já cadastrado' })
+        } else if (errorMessage.includes('Email already exists')) {
+          setFormErrors({ email: 'Email já cadastrado' })
+        } else {
+          toast.error(errorMessage);
+        }
+      } catch (parseError) {
+        console.error('Erro ao interpretar a mensagem de erro:', parseError);
+        toast.error('Erro inesperado ao salvar usuário');
+      }
     }
-  };
+  }
 
   return (
     <Box sx={{ width: '100%', boxSizing: 'border-box' }}>
@@ -313,12 +336,21 @@ export default function UserManagement() {
         <UserForm
           user={selectedUser}
           roles={roles}
-          onSave={handleSave}
-          onCancel={() => {
-            setShowUserForm(false)
-            setSelectedUser(null)
-          }}
-          onSubmit={onSubmit}
+          onCancel={handleClose}
+          onSubmit={handleSave}
+          readOnly={formMode === 'view'}
+          formErrors={formErrors}
+        />
+      )}
+
+      {showConfirmationModal && (
+        <ConfirmationModal
+          isOpen={showConfirmationModal}
+          onClose={() => setShowConfirmationModal(false)}
+          onConfirm={handleConfirmDelete}
+          itemName={selectedUser?.fullName || ''}
+          itemType="usuário"
+          isDeleting={isDeleting}
         />
       )}
     </Box>
