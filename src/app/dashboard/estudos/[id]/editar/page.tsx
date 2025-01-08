@@ -179,20 +179,8 @@ export default function AchadosPage() {
                 </Box>
             </Stack>
 
-            <Box
-                sx={{
-                    marginTop: "1em"
-                }}
-            >
-                <Grid
-                    container
-                    spacing={2}
-                    marginTop={1}
-                    wrap="wrap"
-                    alignItems="flex-start"
-                >
-
-
+            <Box sx={{ marginTop: "1em" }}>
+                <Grid container spacing={2} marginTop={1} wrap="wrap" alignItems="flex-start">
                     <Grid
                         size={{ xs: 12, md: 7 }}
                         padding={2}
@@ -200,101 +188,63 @@ export default function AchadosPage() {
                             display: "flex",
                             flexDirection: "column",
                             alignItems: "center",
-                            backgroundColor: theme.palette.mode === 'light' ? "#f5f6fa" : "transparent",
+                            backgroundColor: theme.palette.mode === 'light' ? "#fff" : "transparent",
                             borderRadius: "5px",
                             border: theme.palette.mode === 'light' ? "none" : "1px solid hsla(220, 20%, 25%, 0.6)"
                         })}
                     >
-                        <Box
-                            sx={{
-                                width: "100%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                            }}
-                        >
-                            <Box>
+                        <Box sx={{ width: "100%", backgroundColor: "#f5f6fa", padding: "1em" }}>
+                            <Box className="flex items-center justify-between mb-6">
+                                <p className="text-sm text-slate-500">
+                                    Adicione os achados encontrados no exame.
+                                </p>
                                 {!isFormVisible && (
-                                    <Stack spacing={0.5}>
-                                        <Typography
-                                            sx={(theme) => ({
-                                                fontSize: "14px",
-                                                color: theme.palette.text.secondary
-                                            })}
-                                        >
-                                            {achados.length} {achados.length === 1 ? 'achado' : 'achados'} adicionados
-                                        </Typography>
-                                        <Typography
-                                            variant="caption"
-                                            sx={(theme) => ({
-                                                fontSize: "12px",
-                                                color: theme.palette.text.secondary,
-                                                opacity: 0.8
-                                            })}
-                                        >
-                                            Exibindo os 3 últimos achados
-                                        </Typography>
-                                    </Stack>
+                                    <Button
+                                        onClick={() => setIsFormVisible(true)}
+                                        className="bg-kai-primary text-white hover:bg-kai-primary/70 flex items-center gap-2"
+                                    >
+                                        <AddIcon sx={{ fontSize: 18 }} />
+                                        Adicionar achado
+                                    </Button>
                                 )}
                             </Box>
-                            {!isFormVisible && (
-                                <Button
-                                    onClick={() => setIsFormVisible(true)}
-                                    className="bg-kai-primary hover:bg-kai-primary/70 flex items-center"
-                                >
-                                    <AddIcon sx={(theme) => ({
-                                        color: theme.palette.mode === 'light' ? '#fff' : '#000',
-                                        fontSize: "18px"
-                                    })} />
-                                    <Typography sx={(theme) => ({
-                                        color: theme.palette.mode === 'light' ? '#fff' : '#000'
-                                    })}>
-                                        Adicionar achado
-                                    </Typography>
-                                </Button>
-                            )}
-                        </Box>
 
-                        {isFormVisible && (
-                            <Box
-                                sx={{
-                                    width: "100%",
-                                    marginTop: "2em"
-                                }}
-                            >
-                                <AchadoForm
-                                    achadoToEdit={editAchado}
-                                    onCancel={() => {
-                                        setIsFormVisible(false)
-                                        setEditAchado(null)
-                                    }}
-                                    onSubmit={editAchado ? handleEditAchado : handleAddAchado}
-                                    selectedImage={selectedImage}
-                                    isLoading={createFindingMutation.isPending || updateFindingMutation.isPending}
-                                />
-                            </Box>
-                        )}
 
-                        <Box
-                            sx={{
-                                width: "100%"
-                            }}
-                        >
-                            <Stack
-                                spacing={2}
-                                marginTop={2}
-                            >
-                                {achados.length > 0 && achados.map(achado => (
-                                    <AchadoCard
-                                        key={achado.id}
-                                        achado={achado}
-                                        onEdit={() => handleEdit(achado)}
-                                        onDelete={() => handleDeleteAchado(achado.id)}
+                            {isFormVisible && (
+                                <Box className="mb-8">
+                                    <AchadoForm
+                                        achadoToEdit={editAchado}
+                                        onCancel={() => {
+                                            setIsFormVisible(false)
+                                            setEditAchado(null)
+                                        }}
+                                        onSubmit={editAchado ? handleEditAchado : handleAddAchado}
+                                        selectedImage={selectedImage}
+                                        isLoading={createFindingMutation.isPending || updateFindingMutation.isPending}
                                     />
-                                ))}
-                            </Stack>
+                                </Box>
+                            )}
+
                         </Box>
+                        <Stack spacing={2} sx={{ marginTop: "5em", width: "100%" }}>
+                            <div>
+                                <h2 className="text-lg font-medium text-slate-900">Últimos adicionados</h2>
+                                <p className="text-sm text-slate-500">
+                                    Exibindo os 3 últimos
+                                </p>
+                            </div>
+                            {achados.length > 0 && achados.map(achado => (
+                                <AchadoCard
+                                    key={achado.id}
+                                    achado={achado}
+                                    onEdit={() => handleEdit(achado)}
+                                    onDelete={() => handleDeleteAchado(achado.id)}
+                                />
+                            ))}
+                        </Stack>
+
                     </Grid>
+
                     <Grid
                         size={{ xs: 12, md: 5 }}
                         sx={(theme) => ({

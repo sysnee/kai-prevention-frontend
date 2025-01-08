@@ -8,17 +8,6 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-function getSeverityVariant(severity: Severity) {
-    const variants = {
-        [Severity.NONE]: 'secondary',
-        [Severity.LOW]: 'success',
-        [Severity.MEDIUM]: 'warning',
-        [Severity.HIGH]: 'destructive',
-        [Severity.SEVERE]: 'destructive'
-    } as const;
-    return variants[severity];
-}
-
 function getSeverityLabel(severity: Severity) {
     const labels = {
         [Severity.NONE]: 'Normal',
@@ -40,62 +29,57 @@ export default function AchadoCard({
     onDelete: () => void
 }) {
     return (
-        <div className="group relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600">
-            {/* Top status bar showing severity */}
+        <div className="group relative bg-white rounded-lg shadow-sm border border-gray-200">
             <div className={cn(
                 "h-1 rounded-t-lg",
                 {
-                    'bg-green-500': achado.severity === Severity.LOW,
-                    'bg-yellow-500': achado.severity === Severity.MEDIUM,
-                    'bg-red-500': achado.severity === Severity.HIGH,
-                    'bg-purple-500': achado.severity === Severity.SEVERE,
-                    'bg-gray-300': achado.severity === Severity.NONE,
+                    'bg-yellow-300': achado.severity === Severity.LOW,
+                    'bg-amber-500': achado.severity === Severity.MEDIUM,
+                    'bg-rose-500': achado.severity === Severity.HIGH,
+                    'bg-black': achado.severity === Severity.SEVERE,
+                    'bg-slate-300': achado.severity === Severity.NONE,
                 }
             )} />
 
-            <div className="p-4">
-                {/* Header with pathology and actions */}
-                <div className="flex items-start justify-between mb-3">
+            <div className="p-3">
+                <div className="flex items-start justify-between mb-2">
                     <div>
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        <h3 className="text-base font-medium text-slate-900">
                             {achado.pathology}
                         </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-slate-600">
                             {achado.system} • {achado.organ}
                         </p>
                     </div>
 
-                    {/* Action buttons */}
-                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={onEdit}
-                            className="h-8 w-8 p-0"
+                            className="h-7 w-7 p-0"
                         >
-                            <EditIcon sx={{ fontSize: 20 }} />
+                            <EditIcon className="h-3.5 w-3.5 text-slate-600" />
                         </Button>
                         <Button
                             variant="ghost"
                             size="sm"
                             onClick={onDelete}
-                            className="h-8 w-8 p-0 hover:text-destructive"
+                            className="h-7 w-7 p-0 hover:text-rose-500"
                         >
-                            <DeleteIcon sx={{ fontSize: 20 }} />
+                            <DeleteIcon className="h-3.5 w-3.5 text-slate-600" />
                         </Button>
                     </div>
                 </div>
 
-                {/* Observations */}
                 {achado.observations && (
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                    <p className="text-xs text-slate-700 mb-2 line-clamp-2">
                         {achado.observations}
                     </p>
                 )}
 
-                {/* Image thumbnail if exists */}
                 {achado.image_url && (
-                    <div className="relative h-32 mb-4 rounded-md overflow-hidden">
+                    <div className="relative h-24 mb-2 rounded overflow-hidden bg-slate-50">
                         <Image
                             src={achado.image_url}
                             alt="Finding image"
@@ -105,20 +89,30 @@ export default function AchadoCard({
                     </div>
                 )}
 
-                {/* Footer with metadata */}
-                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                    <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                            <AvatarFallback>
+                <div className="flex items-center justify-between text-xs border-t border-slate-100 pt-2 mt-2">
+                    <div className="flex items-center gap-1.5">
+                        <Avatar className="h-6 w-6 bg-slate-100">
+                            <AvatarFallback className="text-xs text-slate-600">
                                 {achado.created_by?.fullName[0]}
                             </AvatarFallback>
                         </Avatar>
                         <div>
-                            <p className="font-medium">{achado.created_by?.fullName}</p>
-                            <p>{formatDate(achado.created_at)}</p>
+                            <p className="font-medium text-slate-700 text-xs">{achado.created_by?.fullName}</p>
+                            <p className="text-slate-500 text-xs">{formatDate(achado.created_at)}</p>
                         </div>
                     </div>
-                    <Badge variant={getSeverityVariant(achado.severity)}>
+                    <Badge
+                        variant="custom"
+                        className={cn(
+                            "text-xs px-1.5 py-0.5",
+                            {
+                                'bg-yellow-300 text-white': achado.severity === Severity.LOW,
+                                'bg-amber-500 text-white': achado.severity === Severity.MEDIUM,
+                                'bg-rose-500 text-white': achado.severity === Severity.HIGH,
+                                'bg-black text-white': achado.severity === Severity.SEVERE,
+                                'bg-slate-300 text-slate-700': achado.severity === Severity.NONE,
+                            }
+                        )}>
                         {getSeverityLabel(achado.severity)}
                     </Badge>
                 </div>
