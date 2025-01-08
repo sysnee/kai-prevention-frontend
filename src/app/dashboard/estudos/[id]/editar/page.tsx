@@ -18,6 +18,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { mapAchadosToFindings, mapFindingToAchado } from '@/utils/findings-mapper'
 import { getReportById } from '@/services/reports'
 import { Report } from '@/types/reports'
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { PlusIcon } from "lucide-react";
 
 export default function AchadosPage() {
     const params = useParams()
@@ -499,5 +501,37 @@ export default function AchadosPage() {
                 </Alert>
             )}
         </Box>
+    )
+}
+
+function FindingsSection({ findings, onEdit, onDelete }) {
+    return (
+        <div className="h-full flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-xl font-semibold">Findings</h2>
+                    <p className="text-sm text-gray-500">
+                        {findings.length} findings added
+                    </p>
+                </div>
+                <Button>
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    Add Finding
+                </Button>
+            </div>
+
+            <ScrollArea className="flex-1">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-1">
+                    {findings.map(finding => (
+                        <AchadoCard
+                            key={finding.id}
+                            achado={finding}
+                            onEdit={() => onEdit(finding)}
+                            onDelete={() => onDelete(finding.id)}
+                        />
+                    ))}
+                </div>
+            </ScrollArea>
+        </div>
     )
 }

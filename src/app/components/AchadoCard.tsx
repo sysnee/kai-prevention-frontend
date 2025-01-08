@@ -1,18 +1,22 @@
-import { Avatar, Box, Button, Card, CardContent, Stack, Typography, Chip } from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Finding, Severity } from "@/types/findings";
 import { formatDate } from "@/utils/format-date";
+import { cn } from "@/lib/utils";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-function getSeverityColor(severity: Severity) {
-    const colors = {
-        [Severity.NONE]: 'default',
+function getSeverityVariant(severity: Severity) {
+    const variants = {
+        [Severity.NONE]: 'secondary',
         [Severity.LOW]: 'success',
         [Severity.MEDIUM]: 'warning',
-        [Severity.HIGH]: 'error',
-        [Severity.SEVERE]: 'error'
+        [Severity.HIGH]: 'destructive',
+        [Severity.SEVERE]: 'destructive'
     } as const;
-    return colors[severity];
+    return variants[severity];
 }
 
 function getSeverityLabel(severity: Severity) {
@@ -36,123 +40,89 @@ export default function AchadoCard({
     onDelete: () => void
 }) {
     return (
-        <Card
-            sx={(theme) => ({
-                width: "100%",
-                backgroundColor: "#fff",
-                border: theme.palette.mode === 'light' ? "none" : "1px solid #333b4d",
-                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                overflow: "auto"
-            })}
-        >
-            <CardContent>
-                <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography variant="h4">
-                        {achado.pathology}
-                    </Typography>
-                    <Chip
-                        label={getSeverityLabel(achado.severity)}
-                        color={getSeverityColor(achado.severity)}
-                        size="small"
-                        sx={{
-                            height: '20px',
-                            '& .MuiChip-label': {
-                                fontSize: '0.75rem',
-                                px: 1
-                            }
-                        }}
-                    />
-                </Stack>
-            </CardContent>
+        <div className="group relative bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all duration-200 hover:border-gray-200 dark:hover:border-gray-600">
+            {/* Top status bar showing severity */}
+            <div className={cn(
+                "h-1 rounded-t-lg",
+                {
+                    'bg-green-500': achado.severity === Severity.LOW,
+                    'bg-yellow-500': achado.severity === Severity.MEDIUM,
+                    'bg-red-500': achado.severity === Severity.HIGH,
+                    'bg-purple-500': achado.severity === Severity.SEVERE,
+                    'bg-gray-300': achado.severity === Severity.NONE,
+                }
+            )} />
 
-            <Stack
-                direction="row"
-                alignItems="start"
-                justifyContent="space-between"
-                spacing={2}
-                marginTop={2}
-            >
-                <Box>
-                    <Typography sx={{ fontSize: "16px" }} variant="h6">
-                        Sistema
-                    </Typography>
-                    <Typography sx={{ fontSize: "12px", fontWeight: "lighter" }} variant="h6">
-                        {achado.system}
-                    </Typography>
-                </Box>
+            <div className="p-4">
+                {/* Header with pathology and actions */}
+                <div className="flex items-start justify-between mb-3">
+                    <div>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                            {achado.pathology}
+                        </h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {achado.system} • {achado.organ}
+                        </p>
+                    </div>
 
-                <Box>
-                    <Typography sx={{ fontSize: "16px" }} variant="h6">
-                        Órgão
-                    </Typography>
-                    <Typography sx={{ fontSize: "12px", fontWeight: "lighter" }} variant="h6">
-                        {achado.organ}
-                    </Typography>
-                </Box>
+                    {/* Action buttons */}
+                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onEdit}
+                            className="h-8 w-8 p-0"
+                        >
+                            <EditIcon sx={{ fontSize: 20 }} />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onDelete}
+                            className="h-8 w-8 p-0 hover:text-destructive"
+                        >
+                            <DeleteIcon sx={{ fontSize: 20 }} />
+                        </Button>
+                    </div>
+                </div>
 
+                {/* Observations */}
                 {achado.observations && (
-                    <Box>
-                        <Typography sx={{ fontSize: "16px" }} variant="h6">
-                            Observações
-                        </Typography>
-                        <Typography sx={{ fontSize: "12px", fontWeight: "lighter" }} variant="h6">
-                            {achado.observations}
-                        </Typography>
-                    </Box>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                        {achado.observations}
+                    </p>
                 )}
-            </Stack>
 
-            <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                marginTop={3}
-            >
-                <Box sx={{ display: "flex", alignItems: "center", gap: ".5em" }}>
-                    <Avatar sx={{ width: 35, height: 35 }}></Avatar>
-                    <Box>
-                        <Typography sx={{ fontSize: "11px", fontWeight: "bold" }}>
-                            Laudado por
-                        </Typography>
-                        <Typography sx={{ fontSize: "10px" }}>
-                            {achado.created_by?.fullName}
-                        </Typography>
-                        <Typography sx={{ fontSize: "9px", color: "text.secondary" }}>
-                            {formatDate(achado.created_at)}
-                        </Typography>
-                    </Box>
-                </Box>
+                {/* Image thumbnail if exists */}
+                {achado.image_url && (
+                    <div className="relative h-32 mb-4 rounded-md overflow-hidden">
+                        <Image
+                            src={achado.image_url}
+                            alt="Finding image"
+                            fill
+                            className="object-cover"
+                        />
+                    </div>
+                )}
 
-                <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button
-                        onClick={onEdit}
-                        sx={{
-                            minWidth: 'auto',
-                            padding: '8px',
-                            color: '#FF8046',
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 128, 70, 0.1)',
-                            }
-                        }}
-                    >
-                        <EditIcon sx={{ fontSize: "20px" }} />
-                    </Button>
-
-                    <Button
-                        onClick={onDelete}
-                        sx={{
-                            minWidth: 'auto',
-                            padding: '8px',
-                            color: '#FF8046',
-                            '&:hover': {
-                                backgroundColor: 'rgba(255, 128, 70, 0.1)',
-                            }
-                        }}
-                    >
-                        <DeleteIcon sx={{ fontSize: "20px" }} />
-                    </Button>
-                </Box>
-            </Stack>
-        </Card>
+                {/* Footer with metadata */}
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center gap-2">
+                        <Avatar className="h-8 w-8">
+                            <AvatarFallback>
+                                {achado.created_by?.fullName[0]}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <p className="font-medium">{achado.created_by?.fullName}</p>
+                            <p>{formatDate(achado.created_at)}</p>
+                        </div>
+                    </div>
+                    <Badge variant={getSeverityVariant(achado.severity)}>
+                        {getSeverityLabel(achado.severity)}
+                    </Badge>
+                </div>
+            </div>
+        </div>
     )
 }
