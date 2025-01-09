@@ -6,40 +6,32 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { humanBodyData } from "../constants/human-body-data"
 import { ChevronDown, ChevronRight } from "lucide-react"
-import BoneIcon from "../assets/human-icons/bone.png"
-import Image from "next/image"
-
-interface SystemFindings {
-    count: number
-    severity: "minor" | "moderate" | "informational" | "none"
-}
+import { Severity } from "@/types/findings"
 
 interface BodySystemSelectorProps {
-    findings?: Record<string, SystemFindings>
+    findings?: Record<string, { count: number; severity: Severity }>
     onSystemSelect?: (system: string, subsystem?: string, pathology?: string) => void
     selectedSystem?: string
 }
 
-const systemIcons: Record<string, React.ReactNode> = {
-    // "Sistema Musculoesquelético": <Image src={BoneIcon} alt="Bone" className="h-4 w-4" />
-}
-
-function getSeverityColor(severity: SystemFindings["severity"]) {
+function getSeverityColor(severity: Severity) {
     switch (severity) {
-        case "minor":
-            return "bg-yellow-500 hover:bg-yellow-600"
-        case "moderate":
-            return "bg-orange-500 hover:bg-orange-600"
-        case "informational":
-            return "bg-blue-500 hover:bg-blue-600"
-        case "none":
-            return "bg-green-500 hover:bg-green-600"
+        case Severity.LOW:
+            return "bg-yellow-300 hover:bg-yellow-400"
+        case Severity.MEDIUM:
+            return "bg-amber-500 hover:bg-amber-600"
+        case Severity.HIGH:
+            return "bg-rose-500 hover:bg-rose-600"
+        case Severity.SEVERE:
+            return "bg-black hover:bg-black/90"
+        case Severity.NONE:
+            return "bg-blue-300 hover:bg-blue-400"
         default:
             return "bg-gray-500 hover:bg-gray-600"
     }
 }
 
-function SystemBadge({ count, severity }: SystemFindings) {
+function SystemBadge({ count, severity }: { count: number, severity: Severity }) {
     if (count === 0) {
         return (
             <Badge className="ml-auto bg-green-500 text-white hover:bg-green-600">
@@ -48,15 +40,9 @@ function SystemBadge({ count, severity }: SystemFindings) {
         )
     }
 
-    const severityText = {
-        minor: "minor",
-        moderate: "moderate",
-        informational: "informational"
-    }[severity]
-
     return (
-        <Badge className={cn("ml-auto", getSeverityColor(severity))}>
-            {count} {severityText} {count === 1 ? "finding" : "findings"}
+        <Badge className={cn("ml-auto text-white", getSeverityColor(severity))}>
+            {count} {'achados'}
         </Badge>
     )
 }
@@ -66,124 +52,138 @@ export function BodySystemSelector({
     onSystemSelect,
     selectedSystem
 }: BodySystemSelectorProps) {
-    const [expandedSystem, setExpandedSystem] = useState<string>("Sistema Musculoesquelético")
+    const [expandedSystem, setExpandedSystem] = useState<string>()
     const [expandedOrgan, setExpandedOrgan] = useState<string>()
 
     function toggleSystem(system: string) {
-        setExpandedSystem(current => current === system ? "" : system)
-        // Close any open organ when changing systems
+        setExpandedSystem(current => current === system ? undefined : system)
         setExpandedOrgan(undefined)
     }
 
-    function toggleOrgan(system: string, organ: string) {
-        // Only toggle organs within the currently expanded system
-        if (system === expandedSystem) {
-            setExpandedOrgan(current => current === organ ? undefined : organ)
-        }
+    function toggleOrgan(organ: string) {
+        setExpandedOrgan(current => current === organ ? undefined : organ)
     }
 
     return (
-        <ScrollArea className="h-[calc(100vh-100px)] w-full rounded-md border">
-            <div className="p-4">
-                {Object.entries(humanBodyData).map(([system, subsystems]) => {
-                    const systemFindings = findings[system] || { count: 0, severity: "none" }
-                    const isExpanded = expandedSystem === system
-                    const isSelected = selectedSystem === system
+        <>
+            {/* <pre>
+                {JSON.stringify(findings, null, 2)}
+            </pre> */}
+            <ScrollArea className="h-[calc(100vh-100px)] w-full rounded-md border">
+                <div className="p-4">
+                    {Object.entries(humanBodyData).map(([system, organs]) => {
+                        const systemData = findings[system]
+                        const isExpanded = expandedSystem === system
+                        const isSelected = selectedSystem === system
 
-                    return (
-                        <div key={system} className="mb-4">
-                            <div className="flex w-full items-center">
-                                <button
-                                    onClick={() => toggleSystem(system)}
-                                    className="p-2 hover:bg-accent rounded-l-lg"
-                                    aria-label={isExpanded ? "Collapse system" : "Expand system"}
-                                >
-                                    {isExpanded ? (
-                                        <ChevronDown className="h-4 w-4" />
-                                    ) : (
-                                        <ChevronRight className="h-4 w-4" />
-                                    )}
-                                </button>
-                                <button
-                                    onClick={() => onSystemSelect?.(system)}
-                                    className={cn(
-                                        "flex flex-1 items-center justify-between rounded-r-lg p-2 text-left text-sm",
-                                        "hover:bg-accent hover:text-accent-foreground",
-                                        isSelected && "bg-accent text-accent-foreground"
-                                    )}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        {systemIcons[system]}
+                        const systemSeverity = systemData?.severity || Severity.NONE
+
+                        return (
+                            <div key={system} className="mb-4">
+                                <div className="flex w-full items-center">
+                                    <button
+                                        onClick={() => toggleSystem(system)}
+                                        className="p-2 hover:bg-accent rounded-l-lg"
+                                    >
+                                        {isExpanded ? (
+                                            <ChevronDown className="h-4 w-4" />
+                                        ) : (
+                                            <ChevronRight className="h-4 w-4" />
+                                        )}
+                                    </button>
+                                    <button
+                                        onClick={() => onSystemSelect?.(system)}
+                                        className={cn(
+                                            "flex flex-1 text-left items-center justify-between rounded-r-lg p-2 text-sm",
+                                            "hover:bg-accent hover:text-accent-foreground",
+                                            isSelected && "bg-accent text-accent-foreground"
+                                        )}
+                                    >
                                         <span>{system}</span>
-                                    </div>
-                                    <SystemBadge {...systemFindings} />
-                                </button>
-                            </div>
-
-                            {isExpanded && (
-                                <div className="ml-4 space-y-1">
-                                    {Object.entries(subsystems).map(([organ, pathologies]) => {
-                                        const isOrganExpanded = expandedOrgan === organ
-                                        const organFindings = findings[`${system}/${organ}`]
-                                        const isOrganSelected = selectedSystem === `${system}/${organ}`
-
-                                        return (
-                                            <div key={organ} className="mt-1">
-                                                <div className="flex w-full items-center">
-                                                    <button
-                                                        onClick={() => toggleOrgan(system, organ)}
-                                                        className="p-2 hover:bg-accent rounded-l-lg"
-                                                        aria-label={isOrganExpanded ? "Collapse organ" : "Expand organ"}
-                                                    >
-                                                        {isOrganExpanded ? (
-                                                            <ChevronDown className="h-4 w-4" />
-                                                        ) : (
-                                                            <ChevronRight className="h-4 w-4" />
-                                                        )}
-                                                    </button>
-                                                    <button
-                                                        onClick={() => onSystemSelect?.(system, organ)}
-                                                        className={cn(
-                                                            "flex flex-1 items-center justify-between rounded-r-lg p-2 text-left text-sm",
-                                                            "hover:bg-accent hover:text-accent-foreground",
-                                                            isOrganSelected && "bg-accent text-accent-foreground"
-                                                        )}
-                                                    >
-                                                        <span>{organ}</span>
-                                                        {organFindings && <SystemBadge {...organFindings} />}
-                                                    </button>
-                                                </div>
-
-                                                {isOrganExpanded && (
-                                                    <div className="ml-10 space-y-1 py-1">
-                                                        {pathologies.map((pathology: string) => {
-                                                            const isPathologySelected = selectedSystem === `${system}/${organ}/${pathology}`
-
-                                                            return (
-                                                                <button
-                                                                    key={pathology}
-                                                                    onClick={() => onSystemSelect?.(system, organ, pathology)}
-                                                                    className={cn(
-                                                                        "w-full rounded-lg p-2 text-left text-sm",
-                                                                        "hover:bg-accent hover:text-accent-foreground",
-                                                                        isPathologySelected && "bg-accent text-accent-foreground"
-                                                                    )}
-                                                                >
-                                                                    {pathology}
-                                                                </button>
-                                                            )
-                                                        })}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )
-                                    })}
+                                        <SystemBadge
+                                            count={systemData?.count || 0}
+                                            severity={systemSeverity}
+                                        />
+                                    </button>
                                 </div>
-                            )}
-                        </div>
-                    )
-                })}
-            </div>
-        </ScrollArea>
+
+                                {isExpanded && (
+                                    <div className="ml-4 space-y-1">
+                                        {Object.entries(organs).map(([organ, pathologies]) => {
+                                            const organFindings = findings[`${system}/${organ}`]
+                                            const isOrganExpanded = expandedOrgan === organ
+                                            const isOrganSelected = selectedSystem === `${system}/${organ}`
+
+                                            return (
+                                                <div key={organ} className="mt-1">
+                                                    <div className="flex w-full items-center">
+                                                        <button
+                                                            onClick={() => toggleOrgan(organ)}
+                                                            className="p-2 hover:bg-accent rounded-l-lg"
+                                                        >
+                                                            {isOrganExpanded ? (
+                                                                <ChevronDown className="h-4 w-4" />
+                                                            ) : (
+                                                                <ChevronRight className="h-4 w-4" />
+                                                            )}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => onSystemSelect?.(system, organ)}
+                                                            className={cn(
+                                                                "flex flex-1 items-center justify-between rounded-r-lg p-2 text-sm",
+                                                                "hover:bg-accent hover:text-accent-foreground",
+                                                                isOrganSelected && "bg-accent text-accent-foreground"
+                                                            )}
+                                                        >
+                                                            <span>{organ}</span>
+                                                            <SystemBadge
+                                                                count={organFindings?.count || 0}
+                                                                severity={organFindings?.severity || Severity.NONE}
+                                                            />
+                                                        </button>
+                                                    </div>
+
+                                                    {isOrganExpanded && (
+                                                        <div className="ml-10 space-y-1 py-1">
+                                                            {pathologies.map((pathology: string) => {
+                                                                const pathologyKey = `${system}/${organ}/${pathology}`
+                                                                const pathologyFindings = findings[pathologyKey]
+                                                                const isPathologySelected = selectedSystem === `${system}/${organ}/${pathology}`
+
+                                                                return (
+                                                                    <button
+                                                                        key={pathology}
+                                                                        onClick={() => onSystemSelect?.(system, organ, pathology)}
+                                                                        className={cn(
+                                                                            "w-full rounded-lg p-2 text-left text-sm",
+                                                                            "hover:bg-accent hover:text-accent-foreground",
+                                                                            isPathologySelected && "bg-accent text-accent-foreground"
+                                                                        )}
+                                                                    >
+                                                                        <div className="flex justify-between items-center">
+                                                                            <span>{pathology}</span>
+                                                                            {pathologyFindings && (
+                                                                                <SystemBadge
+                                                                                    count={pathologyFindings.count}
+                                                                                    severity={pathologyFindings.severity}
+                                                                                />
+                                                                            )}
+                                                                        </div>
+                                                                    </button>
+                                                                )
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        )
+                    })}
+                </div>
+            </ScrollArea>
+        </>
     )
 } 

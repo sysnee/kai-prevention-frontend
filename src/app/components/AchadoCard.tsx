@@ -37,7 +37,7 @@ export default function AchadoCard({
                     'bg-amber-500': achado.severity === Severity.MEDIUM,
                     'bg-rose-500': achado.severity === Severity.HIGH,
                     'bg-black': achado.severity === Severity.SEVERE,
-                    'bg-slate-300': achado.severity === Severity.NONE,
+                    'bg-blue-300': achado.severity === Severity.NONE,
                 }
             )} />
 
@@ -110,7 +110,7 @@ export default function AchadoCard({
                                 'bg-amber-500 text-white': achado.severity === Severity.MEDIUM,
                                 'bg-rose-500 text-white': achado.severity === Severity.HIGH,
                                 'bg-black text-white': achado.severity === Severity.SEVERE,
-                                'bg-slate-300 text-slate-700': achado.severity === Severity.NONE,
+                                'bg-blue-300 text-white': achado.severity === Severity.NONE,
                             }
                         )}>
                         {getSeverityLabel(achado.severity)}

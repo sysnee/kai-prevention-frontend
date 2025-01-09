@@ -14,6 +14,25 @@ import AchadoCard from "@/app/components/AchadoCard"
 import AddIcon from '@mui/icons-material/Add'
 import { BodySystemSelector } from "@/app/components/BodySystemSelector"
 import { useState } from "react"
+import { Finding, Severity } from "@/types/findings"
+
+function getHighestSeverity(findings: Array<{ severity: Severity }>) {
+    if (findings.some(f => f.severity === Severity.SEVERE)) return Severity.SEVERE
+    if (findings.some(f => f.severity === Severity.HIGH)) return Severity.HIGH
+    if (findings.some(f => f.severity === Severity.MEDIUM)) return Severity.MEDIUM
+    if (findings.some(f => f.severity === Severity.LOW)) return Severity.LOW
+    return Severity.NONE
+}
+
+interface SystemFindings {
+    count: number
+    organs: {
+        [organ: string]: Array<{
+            pathology: string
+            severity: Severity
+        }>
+    }
+}
 
 export default function EstudoResumoPage() {
     const theme = useTheme()
@@ -36,7 +55,7 @@ export default function EstudoResumoPage() {
         data: findings = [],
         isLoading: isLoadingFindings,
         error: findingsError
-    } = useQuery({
+    } = useQuery<Finding[]>({
         queryKey: ['findings', reportId],
         queryFn: () => getFindingsByReportId(reportId)
     })
@@ -44,27 +63,56 @@ export default function EstudoResumoPage() {
     const isLoading = isLoadingReport || isLoadingFindings
     const error = reportError || findingsError
 
-    // Organize findings by system
+    // Group findings by system and organ
     const findingsBySystem = findings.reduce((acc, finding) => {
-        const system = finding.bodySystem
-        const subsystem = finding.bodySubsystem
-        const key = subsystem ? `${system}/${subsystem}` : system
+        const system = finding.system
+        const organ = finding.organ || 'general' // Use 'general' for system-level findings
 
-        if (!acc[key]) {
-            acc[key] = { count: 0, severity: "none" as const }
+        // Initialize system if it doesn't exist
+        if (!acc[system]) {
+            acc[system] = {
+                count: 0,
+                organs: {}
+            }
         }
 
-        acc[key].count++
-        if (finding.severity === "moderate" || acc[key].severity === "moderate") {
-            acc[key].severity = "moderate"
-        } else if (finding.severity === "minor" || acc[key].severity === "minor") {
-            acc[key].severity = "minor"
-        } else {
-            acc[key].severity = "informational"
+        // Initialize organ array if it doesn't exist
+        if (!acc[system].organs[organ]) {
+            acc[system].organs[organ] = []
         }
+
+        // Add finding to the appropriate organ array
+        acc[system].organs[organ].push({
+            pathology: finding.pathology,
+            severity: finding.severity
+        })
+
+        // Increment system count
+        acc[system].count++
 
         return acc
-    }, {} as Record<string, { count: number; severity: "minor" | "moderate" | "informational" | "none" }>)
+    }, {} as Record<string, SystemFindings>)
+
+    // Convert to format expected by BodySystemSelector
+    const cleanedFindingsBySystem = Object.entries(findingsBySystem).reduce<Record<string, { count: number; severity: Severity }>>((acc, [system, value]: [string, SystemFindings]) => {
+        // Add system-level entry
+        acc[system] = {
+            count: value.count,
+            severity: getHighestSeverity(Object.values(value.organs).flat())
+        }
+
+        // Add organ-level entries
+        Object.entries(value.organs).forEach(([organ, findings]) => {
+            if (organ !== 'general') {
+                acc[`${system}/${organ}`] = {
+                    count: findings.length,
+                    severity: getHighestSeverity(findings)
+                }
+            }
+        })
+
+        return acc
+    }, {} as Record<string, { count: number; severity: Severity }>)
 
     if (isLoading) {
         return (
@@ -139,7 +187,7 @@ export default function EstudoResumoPage() {
                 <Grid container spacing={1.5} justifyContent="start" marginTop={1} wrap="wrap">
                     <Grid size={3}>
                         <BodySystemSelector
-                            findings={findingsBySystem}
+                            findings={cleanedFindingsBySystem}
                             onSystemSelect={(system, subsystem, pathology) => {
                                 const newSelection = pathology
                                     ? `${system}/${subsystem}/${pathology}`
