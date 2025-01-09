@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { humanBodyData } from "../constants/human-body-data"
-import { ChevronDown, ChevronRight } from "lucide-react"
+import { ChevronDown, ChevronRight, Check, X } from "lucide-react"
 import { Severity } from "@/types/findings"
 
 interface BodySystemSelectorProps {
@@ -31,19 +31,52 @@ function getSeverityColor(severity: Severity) {
     }
 }
 
+function getIconColor(severity: Severity) {
+    switch (severity) {
+        case Severity.LOW:
+            return "text-yellow-500"
+        case Severity.MEDIUM:
+            return "text-amber-500"
+        case Severity.HIGH:
+            return "text-rose-500"
+        case Severity.SEVERE:
+            return "text-black"
+        case Severity.NONE:
+            return "text-blue-500"
+        default:
+            return "text-gray-500"
+    }
+}
+
 function SystemBadge({ count, severity }: { count: number, severity: Severity }) {
     if (count === 0) {
         return (
-            <Badge className="ml-auto bg-green-500 text-white hover:bg-green-600">
+            <div className="ml-auto text-green-500 text-sm font-medium">
                 Normal
-            </Badge>
+            </div>
         )
     }
 
     return (
-        <Badge className={cn("ml-auto text-white", getSeverityColor(severity))}>
+        <div className={cn("ml-auto font-medium text-sm", getIconColor(severity))}>
             {count} {count === 1 ? 'achado' : 'achados'}
-        </Badge>
+        </div>
+    )
+}
+
+function OrganBadge({ count, severity }: { count: number, severity: Severity }) {
+    if (count === 0) {
+        return (
+            <div className="ml-auto">
+                <Check className="h-4 w-4 text-green-500" />
+            </div>
+        )
+    }
+
+    return (
+        <div className="ml-auto">
+            <X className={cn("h-4 w-4", getIconColor(severity))} />
+        </div>
     )
 }
 
@@ -130,13 +163,13 @@ export function BodySystemSelector({
                                                         <button
                                                             onClick={() => onSystemSelect?.(system, organ)}
                                                             className={cn(
-                                                                "flex flex-1 items-center justify-between rounded-r-lg p-2 text-sm",
+                                                                "flex flex-1 text-left items-center justify-between rounded-r-lg p-2 text-sm",
                                                                 "hover:bg-accent hover:text-accent-foreground",
                                                                 isOrganSelected && "bg-accent text-accent-foreground"
                                                             )}
                                                         >
                                                             <span>{organ}</span>
-                                                            <SystemBadge
+                                                            <OrganBadge
                                                                 count={organFindings?.count || 0}
                                                                 severity={organFindings?.severity || Severity.NONE}
                                                             />
