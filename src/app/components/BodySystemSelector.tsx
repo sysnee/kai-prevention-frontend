@@ -42,7 +42,7 @@ function SystemBadge({ count, severity }: { count: number, severity: Severity })
 
     return (
         <Badge className={cn("ml-auto text-white", getSeverityColor(severity))}>
-            {count} {'achados'}
+            {count} {count === 1 ? 'achado' : 'achados'}
         </Badge>
     )
 }
