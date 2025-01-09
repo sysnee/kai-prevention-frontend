@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { humanBodyData } from "../constants/human-body-data"
+import { ChevronDown, ChevronRight } from "lucide-react"
 // import BrainIcon from "@/assets/human-icons/brain.svg"
 // import LungsIcon from "@/assets/human-icons/lungs.svg"
 // import HeartIcon from "@/assets/human-icons/heart.svg"
@@ -55,7 +56,7 @@ function getSeverityColor(severity: SystemFindings["severity"]) {
 function SystemBadge({ count, severity }: SystemFindings) {
     if (count === 0) {
         return (
-            <Badge className="ml-auto bg-green-500 hover:bg-green-600">
+            <Badge className="ml-auto bg-green-500 text-white hover:bg-green-600">
                 Normal
             </Badge>
         )
@@ -99,26 +100,36 @@ export function BodySystemSelector({
 
                     return (
                         <div key={system} className="mb-4">
-                            <button
-                                onClick={() => {
-                                    toggleSystem(system)
-                                    onSystemSelect?.(system)
-                                }}
-                                className={cn(
-                                    "flex w-full items-center justify-between rounded-lg p-2 text-left text-sm",
-                                    "hover:bg-accent hover:text-accent-foreground",
-                                    isSelected && "bg-accent text-accent-foreground"
-                                )}
-                            >
-                                <div className="flex items-center">
-                                    {systemIcons[system]}
-                                    <span>{system}</span>
-                                </div>
-                                <SystemBadge {...systemFindings} />
-                            </button>
+                            <div className="flex w-full items-center">
+                                <button
+                                    onClick={() => toggleSystem(system)}
+                                    className="p-2 hover:bg-accent rounded-l-lg"
+                                    aria-label={isExpanded ? "Collapse section" : "Expand section"}
+                                >
+                                    {isExpanded ? (
+                                        <ChevronDown className="h-4 w-4" />
+                                    ) : (
+                                        <ChevronRight className="h-4 w-4" />
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() => onSystemSelect?.(system)}
+                                    className={cn(
+                                        "flex flex-1 items-center justify-between rounded-r-lg p-2 text-left text-sm",
+                                        "hover:bg-accent hover:text-accent-foreground",
+                                        isSelected && "bg-accent text-accent-foreground"
+                                    )}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        {systemIcons[system]}
+                                        <span>{system}</span>
+                                    </div>
+                                    <SystemBadge {...systemFindings} />
+                                </button>
+                            </div>
 
                             {isExpanded && (
-                                <div className="ml-4 mt-1 space-y-1">
+                                <div className="ml-10 mt-1 space-y-1">
                                     {Object.keys(subsystems).map(subsystem => (
                                         <button
                                             key={subsystem}
