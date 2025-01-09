@@ -39,6 +39,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow'
 import { CheckCircleIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { showToast } from '@/lib/toast'
+import api from '@/lib/api'
 
 interface ServiceRequestItemProps {
     request: ServiceRequest
@@ -48,6 +49,12 @@ interface ExamSummaryProps {
     modality: string
     status: string
     color: "default" | "primary" | "secondary" | "error" | "info" | "success" | "warning"
+}
+
+interface CreateReportDto {
+    examId: string
+    status?: string
+    content?: string
 }
 
 // Instead of custom SVG icons, use Typography with Unicode symbols
@@ -164,8 +171,20 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
         return `${age} anos`
     }
 
-    const handleStartReport = (examId: string) => {
-        router.push(`/dashboard/estudos/1/novo`)
+    const handleStartReport = async (examId: string) => {
+        try {
+            const dto: CreateReportDto = {
+                examId
+            }
+
+            const response = await api.post('reports', dto)
+
+            // Navigate to the new report using the returned ID
+            router.push(`/dashboard/estudos/${response.id}/novo`)
+        } catch (error) {
+            showToast.error('Erro ao criar laudo')
+            console.error('Error creating report:', error)
+        }
     }
 
     return (
@@ -372,20 +391,22 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                                 exam.report?.status === 'SIGNED' ? 'Laudo já finalizado' :
                                                     exam.report?.status === 'PENDING_REVIEW' ? 'Laudo em análise' :
                                                         exam.report?.status === 'REVIEWED' ? 'Laudo em revisão' :
-                                                            exam.report?.status === 'DRAFT' ? 'Laudo em rascunho' :
-                                                                ''
+                                                            exam.report?.status === 'DRAFT' ? 'Continuar laudo' :
+                                                                'Iniciar laudo'
                                             }>
                                                 <span>
                                                     <Button
                                                         variant="contained"
                                                         size="small"
-                                                        startIcon={<PlayArrowIcon />}
+                                                        startIcon={exam.report ? <DescriptionIcon /> : <PlayArrowIcon />}
                                                         disabled={exam.report?.status === 'SIGNED'}
                                                         onClick={(e) => {
                                                             e.stopPropagation()
                                                             if (exam.report) {
-                                                                router.push(`/estudos/${exam.report.id}`)
+                                                                // If report exists, navigate to edit page
+                                                                router.push(`/dashboard/estudos/${exam.report.id}/editar`)
                                                             } else {
+                                                                // If no report, create new one
                                                                 handleStartReport(exam.id)
                                                             }
                                                         }}
@@ -413,7 +434,7 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                                             },
                                                         }}
                                                     >
-                                                        {exam.report ? 'Continuar' : 'Iniciar laudo'}
+                                                        {exam.report ? 'Continuar laudo' : 'Iniciar laudo'}
                                                     </Button>
                                                 </span>
                                             </Tooltip>
