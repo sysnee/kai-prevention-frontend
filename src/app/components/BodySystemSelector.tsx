@@ -97,6 +97,18 @@ export function BodySystemSelector({
         setExpandedOrgan(current => current === organ ? undefined : organ)
     }
 
+    function handleSystemClick(system: string, event: React.MouseEvent) {
+        event.stopPropagation()
+        toggleSystem(system)
+        onSystemSelect?.(system)
+    }
+
+    function handleOrganClick(system: string, organ: string, event: React.MouseEvent) {
+        event.stopPropagation()
+        toggleOrgan(organ)
+        onSystemSelect?.(system, organ)
+    }
+
     return (
         <>
             {/* <pre>
@@ -125,7 +137,7 @@ export function BodySystemSelector({
                                         )}
                                     </button>
                                     <button
-                                        onClick={() => onSystemSelect?.(system)}
+                                        onClick={(e) => handleSystemClick(system, e)}
                                         className={cn(
                                             "flex flex-1 text-left items-center justify-between rounded-r-lg p-2 text-sm",
                                             "hover:bg-accent hover:text-accent-foreground",
@@ -161,7 +173,7 @@ export function BodySystemSelector({
                                                             )}
                                                         </button>
                                                         <button
-                                                            onClick={() => onSystemSelect?.(system, organ)}
+                                                            onClick={(e) => handleOrganClick(system, organ, e)}
                                                             className={cn(
                                                                 "flex flex-1 text-left items-center justify-between rounded-r-lg p-2 text-sm",
                                                                 "hover:bg-accent hover:text-accent-foreground",
