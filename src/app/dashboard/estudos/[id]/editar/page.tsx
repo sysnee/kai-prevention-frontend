@@ -195,9 +195,17 @@ export default function AchadosPage() {
                     >
                         <Box sx={{ width: "100%" }}>
                             <Box className="flex items-center justify-between">
-                                <p className="text-sm text-slate-500">
-                                    Adicione os achados encontrados no exame.
-                                </p>
+                                <div className="space-y-1">
+                                    <p className="text-sm text-slate-500">
+                                        Adicione os achados encontrados no exame.
+                                    </p>
+                                    <Link
+                                        href={`/dashboard/estudos/${reportId}`}
+                                        className="text-xs text-kai-primary hover:text-kai-primary/70"
+                                    >
+                                        Ver resumo do laudo →
+                                    </Link>
+                                </div>
                                 {!isFormVisible && (
                                     <Button
                                         onClick={() => setIsFormVisible(true)}
