@@ -12,11 +12,14 @@ import { getReportById } from '@/services/reports'
 import { Report } from '@/types/reports'
 import AchadoCard from "@/app/components/AchadoCard"
 import AddIcon from '@mui/icons-material/Add'
+import { BodySystemSelector } from "@/app/components/BodySystemSelector"
+import { useState } from "react"
 
 export default function EstudoResumoPage() {
     const theme = useTheme()
     const params = useParams()
     const reportId = params.id as string
+    const [selectedSystem, setSelectedSystem] = useState<string>()
 
     // Fetch report data
     const {
@@ -40,6 +43,39 @@ export default function EstudoResumoPage() {
 
     const isLoading = isLoadingReport || isLoadingFindings
     const error = reportError || findingsError
+
+    // Organize findings by system
+    const findingsBySystem = findings.reduce((acc, finding) => {
+        const system = finding.bodySystem
+        const subsystem = finding.bodySubsystem
+        const key = subsystem ? `${system}/${subsystem}` : system
+
+        if (!acc[key]) {
+            acc[key] = { count: 0, severity: "none" as const }
+        }
+
+        acc[key].count++
+        // Update severity based on finding severity
+        if (finding.severity === "moderate" || acc[key].severity === "moderate") {
+            acc[key].severity = "moderate"
+        } else if (finding.severity === "minor" || acc[key].severity === "minor") {
+            acc[key].severity = "minor"
+        } else {
+            acc[key].severity = "informational"
+        }
+
+        return acc
+    }, {} as Record<string, { count: number; severity: "minor" | "moderate" | "informational" | "none" }>)
+
+    // Filter findings based on selected system
+    const filteredFindings = findings.filter(finding => {
+        if (!selectedSystem) return true
+        if (selectedSystem.includes("/")) {
+            const [system, subsystem] = selectedSystem.split("/")
+            return finding.bodySystem === system && finding.bodySubsystem === subsystem
+        }
+        return finding.bodySystem === selectedSystem
+    })
 
     if (isLoading) {
         return (
@@ -112,20 +148,29 @@ export default function EstudoResumoPage() {
 
             <Box sx={{ marginTop: "3em" }}>
                 <Grid container spacing={1.5} justifyContent="start" marginTop={1} wrap="wrap">
-                    <Grid size={8}>
+                    <Grid size={3}>
+                        <BodySystemSelector
+                            findings={findingsBySystem}
+                            onSystemSelect={(system, subsystem) =>
+                                setSelectedSystem(subsystem ? `${system}/${subsystem}` : system)
+                            }
+                            selectedSystem={selectedSystem}
+                        />
+                    </Grid>
+
+                    <Grid size={5}>
                         <Stack spacing={2}>
-                            {findings.map((finding) => (
+                            {filteredFindings.map((finding) => (
                                 <AchadoCard
                                     key={finding.id}
                                     achado={finding}
-                                    onEdit={() => { }} // Empty function since editing is not available in resumo
-                                    onDelete={() => { }} // Empty function since deletion is not available in resumo
+                                    onEdit={() => { }}
+                                    onDelete={() => { }}
                                 />
                             ))}
                         </Stack>
                     </Grid>
 
-                    {/* Right side panel */}
                     <Grid size={4}>
                         <Box sx={(theme) => ({
                             width: '100%',
