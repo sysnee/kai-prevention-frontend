@@ -1,5 +1,3 @@
-import { Finding } from './findings'
-
 export enum ReportStatus {
     DRAFT = 'DRAFT',
     PENDING_REVIEW = 'PENDING_REVIEW',

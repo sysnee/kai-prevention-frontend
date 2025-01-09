@@ -391,20 +391,22 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                                 exam.report?.status === 'SIGNED' ? 'Laudo já finalizado' :
                                                     exam.report?.status === 'PENDING_REVIEW' ? 'Laudo em análise' :
                                                         exam.report?.status === 'REVIEWED' ? 'Laudo em revisão' :
-                                                            exam.report?.status === 'DRAFT' ? 'Laudo em rascunho' :
-                                                                ''
+                                                            exam.report?.status === 'DRAFT' ? 'Continuar laudo' :
+                                                                'Iniciar laudo'
                                             }>
                                                 <span>
                                                     <Button
                                                         variant="contained"
                                                         size="small"
-                                                        startIcon={<PlayArrowIcon />}
+                                                        startIcon={exam.report ? <DescriptionIcon /> : <PlayArrowIcon />}
                                                         disabled={exam.report?.status === 'SIGNED'}
                                                         onClick={(e) => {
                                                             e.stopPropagation()
                                                             if (exam.report) {
-                                                                router.push(`/estudos/${exam.report.id}`)
+                                                                // If report exists, navigate to edit page
+                                                                router.push(`/dashboard/estudos/${exam.report.id}/editar`)
                                                             } else {
+                                                                // If no report, create new one
                                                                 handleStartReport(exam.id)
                                                             }
                                                         }}
@@ -432,7 +434,7 @@ function ServiceRequestItem({ request }: ServiceRequestItemProps) {
                                                             },
                                                         }}
                                                     >
-                                                        {exam.report ? 'Continuar' : 'Iniciar laudo'}
+                                                        {exam.report ? 'Continuar laudo' : 'Iniciar laudo'}
                                                     </Button>
                                                 </span>
                                             </Tooltip>
