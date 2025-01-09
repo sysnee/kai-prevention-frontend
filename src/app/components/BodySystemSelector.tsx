@@ -21,7 +21,7 @@ interface BodySystemSelectorProps {
 }
 
 const systemIcons: Record<string, React.ReactNode> = {
-    "Sistema Musculoesquelético": <Image src={BoneIcon} alt="Bone" className="h-4 w-4" />
+    // "Sistema Musculoesquelético": <Image src={BoneIcon} alt="Bone" className="h-4 w-4" />
 }
 
 function getSeverityColor(severity: SystemFindings["severity"]) {
@@ -66,23 +66,20 @@ export function BodySystemSelector({
     onSystemSelect,
     selectedSystem
 }: BodySystemSelectorProps) {
-    const [expandedSystems, setExpandedSystems] = useState<string[]>(["Sistema Musculoesquelético"])
-    const [expandedOrgans, setExpandedOrgans] = useState<string[]>([])
+    const [expandedSystem, setExpandedSystem] = useState<string>("Sistema Musculoesquelético")
+    const [expandedOrgan, setExpandedOrgan] = useState<string>()
 
     function toggleSystem(system: string) {
-        setExpandedSystems(current =>
-            current.includes(system)
-                ? current.filter(s => s !== system)
-                : [...current, system]
-        )
+        setExpandedSystem(current => current === system ? "" : system)
+        // Close any open organ when changing systems
+        setExpandedOrgan(undefined)
     }
 
-    function toggleOrgan(organ: string) {
-        setExpandedOrgans(current =>
-            current.includes(organ)
-                ? current.filter(o => o !== organ)
-                : [...current, organ]
-        )
+    function toggleOrgan(system: string, organ: string) {
+        // Only toggle organs within the currently expanded system
+        if (system === expandedSystem) {
+            setExpandedOrgan(current => current === organ ? undefined : organ)
+        }
     }
 
     return (
@@ -90,7 +87,7 @@ export function BodySystemSelector({
             <div className="p-4">
                 {Object.entries(humanBodyData).map(([system, subsystems]) => {
                     const systemFindings = findings[system] || { count: 0, severity: "none" }
-                    const isExpanded = expandedSystems.includes(system)
+                    const isExpanded = expandedSystem === system
                     const isSelected = selectedSystem === system
 
                     return (
@@ -126,7 +123,7 @@ export function BodySystemSelector({
                             {isExpanded && (
                                 <div className="ml-4 space-y-1">
                                     {Object.entries(subsystems).map(([organ, pathologies]) => {
-                                        const isOrganExpanded = expandedOrgans.includes(organ)
+                                        const isOrganExpanded = expandedOrgan === organ
                                         const organFindings = findings[`${system}/${organ}`]
                                         const isOrganSelected = selectedSystem === `${system}/${organ}`
 
@@ -134,7 +131,7 @@ export function BodySystemSelector({
                                             <div key={organ} className="mt-1">
                                                 <div className="flex w-full items-center">
                                                     <button
-                                                        onClick={() => toggleOrgan(organ)}
+                                                        onClick={() => toggleOrgan(system, organ)}
                                                         className="p-2 hover:bg-accent rounded-l-lg"
                                                         aria-label={isOrganExpanded ? "Collapse organ" : "Expand organ"}
                                                     >
