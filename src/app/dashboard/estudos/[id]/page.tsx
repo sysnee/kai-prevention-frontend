@@ -55,7 +55,6 @@ export default function EstudoResumoPage() {
         }
 
         acc[key].count++
-        // Update severity based on finding severity
         if (finding.severity === "moderate" || acc[key].severity === "moderate") {
             acc[key].severity = "moderate"
         } else if (finding.severity === "minor" || acc[key].severity === "minor") {
@@ -66,16 +65,6 @@ export default function EstudoResumoPage() {
 
         return acc
     }, {} as Record<string, { count: number; severity: "minor" | "moderate" | "informational" | "none" }>)
-
-    // Filter findings based on selected system
-    const filteredFindings = findings.filter(finding => {
-        if (!selectedSystem) return true
-        if (selectedSystem.includes("/")) {
-            const [system, subsystem] = selectedSystem.split("/")
-            return finding.bodySystem === system && finding.bodySubsystem === subsystem
-        }
-        return finding.bodySystem === selectedSystem
-    })
 
     if (isLoading) {
         return (
@@ -151,16 +140,21 @@ export default function EstudoResumoPage() {
                     <Grid size={3}>
                         <BodySystemSelector
                             findings={findingsBySystem}
-                            onSystemSelect={(system, subsystem) =>
-                                setSelectedSystem(subsystem ? `${system}/${subsystem}` : system)
-                            }
+                            onSystemSelect={(system, subsystem, pathology) => {
+                                const newSelection = pathology
+                                    ? `${system}/${subsystem}/${pathology}`
+                                    : subsystem
+                                        ? `${system}/${subsystem}`
+                                        : system
+                                setSelectedSystem(newSelection)
+                            }}
                             selectedSystem={selectedSystem}
                         />
                     </Grid>
 
                     <Grid size={5}>
                         <Stack spacing={2}>
-                            {filteredFindings.map((finding) => (
+                            {findings.map((finding) => (
                                 <AchadoCard
                                     key={finding.id}
                                     achado={finding}

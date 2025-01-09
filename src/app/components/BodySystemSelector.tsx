@@ -6,13 +6,6 @@ import { useState } from "react"
 import { cn } from "@/lib/utils"
 import { humanBodyData } from "../constants/human-body-data"
 import { ChevronDown, ChevronRight } from "lucide-react"
-// import BrainIcon from "@/assets/human-icons/brain.svg"
-// import LungsIcon from "@/assets/human-icons/lungs.svg"
-// import HeartIcon from "@/assets/human-icons/heart.svg"
-// import LeafIcon from "@/assets/human-icons/leaf.svg"
-// import KidneyIcon from "@/assets/human-icons/kidney.svg"
-// import ReproductiveIcon from "@/assets/human-icons/reproductive.svg"
-// import StomachIcon from "@/assets/human-icons/stomach.svg"
 import BoneIcon from "../assets/human-icons/bone.png"
 import Image from "next/image"
 
@@ -23,19 +16,12 @@ interface SystemFindings {
 
 interface BodySystemSelectorProps {
     findings?: Record<string, SystemFindings>
-    onSystemSelect?: (system: string, subsystem?: string) => void
+    onSystemSelect?: (system: string, subsystem?: string, pathology?: string) => void
     selectedSystem?: string
 }
 
 const systemIcons: Record<string, React.ReactNode> = {
-    // "Sistema Nervoso": <BrainIcon className="h-4 w-4" />,
-    // "Sistema Respiratório": <LungsIcon className="h-4 w-4" />,
-    // "Sistema Circulatório": <HeartIcon className="h-4 w-4" />,
-    // "Sistema Endócrino": <LeafIcon className="h-4 w-4" />,
-    // "Sistema Urinário": <KidneyIcon className="h-4 w-4" />,
-    // "Sistema Reprodutivo": <ReproductiveIcon className="h-4 w-4" />,
-    // "Sistema Digestivo": <StomachIcon className="h-4 w-4" />,
-    // "Sistema Musculoesquelético": <Image src={BoneIcon} alt="Bone" className="h-8 w-8" />
+    "Sistema Musculoesquelético": <Image src={BoneIcon} alt="Bone" className="h-4 w-4" />
 }
 
 function getSeverityColor(severity: SystemFindings["severity"]) {
@@ -81,12 +67,21 @@ export function BodySystemSelector({
     selectedSystem
 }: BodySystemSelectorProps) {
     const [expandedSystems, setExpandedSystems] = useState<string[]>(["Sistema Musculoesquelético"])
+    const [expandedOrgans, setExpandedOrgans] = useState<string[]>([])
 
     function toggleSystem(system: string) {
         setExpandedSystems(current =>
             current.includes(system)
                 ? current.filter(s => s !== system)
                 : [...current, system]
+        )
+    }
+
+    function toggleOrgan(organ: string) {
+        setExpandedOrgans(current =>
+            current.includes(organ)
+                ? current.filter(o => o !== organ)
+                : [...current, organ]
         )
     }
 
@@ -104,7 +99,7 @@ export function BodySystemSelector({
                                 <button
                                     onClick={() => toggleSystem(system)}
                                     className="p-2 hover:bg-accent rounded-l-lg"
-                                    aria-label={isExpanded ? "Collapse section" : "Expand section"}
+                                    aria-label={isExpanded ? "Collapse system" : "Expand system"}
                                 >
                                     {isExpanded ? (
                                         <ChevronDown className="h-4 w-4" />
@@ -129,24 +124,63 @@ export function BodySystemSelector({
                             </div>
 
                             {isExpanded && (
-                                <div className="ml-10 mt-1 space-y-1">
-                                    {Object.keys(subsystems).map(subsystem => (
-                                        <button
-                                            key={subsystem}
-                                            onClick={() => onSystemSelect?.(system, subsystem)}
-                                            className={cn(
-                                                "flex w-full items-center justify-between rounded-lg p-2 text-left text-sm",
-                                                "hover:bg-accent hover:text-accent-foreground",
-                                                selectedSystem === `${system}/${subsystem}` &&
-                                                "bg-accent text-accent-foreground"
-                                            )}
-                                        >
-                                            <span>{subsystem}</span>
-                                            {findings[`${system}/${subsystem}`] && (
-                                                <SystemBadge {...findings[`${system}/${subsystem}`]} />
-                                            )}
-                                        </button>
-                                    ))}
+                                <div className="ml-4 space-y-1">
+                                    {Object.entries(subsystems).map(([organ, pathologies]) => {
+                                        const isOrganExpanded = expandedOrgans.includes(organ)
+                                        const organFindings = findings[`${system}/${organ}`]
+                                        const isOrganSelected = selectedSystem === `${system}/${organ}`
+
+                                        return (
+                                            <div key={organ} className="mt-1">
+                                                <div className="flex w-full items-center">
+                                                    <button
+                                                        onClick={() => toggleOrgan(organ)}
+                                                        className="p-2 hover:bg-accent rounded-l-lg"
+                                                        aria-label={isOrganExpanded ? "Collapse organ" : "Expand organ"}
+                                                    >
+                                                        {isOrganExpanded ? (
+                                                            <ChevronDown className="h-4 w-4" />
+                                                        ) : (
+                                                            <ChevronRight className="h-4 w-4" />
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => onSystemSelect?.(system, organ)}
+                                                        className={cn(
+                                                            "flex flex-1 items-center justify-between rounded-r-lg p-2 text-left text-sm",
+                                                            "hover:bg-accent hover:text-accent-foreground",
+                                                            isOrganSelected && "bg-accent text-accent-foreground"
+                                                        )}
+                                                    >
+                                                        <span>{organ}</span>
+                                                        {organFindings && <SystemBadge {...organFindings} />}
+                                                    </button>
+                                                </div>
+
+                                                {isOrganExpanded && (
+                                                    <div className="ml-10 space-y-1 py-1">
+                                                        {pathologies.map((pathology: string) => {
+                                                            const isPathologySelected = selectedSystem === `${system}/${organ}/${pathology}`
+
+                                                            return (
+                                                                <button
+                                                                    key={pathology}
+                                                                    onClick={() => onSystemSelect?.(system, organ, pathology)}
+                                                                    className={cn(
+                                                                        "w-full rounded-lg p-2 text-left text-sm",
+                                                                        "hover:bg-accent hover:text-accent-foreground",
+                                                                        isPathologySelected && "bg-accent text-accent-foreground"
+                                                                    )}
+                                                                >
+                                                                    {pathology}
+                                                                </button>
+                                                            )
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )
+                                    })}
                                 </div>
                             )}
                         </div>
