@@ -1,141 +1,122 @@
-import { Avatar, Box, Button, Card, CardContent, Stack, Typography } from "@mui/material";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Finding, Severity } from "@/types/findings";
+import { formatDate } from "@/utils/format-date";
+import { cn } from "@/lib/utils";
 import EditIcon from '@mui/icons-material/Edit';
-import { Achado } from "../types/types";
+import DeleteIcon from '@mui/icons-material/Delete';
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-export default function AchadoCard({ achado, onEdit }: { achado: Achado, onEdit: () => void }) {
+function getSeverityLabel(severity: Severity) {
+    const labels = {
+        [Severity.NONE]: 'Informativo',
+        [Severity.LOW]: 'Leve',
+        [Severity.MEDIUM]: 'Moderada',
+        [Severity.HIGH]: 'Alta',
+        [Severity.SEVERE]: 'Grave'
+    };
+    return labels[severity];
+}
+
+export default function AchadoCard({
+    achado,
+    onEdit,
+    onDelete
+}: {
+    achado: Finding,
+    onEdit: () => void,
+    onDelete: () => void
+}) {
     return (
-        <Card
-            sx={(theme) => ({
-                width: "100%",
-                backgroundColor: "#fff",
-                border: theme.palette.mode === 'light' ? "none" : "1px solid #333b4d",
-                boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-                overflow: "auto"
-            })}
-        >
-            <CardContent>
-                <Typography
-                    variant="h4"
-                >
-                    {achado.titulo}
-                </Typography>
-            </CardContent>
+        <div className="group relative bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className={cn(
+                "h-1 rounded-t-lg",
+                {
+                    'bg-yellow-300': achado.severity === Severity.LOW,
+                    'bg-amber-500': achado.severity === Severity.MEDIUM,
+                    'bg-rose-500': achado.severity === Severity.HIGH,
+                    'bg-black': achado.severity === Severity.SEVERE,
+                    'bg-blue-300': achado.severity === Severity.NONE,
+                }
+            )} />
 
-            <Stack
-                direction="row"
-                alignItems="start"
-                justifyContent="space-between"
-                spacing={2}
-                marginTop={2}
-            >
-                <Box>
-                    <Typography
-                        sx={{
-                            fontSize: "16px",
-                        }}
-                        variant="h6"
-                    >
-                        Sistema
-                    </Typography>
-                    <Typography
-                        sx={{
-                            fontSize: "12px",
-                            fontWeight: "lighter"
-                        }}
-                        variant="h6"
-                    >
-                        {achado.sistema}
-                    </Typography>
-                </Box>
+            <div className="p-3">
+                <div className="flex items-start justify-between mb-2">
+                    <div>
+                        <h3 className="text-base font-medium text-slate-900">
+                            {achado.pathology}
+                        </h3>
+                        <p className="text-xs text-slate-600">
+                            {achado.system} • {achado.organ}
+                        </p>
+                    </div>
 
-                <Box>
-                    <Typography
-                        sx={{
-                            fontSize: "16px",
-                        }}
-                        variant="h6"
-                    >
-                        Orgão
-                    </Typography>
-                    <Typography
-                        sx={{
-                            fontSize: "12px",
-                            fontWeight: "lighter"
-                        }}
-                        variant="h6"
-                    >
-                        {achado.orgao}
-                    </Typography>
-                </Box>
-
-                <Box>
-                    <Typography
-                        sx={{
-                            fontSize: "16px",
-                        }}
-                        variant="h6"
-                    >
-                        Patologias
-                    </Typography>
-                    <Typography
-                        sx={{
-                            fontSize: "12px",
-                            fontWeight: "lighter"
-                        }}
-                        variant="h6"
-                    >
-                        {achado.patologias.map((patologia, index) => (
-                            <p key={index}>{patologia}</p>
-                        ))}
-                    </Typography>
-                </Box>
-            </Stack>
-
-            <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                marginTop={3}
-            >
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: ".5em"
-                    }}
-                >
-                    <Avatar sx={{ width: 35, height: 35 }}></Avatar>
-                    <Box>
-                        <Typography
-                            sx={{
-                                fontSize: "11px",
-                                fontWeight: "bold"
-                            }}
+                    <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onEdit}
+                            className="h-7 w-7 p-0"
                         >
-                            Laudado por
-                        </Typography>
-                        <Typography
-                            sx={{
-                                fontSize: "10px"
-                            }}
+                            <EditIcon className="h-3.5 w-3.5 text-slate-600" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={onDelete}
+                            className="h-7 w-7 p-0 hover:text-rose-500"
                         >
-                            Carlos Maciel
-                        </Typography>
-                    </Box>
-                </Box>
+                            <DeleteIcon className="h-3.5 w-3.5 text-slate-600" />
+                        </Button>
+                    </div>
+                </div>
 
-                <Button
-                    onClick={onEdit}
-                    sx={(theme) => ({
-                        backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
-                        border: "1px solid #e5e7eb"
-                    })}
-                    className="text-kai-primary transition-colors hover:bg-kai-primary/10"
-                >
-                    <EditIcon sx={{ fontSize: "16px", marginRight: ".2em" }} />
-                    Editar achado
-                </Button>
-            </Stack>
-        </Card>
+                {achado.observations && (
+                    <p className="text-xs text-slate-700 mb-2 line-clamp-2">
+                        {achado.observations}
+                    </p>
+                )}
+
+                {achado.image_url && (
+                    <div className="relative h-24 mb-2 rounded overflow-hidden bg-slate-50">
+                        <Image
+                            src={achado.image_url}
+                            alt="Finding image"
+                            fill
+                            className="object-cover"
+                        />
+                    </div>
+                )}
+
+                <div className="flex items-center justify-between text-xs border-t border-slate-100 pt-2 mt-2">
+                    <div className="flex items-center gap-1.5">
+                        <Avatar className="h-6 w-6 bg-slate-100">
+                            <AvatarFallback className="text-xs text-slate-600">
+                                {achado.created_by?.fullName[0]}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div>
+                            <p className="font-medium text-slate-700 text-xs">{achado.created_by?.fullName}</p>
+                            <p className="text-slate-500 text-xs">{formatDate(achado.created_at)}</p>
+                        </div>
+                    </div>
+                    <Badge
+                        variant="custom"
+                        className={cn(
+                            "text-xs px-1.5 py-0.5",
+                            {
+                                'bg-yellow-300 text-white': achado.severity === Severity.LOW,
+                                'bg-amber-500 text-white': achado.severity === Severity.MEDIUM,
+                                'bg-rose-500 text-white': achado.severity === Severity.HIGH,
+                                'bg-black text-white': achado.severity === Severity.SEVERE,
+                                'bg-blue-300 text-white': achado.severity === Severity.NONE,
+                            }
+                        )}>
+                        {getSeverityLabel(achado.severity)}
+                    </Badge>
+                </div>
+            </div>
+        </div>
     )
 }
