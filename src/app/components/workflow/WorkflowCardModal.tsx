@@ -252,6 +252,7 @@ export function WorkflowCardModal({ exam, onClose }: WorkflowCardModalProps) {
               notes={notes}
               onAddNote={handleAddNote}
               isLoading={isLoadingNotes}
+              currentStatus={exam.status as ServiceStatus}
             />
           </div>
         </div>

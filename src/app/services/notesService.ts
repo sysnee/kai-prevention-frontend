@@ -13,6 +13,13 @@ export const notesService = {
     return response;
   },
 
+  async update(id: string, content: string): Promise<ServiceRequestNote> {
+    const response = await api.put(`service-requests/notes/${id}`, {
+      content,
+    });
+    return response;
+  },
+
   async findByServiceRequest(
     serviceRequestId: string
   ): Promise<ServiceRequestNote[]> {
