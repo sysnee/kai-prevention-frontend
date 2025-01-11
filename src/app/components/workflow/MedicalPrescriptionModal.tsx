@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Upload, Save } from 'lucide-react';
 import { useTheme } from '@mui/material/styles';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 
 interface MedicalPrescriptionModalProps {
   isOpen: boolean;
@@ -180,13 +180,16 @@ export function MedicalPrescriptionModal({ isOpen, onClose, onSave }: MedicalPre
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+              className="px-4 py-2 text-sm font-medium text-kai-primary border hover:bg-kai-primary/10 rounded-md"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium border rounded-md hover:bg-kai-primary/90 flex items-center"
+              className="px-4 py-2 text-sm font-medium bg-kai-primary rounded-md hover:bg-kai-primary/70 flex items-center"
+              style={{
+                color: theme.palette.mode === 'light' ? '#fff' : '#000'
+              }}
               disabled={isUploading}
             >
               <Save className="w-4 h-4 mr-2" />

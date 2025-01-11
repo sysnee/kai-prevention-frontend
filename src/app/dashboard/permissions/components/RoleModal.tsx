@@ -35,7 +35,7 @@ const STAGES: ServiceStatus[] = [
   "PLANNED",
   "WAITING",
   "STARTED",
-  "ONHOLD",
+  "ON_HOLD",
   "COMPLETED",
   "TRANSCRIPTION",
   "SIGNED",

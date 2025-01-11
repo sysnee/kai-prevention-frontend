@@ -10,7 +10,6 @@ import { ActionButtons } from './card/ActionButtons';
 import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTheme } from '@mui/material';
-import { serviceExams } from '../../constants';
 import { ServiceStatus } from '../../types/pemissions/permissions';
 
 interface WorkflowCardModalProps {
@@ -156,10 +155,10 @@ export function WorkflowCardModal({ exam, onClose }: WorkflowCardModalProps) {
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 text-kai-primary hover:bg-kai-primary/10 rounded-full transition-colors"
               title="Fechar"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -188,11 +187,12 @@ export function WorkflowCardModal({ exam, onClose }: WorkflowCardModalProps) {
             >
               <h3 className="text-lg font-medium mb-4">Status dos Exames</h3>
               <div className="space-y-3">
-                {serviceExams[exam.examType].map((ex: any, index) => (
+                {exam.exams.map((ex: any, index: number) => (
                   <ExamStatus
                     key={index}
                     examId={ex.id}
-                    name={ex.name}
+                    description={ex.description}
+                    modality={ex.modality}
                     room={ex.room}
                     status={exam.status as ServiceStatus}
                     onStatusChange={handleExamStatusChange}

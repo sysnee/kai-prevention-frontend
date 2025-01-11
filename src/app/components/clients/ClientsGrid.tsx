@@ -5,18 +5,19 @@ import { DataGrid, GridRowsProp } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
 import { generateRows } from "../../internals/data/clientsGridData";
 import { colum } from "../../internals/data/clientsGridData";
+import { useTheme } from "@mui/material/styles";
 
 interface ClientsGridProps {
     clientes: any[];
     searchQuery: string;
     onView: (cliente: any) => void;
     onEdit: (cliente: any) => void;
-    onDelete: (cliente: any) => void;
 }
 
-export default function ClientsGrid({ clientes, searchQuery, onView, onEdit, onDelete }: ClientsGridProps) {
+export default function ClientsGrid({ clientes, searchQuery, onView, onEdit }: ClientsGridProps) {
     const [rows, setRows] = React.useState<GridRowsProp>([]);
     const [filteredRows, setFilteredRows] = React.useState<GridRowsProp>([]);
+    const theme = useTheme();
 
     React.useEffect(() => {
         function fetchData() {
@@ -48,7 +49,7 @@ export default function ClientsGrid({ clientes, searchQuery, onView, onEdit, onD
         <Box sx={{ height: "100%", width: "100%", paddingBottom: "2em" }}>
             <DataGrid
                 rows={filteredRows}
-                columns={colum(onView, onEdit, onDelete)}
+                columns={colum(onView, onEdit)}
                 pageSizeOptions={[5, 10, 20]}
                 initialState={{
                     pagination: { paginationModel: { pageSize: 10 } },
@@ -60,6 +61,26 @@ export default function ClientsGrid({ clientes, searchQuery, onView, onEdit, onD
                             padding: 0,
                         },
                     },
+                }}
+                sx={{
+                    '.MuiDataGrid-columnHeaders': {
+                        fontSize: '15px',
+                    },
+                    '.MuiDataGrid-columnHeader': {
+                        backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+                    },
+                    '.MuiDataGrid-columnHeaderTitle': {
+                        backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+                    },
+                    '.MuiDataGrid-footerContainer': {
+                        backgroundColor: 'transparent !important',
+                        fontSize: '15px',
+                    },
+                    '.MuiDataGrid-cell': {
+                        fontSize: '15px',
+                    },
+                    backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+                    borderColor: theme.palette.mode === 'dark' ? 'hsla(220, 20%, 25%, 0.6)' : 'inherit',
                 }}
                 localeText={{
                     MuiTablePagination: {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTheme } from '@mui/system';
 import {
   Dialog,
   DialogTitle,
@@ -23,11 +24,11 @@ import {
 } from '@mui/material'
 import { X } from 'lucide-react'
 import api from '../../../../../lib/api'
-import { Role } from '@/src/app/types/permissions'
-import { PermissionType } from '@/src/app/types/permissions'
-import { showToast } from '@/src/lib/toast'
-import { PERMISSION_TRANSLATIONS, RESOURCE_TRANSLATIONS } from '@/src/app/constants/translations'
-import { ResourceType } from '@/src/app/types/permissions'
+import { Role } from '@/app/types/permissions'
+import { PermissionType } from '@/app/types/permissions'
+import { showToast } from '@/lib/toast'
+import { PERMISSION_TRANSLATIONS, RESOURCE_TRANSLATIONS } from '@/app/constants/translations'
+import { ResourceType } from '@/app/types/permissions'
 
 interface RoleFormData {
   name: string
@@ -46,6 +47,7 @@ interface RolePermissionFormProps {
 }
 
 export default function RolePermissionForm({ open, onClose, role, mode, onSave }: RolePermissionFormProps) {
+  const theme = useTheme();
   const [formData, setFormData] = useState<RoleFormData>({
     name: '',
     permissions: []
@@ -282,12 +284,22 @@ export default function RolePermissionForm({ open, onClose, role, mode, onSave }
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={onClose} disabled={isLoading}>
+          <Button
+            onClick={onClose}
+            disabled={isLoading}
+            sx={(theme) => ({
+              backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
+              border: "1px solid #e5e7eb"
+            })}
+            className="text-kai-primary transition-colors hover:bg-kai-primary/10"
+          >
             {isViewMode ? 'Fechar' : 'Cancelar'}
           </Button>
           {!isViewMode && (
-            <Button type='submit' variant='contained' color='primary' disabled={isLoading}>
-              {isLoading ? 'Salvando...' : mode === 'create' ? 'Criar' : 'Salvar'}
+            <Button type='submit' disabled={isLoading} className="bg-kai-primary hover:bg-kai-primary/70">
+              <span style={{ color: theme.palette.mode === 'light' ? '#fff' : '#000' }}>
+                {isLoading ? 'Salvando...' : mode === 'create' ? 'Criar' : 'Salvar'}
+              </span>
             </Button>
           )}
         </DialogActions>

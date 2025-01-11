@@ -11,20 +11,21 @@ export type Role =
 export type Module = "client" | "exam";
 
 export type ServiceStatus =
-  | "PLANNED"
-  | "WAITING"
-  | "STARTED"
-  | "ONHOLD"
-  | "COMPLETED"
-  | "TRANSCRIPTION"
-  | "REVISION"
-  | "SIGNED";
+  | 'PLANNED'
+  | 'WAITING'
+  | 'STARTED'
+  | 'ON_HOLD'
+  | 'COMPLETED'
+  | 'TRANSCRIPTION'
+  | 'IN_REVISION'
+  | 'SIGNED'
+  | 'CANCELED'
 
 export enum ExamStatusEnum {
   PLANNED = "Planejado",
   WAITING = "Aguardando",
   STARTED = "Iniciado",
-  ONHOLD = "Pausado",
+  ON_HOLD = "Pausado",
   COMPLETED = "Concluído",
   TRANSCRIPTION = "Transcrição",
   REVISION = "Revisão",

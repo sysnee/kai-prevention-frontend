@@ -10,7 +10,7 @@ import RolesTable from './components/RolesTable'
 import RolePermissionForm from './components/forms/RolePermissionForm'
 import api from '../../../lib/api'
 import { ConfirmationModal } from '../../components/shared/ConfirmationModal'
-import { showToast } from '@/src/lib/toast'
+import { showToast } from '@/lib/toast'
 
 export default function PermissionsManagement() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
@@ -138,11 +138,11 @@ export default function PermissionsManagement() {
               setSelectedRole(null)
               setModalMode('create')
             }}
-            className={`flex items-center px-4 py-2 rounded-lg text-white
-              ${theme.palette.mode === 'light' ? 'bg-kai-primary hover:bg-kai-primary/40' : 'bg-gray-600 hover:bg-gray-700'}
-            `}
-            startIcon={<PlusIcon />}>
-            Novo Perfil
+            className="flex items-center px-4 py-2 rounded-lg bg-kai-primary hover:bg-kai-primary/70"
+            startIcon={<PlusIcon style={{ color: theme.palette.mode === 'light' ? '#fff' : '#000' }} />}>
+            <span style={{ color: theme.palette.mode === 'light' ? '#fff' : '#000' }}>
+              Novo Perfil
+            </span>
           </Button>
         </Box>
       </Box>

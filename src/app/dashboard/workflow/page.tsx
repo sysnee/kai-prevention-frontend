@@ -1,40 +1,66 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { WorkflowMetrics } from '../../components/workflow/WorkflowMetrics';
 import { WorkflowBoard } from '../../components/workflow/WorkflowBoard';
-import api from '@/src/lib/api';
-
+import WorkflowSkeleton from '../../components/workflow/WorkflowSkeleton';
+import WorkflowMetricsSkeleton from '../../components/workflow/WorkflowMetricsSkeleton'
+import { useSearchParams } from 'next/navigation'
+import { useWorkflowStore } from '../../stores/workflowStore'
+import api from '@/lib/api';
 
 export default function Workflow() {
+  const searchParams = useSearchParams()
+  const { serviceRequests, setSelectedAppointment } = useWorkflowStore()
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedStatus] = useState<string | null>(null);
   const [plannedList, setPlannedList] = useState([])
   const [waitingList, setWaitingList] = useState([])
   const [startedList, setStartedList] = useState([])
+  const [inRevision, setInRevision] = useState([])
+  const [relevantFindings, setRelevantFindings] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [completedList, setCompletedList] = useState([])
 
-  async function fetchPlannedList() {
-    const { data } = await api.get('service-requests?status=PLANNED&limit=20');
-    setPlannedList(data);
+  async function fetchWorkflowData() {
+    try {
+      setIsLoading(true)
+      const [planned, waiting, started, revision, completed] = await Promise.all([
+        api.get('service-requests?status=PLANNED&limit=20'),
+        api.get('service-requests?status=WAITING&limit=20'),
+        api.get('service-requests?status=STARTED&limit=20'),
+        api.get('service-requests?status=IN_REVISION&limit=20'),
+        api.get('service-requests?status=COMPLETED&limit=20')
+      ])
+
+      setPlannedList(planned.data)
+      setWaitingList(waiting.data)
+      setStartedList(started.data)
+      setInRevision(revision.data)
+      setCompletedList(completed.data)
+      setRelevantFindings([])
+    } catch (error) {
+      console.error('Erro ao carregar dados do workflow:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  async function fetchWaitingList() {
-    const { data } = await api.get('service-requests?status=WAITING&limit=20');
-    setWaitingList(data);
-  }
+  useEffect(() => {
+    fetchWorkflowData()
+  }, [])
 
-  async function fetchStartedList() {
-    const { data } = await api.get('service-requests?status=STARTED&limit=20');
-    setStartedList(data);
-  }
-
-  React.useEffect(() => {
-    fetchPlannedList();
-    fetchWaitingList();
-    fetchStartedList();
-  }, []);
+  useEffect(() => {
+    const codeParam = searchParams.get('code')
+    if (codeParam && serviceRequests.length) {
+      const serviceRequest = serviceRequests.find(sr => sr.code === Number(codeParam))
+      if (serviceRequest) {
+        setSelectedAppointment(serviceRequest)
+      }
+    }
+  }, [searchParams, serviceRequests, setSelectedAppointment])
 
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
@@ -68,20 +94,31 @@ export default function Workflow() {
       </div>
 
       <div className="space-y-6">
-        <WorkflowMetrics date={selectedDate} total={plannedList.length} />
-        <WorkflowBoard
-          planned={plannedList}
-          waiting={waitingList}
-          started={startedList}
-          on_hold={[]}
-          completed={[]}
-          transcription={[]}
-          signed={[]}
-          canceled={[]}
-          searchQuery={searchQuery}
-          selectedStatus={selectedStatus}
-          selectedDate={selectedDate}
-        />
+        {isLoading ? (
+          <>
+            <WorkflowMetricsSkeleton />
+            <WorkflowSkeleton />
+          </>
+        ) : (
+          <>
+            <WorkflowMetrics date={selectedDate} total={plannedList.length} />
+            <WorkflowBoard
+              planned={plannedList}
+              waiting={waitingList}
+              started={startedList}
+              on_hold={[]}
+              completed={completedList}
+              transcription={[]}
+              signed={[]}
+              canceled={[]}
+              in_revision={inRevision}
+              relevant_findings={relevantFindings}
+              searchQuery={searchQuery}
+              selectedStatus={selectedStatus}
+              selectedDate={selectedDate}
+            />
+          </>
+        )}
       </div>
     </div>
   );

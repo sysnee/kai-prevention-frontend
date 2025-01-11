@@ -1,4 +1,4 @@
-import { AccessLevel, Role, ServiceStatus } from "@/src/app/types/pemissions/permissions";
+import { AccessLevel, Role, ServiceStatus } from "@/app/types/pemissions/permissions";
 
 type AccessDescription = string | Partial<Record<Role, string>>;
 
@@ -31,7 +31,7 @@ export const examAccessDescriptions: Record<
     },
     full: "Acesso completo",
   },
-  ONHOLD: {
+  ON_HOLD: {
     none: "Acesso não autorizado",
     read: "Visualizar / Consultar",
     write: {
@@ -57,7 +57,7 @@ export const examAccessDescriptions: Record<
     },
     full: "Acesso completo",
   },
-  REVISION: {
+  IN_REVISION: {
     none: "Acesso não autorizado",
     read: "Visualizar / Consultar",
     write: {
@@ -66,6 +66,12 @@ export const examAccessDescriptions: Record<
     full: "Acesso completo",
   },
   SIGNED: {
+    none: "Acesso não autorizado",
+    read: "Visualizar / Consultar",
+    write: "Não aplicável",
+    full: "Acesso completo",
+  },
+  CANCELED: {
     none: "Acesso não autorizado",
     read: "Visualizar / Consultar",
     write: "Não aplicável",

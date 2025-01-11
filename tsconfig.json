@@ -24,12 +24,13 @@
     ],
     "paths": {
       "@/*": [
-        "./*"
+        "./src/*"
       ]
     },
     "target": "ES2017",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "baseUrl": "."
   },
   "include": [
     "next-env.d.ts",

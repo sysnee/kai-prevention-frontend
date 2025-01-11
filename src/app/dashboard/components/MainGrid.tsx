@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import Copyright from '../../internals/components/Copyright';
 import { StatCardProps } from './StatCard';
 import { Button } from '@mui/material';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
 
 const data: StatCardProps[] = [
   {

@@ -1,21 +1,51 @@
 import React, { useEffect, useState } from 'react';
-import { X, Save, User, Send, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { X, Save, User, Send, Clock, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import { QuestionnaireAnswersModal } from './QuestionnaireAnswersModal';
 import toast from 'react-hot-toast';
 import { useTheme } from '@mui/material';
 import BirthdateInput from './BirthdateInput';
+import { Button, Typography } from '@mui/material';
+import { clientSchema, type ClientSchema } from '../../../lib/schemas/client'
+import { z } from 'zod'
 
-interface ClientFormProps {
-  client?: any;
-  onCreate: (data: any) => void;
-  onEdit?: (data: any) => void;
-  onCancel?: () => void;
-  readOnly?: boolean;
-  cpfError?: string;
-  emailError?: string;
+interface Client {
+  id?: string
+  name: string
+  birthdate: string
+  gender: 'male' | 'female' | 'other'
+  cpf: string
+  phone: string
+  email: string
+  zipcode: string
+  street: string
+  number: string
+  complement?: string
+  neighborhood: string
+  city: string
+  state: string
+  questionnaires?: Array<any>
 }
 
-export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = false, cpfError, emailError }: ClientFormProps) {
+interface ClientFormProps {
+  client?: any
+  onSubmit: (data: any) => Promise<void>
+  onCancel?: () => void
+  readOnly?: boolean
+  formErrors?: {
+    cpf?: string
+    email?: string
+  }
+  isSubmitting?: boolean
+}
+
+export function ClientForm({
+  client,
+  onSubmit,
+  onCancel,
+  readOnly = false,
+  formErrors = {},
+  isSubmitting = false
+}: ClientFormProps) {
   const theme = useTheme();
   const [isLoadingCep, setIsLoadingCep] = useState(false);
   const [cepError, setCepError] = useState('');
@@ -47,17 +77,11 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
   const cpfFormatted = client?.cpf ? formatCPF(client.cpf) : '';
   const zipcodeFormatted = client?.zipcode ? formatCEP(client.zipcode) : '';
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Client>({
     // Personal Information
     name: client?.name || '',
     birthdate: client?.birthdate || '',
-    gender: client?.gender
-      ? client.gender === 'male'
-        ? 'male'
-        : client.gender === 'female'
-          ? 'female'
-          : 'other'
-      : '',
+    gender: (client?.gender || 'other') as 'male' | 'female' | 'other',
     cpf: cpfFormatted,
 
     // Contact Information
@@ -141,36 +165,19 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
     return value.replace(/\D/g, '');
   };
 
-  const handleSubmitCreate = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
 
-    if (!readOnly) {
-      const cleanedData = {
-        ...formData,
-        zipcode: removeFormatting(formData.zipcode),
-        cpf: removeFormatting(formData.cpf),
-        phone: removeFormatting(formData.phone),
-      };
-
-      onCreate(cleanedData);
+    const cleanedData = {
+      ...formData,
+      zipcode: removeFormatting(formData.zipcode),
+      cpf: removeFormatting(formData.cpf),
+      phone: removeFormatting(formData.phone),
     }
-  };
 
-  const handleSubmitEdit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!readOnly) {
-      const cleanedData = {
-        ...formData,
-        id: client?.id,
-        zipcode: removeFormatting(formData.zipcode),
-        cpf: removeFormatting(formData.cpf),
-        phone: removeFormatting(formData.phone),
-      };
-
-      onEdit(cleanedData);
-    }
-  };
+    console.log(cleanedData)
+    await onSubmit(cleanedData)
+  }
 
   const renderQuestionnaireHistory = () => {
     if (!client?.questionnaires?.length) return null;
@@ -251,13 +258,13 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
           </h2>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-gray-400 rounded-full"
+            className="p-2 text-kai-primary hover:bg-kai-primary/10 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <form onSubmit={client ? handleSubmitEdit : handleSubmitCreate} className="flex-1 overflow-y-auto">
+        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
           <div className="p-6 space-y-6">
             <div className="grid grid-cols-2 gap-6">
               {/* Informações Pessoais */}
@@ -335,10 +342,14 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
                       className={`w-full px-3 py-2 rounded-md ${readOnly ? '' : 'focus:ring-2 focus:ring-kai-primary focus:border-transparent'
                         }`}
                       style={{
-                        border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)",
+                        border: formErrors.cpf
+                          ? "1px solid #dc2626"
+                          : theme.palette.mode === 'light'
+                            ? "1px solid rgba(229,231,235,255)"
+                            : "1px solid hsla(220, 20%, 25%, 0.6)",
                       }}
                     />
-                    {cpfError && <p className="mt-1 text-sm text-red-600">{cpfError}</p>}
+                    {formErrors.cpf && <p className="mt-1 text-sm text-red-600">{formErrors.cpf}</p>}
                   </div>
                 </div>
               </div>
@@ -384,10 +395,14 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
                       className={`w-full px-3 py-2 rounded-md ${readOnly ? '' : 'focus:ring-2 focus:ring-kai-primary focus:border-transparent'
                         }`}
                       style={{
-                        border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)",
+                        border: formErrors.email
+                          ? "1px solid #dc2626"
+                          : theme.palette.mode === 'light'
+                            ? "1px solid rgba(229,231,235,255)"
+                            : "1px solid hsla(220, 20%, 25%, 0.6)",
                       }}
                     />
-                    {emailError && <p className="mt-1 text-sm text-red-600">{emailError}</p>}
+                    {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
                   </div>
 
                   <div>
@@ -536,31 +551,39 @@ export function ClientForm({ client, onCreate, onEdit, onCancel, readOnly = fals
             }}
           >
             <div className="flex justify-end space-x-3">
-              <button
-                type="button"
+              <Button
                 onClick={onCancel}
-                className={`px-4 py-2 text-sm font-medium rounded-md
-                  ${theme.palette.mode === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}
-                `}
-                style={{
-                  border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)",
-                }}
+                sx={(theme) => ({
+                  backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
+                  border: "1px solid #e5e7eb"
+                })}
+                className="text-kai-primary transition-colors hover:bg-kai-primary/10"
               >
-                {readOnly ? 'Fechar' : 'Cancelar'}
-              </button>
+                <Typography>
+                  {readOnly ? 'Fechar' : 'Cancelar'}
+                </Typography>
+              </Button>
               {!readOnly && (
-                <button
-                  type='submit'
-                  className={`px-4 py-2 text-sm font-medium rounded-md flex items-center
-                    ${theme.palette.mode === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-300'}
-                  `}
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-kai-primary hover:bg-kai-primary/70"
                   style={{
-                    border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)",
+                    color: theme.palette.mode === 'light' ? '#fff' : '#000'
                   }}
                 >
-                  <Save className="w-4 h-4 mr-2" />
-                  Salvar
-                </button>
+                  {isSubmitting ? (
+                    <span className="flex items-center">
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Salvando...
+                    </span>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      Salvar
+                    </>
+                  )}
+                </Button>
               )}
             </div>
           </div>

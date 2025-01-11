@@ -14,7 +14,7 @@ export enum ResourceType {
   WORKFLOW_PLANNED = 'workflow_planned',
   WORKFLOW_WAITING = 'workflow_waiting',
   WORKFLOW_STARTED = 'workflow_started',
-  WORKFLOW_ONHOLD = 'workflow_onhold',
+  WORKFLOW_ON_HOLD = 'workflow_ON_HOLD',
   WORKFLOW_COMPLETED = 'workflow_completed',
   WORKFLOW_TRANSCRIPTION = 'workflow_transcription',
   WORKFLOW_SIGNED = 'workflow_signed'

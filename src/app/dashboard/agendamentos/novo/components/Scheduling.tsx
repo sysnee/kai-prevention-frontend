@@ -5,11 +5,12 @@ import { ExamSelector } from './ExamSelector';
 import { Calendar } from './Calendar';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { generateTimeSlots } from '@/src/app/utils/temp';
-import { createAppointment, ExamTypeEnum } from '@/src/lib/appoinment';
-import { TimeSlotPicker } from '@/src/app/components/scheduling/TimeSlotPicker';
-import { PatientForm } from '@/src/app/components/scheduling/PatientForm';
+import { generateTimeSlots } from '@/app/utils/temp';
+import { createAppointment, ExamTypeEnum } from '@/lib/appoinment';
+import { TimeSlotPicker } from '@/app/components/scheduling/TimeSlotPicker';
+import { PatientForm } from '@/app/components/scheduling/PatientForm';
 import { redirect } from 'next/navigation';
+import { useTheme } from '@mui/material';
 
 type Step = 'exam' | 'date' | 'time' | 'patient' | 'confirmation';
 
@@ -21,7 +22,7 @@ export function Scheduling() {
   const [timeSlots, setTimeSlots] = useState<Array<{ time: string; available: boolean }>>([]);
   const [patientData, setPatientData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  const theme = useTheme();
   const steps: { [key in Step]: { title: string; subtitle: string } } = {
     exam: {
       title: 'Selecione o Pacote',
@@ -201,8 +202,13 @@ export function Scheduling() {
         );
       case 'confirmation':
         return (
-          <div className="max-w-2xl mx-auto bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Resumo do Agendamento</h3>
+          <div className="max-w-2xl mx-auto rounded-lg shadow p-6"
+            style={{
+              border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d",
+              backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#111827"
+            }}
+          >
+            <h3 className="text-lg font-medium text-gray-500 mb-4">Resumo do Agendamento</h3>
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-gray-500">Pacote</p>
@@ -220,8 +226,8 @@ export function Scheduling() {
                 <p className="text-sm text-gray-600">{patientData?.email}</p>
                 <p className="text-sm text-gray-600">{patientData?.phone}</p>
               </div>
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-800">
+              <div className="bg-kai-primary/10 p-4 rounded-lg">
+                <p className="text-sm text-kai-primary">
                   Após a confirmação, o cliente receberá um email de confirmação com o link para responder um questionário.
                 </p>
               </div>
@@ -229,7 +235,10 @@ export function Scheduling() {
             <button
               onClick={handleSubmit}
               disabled={isLoading}
-              className="w-full mt-6 px-4 py-2 bg-kai-primary text-white rounded-lg hover:bg-kai-primary/90 disabled:opacity-50"
+              className="w-full mt-6 px-4 py-2 bg-kai-primary rounded-lg hover:bg-kai-primary/70 disabled:opacity-50"
+              style={{
+                color: theme.palette.mode === 'light' ? "#fff" : "#000"
+              }}
             >
               {isLoading ? 'Confirmando...' : 'Confirmar Agendamento'}
             </button>
@@ -243,7 +252,7 @@ export function Scheduling() {
   return (
     <div className="max-w-7xl mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
+        <h1 className="text-3xl font-bold text-gray-500">
           {steps[currentStep].title}
         </h1>
         <p className="mt-2 text-gray-600">
@@ -257,7 +266,7 @@ export function Scheduling() {
         {currentStep !== 'exam' && (
           <button
             onClick={handleBack}
-            className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900"
+            className="flex items-center px-4 py-2 text-kai-primary hover:bg-kai-primary/10 rounded-lg"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar
@@ -272,7 +281,7 @@ export function Scheduling() {
             }}
 
             onClick={handleNext}
-            className="flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 ml-auto"
+            className="flex items-center px-4 py-2 text-kai-primary hover:bg-kai-primary/10 rounded-lg ml-auto"
           >
             Próximo
             <ChevronRight className="w-5 h-5 ml-1" />

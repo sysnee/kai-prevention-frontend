@@ -2,6 +2,7 @@ import React from 'react';
 import { Clock } from 'lucide-react';
 import { useTheme } from '@mui/material';
 import { WORKFLOW_STAGES } from '../WorkflowBoard';
+import { stages } from '@/app/constants';
 
 interface TimelineSectionProps {
   currentStage: string;
@@ -14,16 +15,6 @@ function StatusIcon({ icon: Icon }) {
 }
 
 export function TimelineSection({ currentStage }: TimelineSectionProps) {
-  const stages = [
-    { id: 'PLANNED', label: 'Planejado' },
-    { id: 'WAITING', label: 'Aguardando' },
-    { id: 'STARTED', label: 'Iniciado' },
-    { id: 'ON_HOLD', label: 'Pausado' },
-    { id: 'COMPLETED', label: 'Concluído' },
-    { id: 'IN_TRANSCRIPTION', label: 'Em Transcrição' },
-    { id: 'SIGNED', label: 'Laudado' },
-    // { id: 'CANCELED', label: 'Cancelado', time: '0min' }
-  ];
   const theme = useTheme();
 
   const currentIndex = stages.findIndex(stage => stage.id === currentStage);

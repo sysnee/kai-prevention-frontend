@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, AlertTriangle } from 'lucide-react';
 import { useTheme } from '@mui/material/styles';
+import { Button, Typography } from '@mui/material';
 
 interface CancelModalProps {
   isOpen: boolean;
@@ -22,13 +23,13 @@ export function CancelModal({ isOpen, onClose, onConfirm }: CancelModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div 
+      <div
         className="rounded-lg p-6 max-w-md w-full mx-4"
         style={{
           backgroundColor: theme.palette.background.default,
@@ -37,8 +38,8 @@ export function CancelModal({ isOpen, onClose, onConfirm }: CancelModalProps) {
         onClick={e => e.stopPropagation()}
       >
         <div className="flex items-center justify-center mb-4">
-          <div className="bg-red-100 rounded-full p-3">
-            <AlertTriangle className="w-6 h-6 text-red-600" />
+          <div className="bg-kai-primary/10 rounded-full p-3">
+            <AlertTriangle className="w-6 h-6 text-kai-primary" />
           </div>
         </div>
 
@@ -62,19 +63,23 @@ export function CancelModal({ isOpen, onClose, onConfirm }: CancelModalProps) {
           </div>
 
           <div className="flex justify-end space-x-3">
-            <button
-              type="button"
+            <Button
+              sx={(theme) => ({
+                backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
+                border: "1px solid #e5e7eb"
+              })}
+              className="text-kai-primary transition-colors hover:bg-kai-primary/10"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
             >
-              Voltar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-            >
-              Confirmar Cancelamento
-            </button>
+              <Typography>Voltar</Typography>
+            </Button>
+            <Button className="bg-kai-primary hover:bg-kai-primary/70">
+              <Typography sx={(theme) => ({
+                color: theme.palette.mode === 'light' ? '#fff' : '#000'
+              })}>
+                Confirmar Cancelamento
+              </Typography>
+            </Button>
           </div>
         </form>
       </div>

@@ -10,6 +10,7 @@ interface ConfirmationModalProps {
   title?: string
   itemName: string
   itemType: string
+  isDeleting?: boolean
 }
 
 export function ConfirmationModal({
@@ -18,7 +19,8 @@ export function ConfirmationModal({
   onConfirm,
   title = 'Confirmar Exclusão',
   itemName,
-  itemType
+  itemType,
+  isDeleting = false
 }: ConfirmationModalProps) {
   const theme = useTheme()
 
@@ -33,15 +35,16 @@ export function ConfirmationModal({
             marginBottom: 2
           }}>
           <Box
+            className="bg-kai-primary/10"
             sx={{
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              backgroundColor: theme.palette.error.light,
+              backgroundColor: 'rgba(37, 99, 235, 0.1)',
               borderRadius: '50%',
               padding: 2
             }}>
-            <AlertTriangle size={28} color='white' style={{ display: 'block' }} />
+            <AlertTriangle size={28} className="text-kai-primary" />
           </Box>
         </Box>
         <Typography variant='h6' align='center' sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}>
@@ -71,24 +74,26 @@ export function ConfirmationModal({
             gap: 1
           }}>
           <Button
-            variant='outlined'
-            color='inherit'
             onClick={onClose}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 'medium'
-            }}>
-            Cancelar
+            disabled={isDeleting}
+            sx={(theme) => ({
+              backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#0b0e14",
+              border: "1px solid #e5e7eb"
+            })}
+            className="text-kai-primary transition-colors hover:bg-kai-primary/10"
+          >
+            <Typography>Cancelar</Typography>
           </Button>
           <Button
-            variant='contained'
-            color='error'
             onClick={onConfirm}
-            sx={{
-              textTransform: 'none',
-              fontWeight: 'medium'
-            }}>
-            Excluir
+            disabled={isDeleting}
+            className="bg-kai-primary hover:bg-kai-primary/70"
+          >
+            <Typography sx={(theme) => ({
+              color: theme.palette.mode === 'light' ? '#fff' : '#000'
+            })}>
+              {isDeleting ? 'Excluindo...' : 'Excluir'}
+            </Typography>
           </Button>
         </Box>
       </DialogActions>

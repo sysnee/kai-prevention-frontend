@@ -1,30 +1,37 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, LayoutList, PlusIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon, LayoutList, PlusIcon } from 'lucide-react';
 import { AppointmentList } from '../../components/scheduling/AppointmentList';
 import { AppointmentDashboard } from '../../components/scheduling/AppointmentDashboard';
 import { CalendarView } from '../../components/scheduling/CalendarView';
 import { Button } from '@mui/material';
 import { useTheme } from '@mui/system';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/pt-br';
+import { ptBR } from '@mui/x-date-pickers/locales';
+import { ptBR as ptBRCore } from '@mui/material/locale';
 
 export default function SchedulingList() {
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([
+        dayjs().subtract(2, 'day'),
+        dayjs().add(7, 'day')
+    ]);
     const [view, setView] = useState<'list' | 'calendar'>('list');
+    const [loading, setLoading] = useState(true);
 
     const theme = useTheme()
 
-    const handlePrevDay = () => {
-        const newDate = new Date(selectedDate);
-        newDate.setDate(selectedDate.getDate() - 1);
-        setSelectedDate(newDate);
-    };
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setLoading(false);
+        }, 1500);
 
-    const handleNextDay = () => {
-        const newDate = new Date(selectedDate);
-        newDate.setDate(selectedDate.getDate() + 1);
-        setSelectedDate(newDate);
-    };
+        return () => clearTimeout(timer);
+    }, [dateRange]);
 
     return (
         <div className="max-w-7xl mx-auto py-8 px-4">
@@ -35,51 +42,99 @@ export default function SchedulingList() {
 
                 <Button
                     href='/dashboard/agendamentos/novo'
-                    className={`flex items-center px-4 py-2 rounded-lg text-white
-              ${theme.palette.mode === 'light' ? 'bg-kai-primary hover:bg-kai-primary/40' : 'bg-gray-600 hover:bg-gray-700'}
-            `}
+                    className="flex items-center px-4 py-2 rounded-lg bg-kai-primary hover:bg-kai-primary/70"
+                    style={{
+                        color: theme.palette.mode === 'light' ? "#fff" : "#000",
+                    }}
                     startIcon={<PlusIcon />}>
                     Novo Agendamento
                 </Button>
             </div>
 
-            <AppointmentDashboard date={selectedDate} totalAppointments={13} />
+            <AppointmentDashboard
+                dateRange={[
+                    dateRange[0]?.toDate() || null,
+                    dateRange[1]?.toDate() || null
+                ]}
+            />
 
             <div className="mt-8 mb-6">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <button
-                            onClick={handlePrevDay}
-                            className="p-2 hover:bg-gray-100 rounded-full"
+                        <LocalizationProvider
+                            dateAdapter={AdapterDayjs}
+                            adapterLocale="pt-br"
+                            localeText={ptBR.components.MuiLocalizationProvider.defaultProps.localeText}
                         >
-                            <ChevronLeft className="w-5 h-5" />
-                        </button>
-                        <div className="flex items-center bg-white px-4 py-2 rounded-lg border border-gray-200">
-                            <CalendarIcon className="w-5 h-5 text-gray-400 mr-2" />
-                            <span className="font-medium">
-                                {selectedDate.toLocaleDateString('pt-BR', {
-                                    weekday: 'long',
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric',
-                                })}
-                            </span>
-                        </div>
-                        <button
-                            onClick={handleNextDay}
-                            className="p-2 hover:bg-gray-100 rounded-full"
-                        >
-                            <ChevronRight className="w-5 h-5" />
-                        </button>
+                            <div className="flex gap-4">
+                                <DatePicker
+                                    label="Data inicial"
+                                    value={dateRange[0]}
+                                    onChange={(newValue) => {
+                                        setDateRange([newValue, dateRange[1]]);
+                                        setLoading(true);
+                                    }}
+                                    format="DD/MM/YYYY"
+                                    slotProps={{
+                                        textField: { size: 'small' },
+                                        inputAdornment: {
+                                            sx: {
+                                                '& .MuiIconButton-root': {
+                                                    padding: '4px',
+                                                    marginRight: '1px',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    '& svg': {
+                                                        color: '#FF8046'
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    sx={{ width: 200 }}
+                                />
+                                <DatePicker
+                                    label="Data final"
+                                    value={dateRange[1]}
+                                    onChange={(newValue) => {
+                                        setDateRange([dateRange[0], newValue]);
+                                        setLoading(true);
+                                    }}
+                                    format="DD/MM/YYYY"
+                                    slotProps={{
+                                        textField: { size: 'small' },
+                                        inputAdornment: {
+                                            sx: {
+                                                '& .MuiIconButton-root': {
+                                                    padding: '4px',
+                                                    marginRight: '1px',
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    '& svg': {
+                                                        color: '#FF8046'
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }}
+                                    sx={{ width: 200 }}
+                                />
+                            </div>
+                        </LocalizationProvider>
                     </div>
 
                     <div className="flex items-center space-x-4">
-                        <div className="flex rounded-lg border border-gray-200 p-1 bg-white">
+                        <div
+                            className="flex rounded-lg p-1 gap-2"
+                            style={{
+                                border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d"
+                            }}
+                        >
                             <button
                                 onClick={() => setView('list')}
                                 className={`px-3 py-1 rounded flex items-center ${view === 'list'
                                     ? 'bg-kai-primary/10 text-kai-primary'
-                                    : 'text-gray-600 hover:bg-gray-50'
+                                    : 'text-gray-600 hover:bg-kai-primary/10'
                                     }`}
                             >
                                 <LayoutList className="w-5 h-5 mr-2" />
@@ -89,7 +144,7 @@ export default function SchedulingList() {
                                 onClick={() => setView('calendar')}
                                 className={`px-3 py-1 rounded flex items-center ${view === 'calendar'
                                     ? 'bg-kai-primary/10 text-kai-primary'
-                                    : 'text-gray-600 hover:bg-gray-50'
+                                    : 'text-gray-600 hover:bg-kai-primary/10'
                                     }`}
                             >
                                 <CalendarIcon className="w-5 h-5 mr-2" />
@@ -102,11 +157,17 @@ export default function SchedulingList() {
 
             {view === 'calendar' ? (
                 <CalendarView
-                    date={selectedDate}
+                    dateRange={[
+                        dateRange[0]?.toDate() || null,
+                        dateRange[1]?.toDate() || null
+                    ]}
                 />
             ) : (
                 <AppointmentList
-                    date={selectedDate}
+                    dateRange={[
+                        dateRange[0]?.toDate() || null,
+                        dateRange[1]?.toDate() || null
+                    ]}
                 />
             )}
         </div>

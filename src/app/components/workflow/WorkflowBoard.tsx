@@ -1,8 +1,8 @@
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { DragDropContext, Droppable } from '@hello-pangea/dnd';
 import { WorkflowColumn } from './WorkflowColumn';
 import { WorkflowCard } from './WorkflowCard';
-import { useWorkflowStore } from '../../stores/workflowStore';
+import { STAGE_ORDER, useWorkflowStore } from '../../stores/workflowStore';
 import {
   ClipboardList,
   Clock,
@@ -13,8 +13,12 @@ import {
   ShieldCheck,
   FileCheck,
   XCircle,
-  AlertOctagon
+  AlertOctagon,
+  ClockIcon,
+  AlertCircle
 } from 'lucide-react';
+import { WorkflowConfirmationDialog } from './dialogs/WorkflowConfirmationDialog'
+import toast from 'react-hot-toast'
 
 export const WORKFLOW_STAGES = [
   {
@@ -60,6 +64,20 @@ export const WORKFLOW_STAGES = [
     description: 'Em transcrição'
   },
   {
+    id: 'IN_REVISION',
+    title: 'Em Revisão',
+    icon: ClockIcon,
+    color: 'text-yellow-500',
+    description: 'Exames em revisão'
+  },
+  {
+    id: 'RELEVANT_FINDINGS',
+    title: 'Achados Relevantes',
+    icon: AlertCircle,
+    color: 'text-rose-500',
+    description: 'Exames com achados importantes'
+  },
+  {
     id: 'SIGNED',
     title: 'Laudado',
     icon: FileCheck,
@@ -84,9 +102,11 @@ interface WorkflowBoardProps {
   transcription: any[];
   signed: any[];
   canceled: any[];
+  in_revision: any[];
   searchQuery: string;
   selectedStatus: string | null;
   selectedDate: Date;
+  relevant_findings: any[];
 }
 
 export function WorkflowBoard({
@@ -98,12 +118,25 @@ export function WorkflowBoard({
   transcription,
   signed,
   canceled,
+  in_revision,
   searchQuery,
   selectedStatus,
-  selectedDate
+  selectedDate,
+  relevant_findings = []
 }: WorkflowBoardProps) {
   const { serviceRequests, moveExam, setServiceRequests } = useWorkflowStore();
-
+  const [confirmationDialog, setConfirmationDialog] = useState<{
+    isOpen: boolean
+    examId: string
+    source: string
+    destination: string
+  }>({
+    isOpen: false,
+    examId: '',
+    source: '',
+    destination: ''
+  })
+  const [isMoving, setIsMoving] = useState(false)
 
   useEffect(() => {
     setServiceRequests(
@@ -115,28 +148,57 @@ export function WorkflowBoard({
         completed,
         transcription,
         signed,
-        canceled
+        canceled,
+        in_revision
       )
     )
   }, [
     planned,
     waiting,
     started,
+    in_revision,
+    completed
   ])
 
   const handleDragEnd = async (result: any) => {
-    if (!result.destination) return;
+    if (!result.destination) return
 
-    const { source, destination, draggableId } = result;
+    const { source, destination, draggableId } = result
 
-    if (source.droppableId !== destination.droppableId) {
-      try {
-        await moveExam(draggableId, source.droppableId, destination.droppableId);
-      } catch (error) {
-        console.error('Error moving exam:', error);
-      }
+    // If not changing columns, do nothing
+    if (source.droppableId === destination.droppableId) return
+
+    // Check if trying to move backwards
+    if (STAGE_ORDER[destination.droppableId.toUpperCase()] < STAGE_ORDER[source.droppableId.toUpperCase()]) {
+      toast.error('Não é permitido mover exames para estágios anteriores', {
+        duration: 5000,
+      })
+      return
     }
-  };
+
+    // Show confirmation dialog for forward movement
+    setConfirmationDialog({
+      isOpen: true,
+      examId: draggableId,
+      source: source.droppableId,
+      destination: destination.droppableId
+    })
+  }
+
+  const handleConfirmMove = async () => {
+    const { examId, source, destination } = confirmationDialog
+
+    setIsMoving(true)
+    try {
+      await moveExam(examId, source, destination)
+      setConfirmationDialog(prev => ({ ...prev, isOpen: false }))
+    } catch (error) {
+      console.error('Error moving exam:', error)
+      toast.error('Erro ao mover o exame')
+    } finally {
+      setIsMoving(false)
+    }
+  }
 
   // const filteredExams = serviceRequests?.filter(sr => {
   //   // const matchesSearch = exam.patientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -152,6 +214,16 @@ export function WorkflowBoard({
         {/* <pre>
           {JSON.stringify(serviceRequests, null, 2)}
         </pre> */}
+        <WorkflowConfirmationDialog
+          isOpen={confirmationDialog.isOpen}
+          onClose={() => setConfirmationDialog(prev => ({ ...prev, isOpen: false }))}
+          onConfirm={handleConfirmMove}
+          title="Confirmar movimentação"
+          description="Esta ação é irreversível. Deseja prosseguir com a movimentação do exame?"
+          confirmText="Sim, mover"
+          cancelText="Cancelar"
+          isLoading={isMoving}
+        />
         <DragDropContext onDragEnd={handleDragEnd}>
           {WORKFLOW_STAGES.map((status) => (
             <div

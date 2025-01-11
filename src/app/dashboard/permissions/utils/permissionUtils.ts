@@ -1,4 +1,4 @@
-import { AccessLevel, Role, ServiceStatus } from "@/src/app/types/pemissions/permissions";
+import { AccessLevel, Role, ServiceStatus } from "@/app/types/pemissions/permissions";
 import { examAccessDescriptions, patientAccessDescriptions } from "../constants/accessDescriptions";
 
 export function getPatientAccessDescription(

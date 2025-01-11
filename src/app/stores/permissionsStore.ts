@@ -39,10 +39,10 @@ export const mockRolePermissions: RolePermissions[] = [
         ),
       },
       {
-        stage: "ONHOLD",
+        stage: "ON_HOLD",
         access: "read",
         description: getExamAccessDescription(
-          "ONHOLD",
+          "ON_HOLD",
           "read",
           "Recepcionista"
         ),
@@ -101,9 +101,9 @@ export const mockRolePermissions: RolePermissions[] = [
         description: getExamAccessDescription("STARTED", "read", "Enfermeiro"),
       },
       {
-        stage: "ONHOLD",
+        stage: "ON_HOLD",
         access: "read",
-        description: getExamAccessDescription("ONHOLD", "read", "Enfermeiro"),
+        description: getExamAccessDescription("ON_HOLD", "read", "Enfermeiro"),
       },
       {
         stage: "COMPLETED",
@@ -155,9 +155,9 @@ export const mockRolePermissions: RolePermissions[] = [
         description: getExamAccessDescription("STARTED", "read", "Biomedico"),
       },
       {
-        stage: "ONHOLD",
+        stage: "ON_HOLD",
         access: "read",
-        description: getExamAccessDescription("ONHOLD", "read", "Biomedico"),
+        description: getExamAccessDescription("ON_HOLD", "read", "Biomedico"),
       },
       {
         stage: "COMPLETED",
@@ -217,9 +217,9 @@ export const mockRolePermissions: RolePermissions[] = [
         ),
       },
       {
-        stage: "ONHOLD",
+        stage: "ON_HOLD",
         access: "read",
-        description: getExamAccessDescription("ONHOLD", "read", "Radiologista"),
+        description: getExamAccessDescription("ON_HOLD", "read", "Radiologista"),
       },
       {
         stage: "COMPLETED",
@@ -271,9 +271,9 @@ export const mockRolePermissions: RolePermissions[] = [
         description: getExamAccessDescription("STARTED", "read", "HeadDoctor"),
       },
       {
-        stage: "ONHOLD",
+        stage: "ON_HOLD",
         access: "read",
-        description: getExamAccessDescription("ONHOLD", "read", "HeadDoctor"),
+        description: getExamAccessDescription("ON_HOLD", "read", "HeadDoctor"),
       },
       {
         stage: "COMPLETED",
@@ -325,9 +325,9 @@ export const mockRolePermissions: RolePermissions[] = [
         description: getExamAccessDescription("STARTED", "read", "Master"),
       },
       {
-        stage: "ONHOLD",
+        stage: "ON_HOLD",
         access: "read",
-        description: getExamAccessDescription("ONHOLD", "read", "Master"),
+        description: getExamAccessDescription("ON_HOLD", "read", "Master"),
       },
       {
         stage: "COMPLETED",

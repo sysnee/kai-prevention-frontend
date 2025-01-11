@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Clock, AlertCircle, Info, AlertTriangleIcon } from 'lucide-react';
-import { examsList } from '@/src/app/data/exams';
-import { formatCurrency } from '@/src/app/utils/format';
+import { Search, AlertCircle, Info, AlertTriangleIcon } from 'lucide-react';
+import { examsList } from '@/app/data/exams';
+import { useTheme } from '@mui/material';
 
 interface ExamSelectorProps {
   selectedExam: any;
@@ -11,6 +11,7 @@ interface ExamSelectorProps {
 export function ExamSelector({ selectedExam, onExamSelect }: ExamSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const theme = useTheme();
 
   const categories = Array.from(new Set(examsList.map(exam => exam.category)));
 
@@ -30,7 +31,10 @@ export function ExamSelector({ selectedExam, onExamSelect }: ExamSelectorProps) 
             placeholder="Buscar exames..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 rounded-lg focus:ring-2 focus:ring-kai-primary focus:border-transparent"
+            style={{
+              border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d"
+            }}
           />
           <Search className="w-5 h-5 text-gray-400 absolute left-3 top-2.5" />
         </div>
@@ -38,7 +42,10 @@ export function ExamSelector({ selectedExam, onExamSelect }: ExamSelectorProps) 
           <select
             value={selectedCategory || ''}
             onChange={(e) => setSelectedCategory(e.target.value || null)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-3 py-2 rounded-lg focus:ring-2 focus:ring-kai-primary focus:border-transparent"
+            style={{
+              border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d"
+            }}
           >
             <option value="">Todas as categorias</option>
             {categories.map(category => (
@@ -55,10 +62,14 @@ export function ExamSelector({ selectedExam, onExamSelect }: ExamSelectorProps) 
           <button
             key={exam.id}
             onClick={() => onExamSelect(exam)}
-            className={`text-left p-4 rounded-xl border transition-all ${selectedExam?.id === exam.id
-              ? 'border-blue-500 ring-2 ring-blue-200 bg-blue-50'
-              : 'border-gray-200 hover:border-blue-500 bg-white'
+            className={`text-left p-4 rounded-xl transition-all ${selectedExam?.id === exam.id
+              ? 'ring-2 ring-kai-primary bg-kai-primary/10'
+              : theme.palette.mode === 'light' ? 'border-gray-200 bg-white hover:bg-kai-primary/10' :
+                'border-gray-200 hover:bg-kai-primary/10'
               }`}
+            style={{
+              border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d"
+            }}
           >
             <div className="flex items-start">
               {/* <img
@@ -67,24 +78,30 @@ export function ExamSelector({ selectedExam, onExamSelect }: ExamSelectorProps) 
                 className="w-20 h-20 object-cover rounded-lg"
               /> */}
               <div className="ml-4 flex-1">
-                <h3 className="font-medium text-gray-900">{exam.name}</h3>
+                <h3 className="font-medium text-gray-500">{exam.name}</h3>
                 <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                   {exam.description}
                 </p>
                 <div className="mt-2 flex items-center justify-between">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <AlertTriangleIcon className="w-4 h-4 mr-1" />
+                  <div className="flex items-center text-sm text-gray-500">
+                    <AlertTriangleIcon className="w-4 h-4 mr-1 text-kai-primary" />
                     Requer preparação prévia
                   </div>
-                  <span className="font-medium text-blue-600">
+                  <span className="font-medium text-kai-primary">
                     R$ ---,--
                   </span>
                 </div>
               </div>
             </div>
             {exam.preparation && (
-              <div className="mt-3 flex items-start text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
-                <AlertCircle className="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" />
+              <div
+                className="mt-3 flex items-start text-sm text-gray-500 rounded-lg p-3"
+                style={{
+                  border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d",
+                  backgroundColor: theme.palette.mode === 'light' ? "#f9fafb" : "#111827"
+                }}
+              >
+                <AlertCircle className="w-5 h-5 text-kai-primary mr-2 flex-shrink-0" />
                 <p>Modalidades: {exam.duration}</p>
               </div>
             )}

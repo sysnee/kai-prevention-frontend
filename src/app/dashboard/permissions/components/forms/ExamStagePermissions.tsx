@@ -1,6 +1,6 @@
 "use client";
 
-import { ExamStageAccess } from "@/src/app/types/pemissions/permissions";
+import { ExamStageAccess } from "@/app/types/pemissions/permissions";
 import { FormControl, InputLabel, Select, MenuItem, Box } from "@mui/material";
 
 interface ExamStagePermissionsProps {
@@ -34,7 +34,7 @@ export default function ExamStagePermissions({
         return "Aguardando";
       case "started":
         return "Iniciado";
-      case "onhold":
+      case "ON_HOLD":
         return "Pausado";
       case "completed":
         return "Concluído";

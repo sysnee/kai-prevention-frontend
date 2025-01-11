@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTheme } from '@mui/material';
 
 interface CalendarProps {
   selectedDate: Date;
@@ -7,6 +8,7 @@ interface CalendarProps {
 }
 
 export function Calendar({ selectedDate, onDateSelect }: CalendarProps) {
+  const theme = useTheme();
   const [currentMonth, setCurrentMonth] = React.useState(() => {
     const date = new Date(selectedDate);
     date.setDate(1);
@@ -63,15 +65,21 @@ export function Calendar({ selectedDate, onDateSelect }: CalendarProps) {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+    <div
+      className="max-w-md mx-auto rounded-xl shadow-lg p-6"
+      style={{
+        border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d",
+        backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#111827"
+      }}
+    >
       <div className="flex justify-between items-center mb-6">
         <button
           onClick={handlePrevMonth}
-          className="p-2 hover:bg-blue-50 rounded-full transition-colors duration-200 text-blue-600"
+          className="p-2 hover:bg-kai-primary/10 rounded-full transition-colors duration-200 text-kai-primary"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h2 className="text-lg font-semibold text-gray-800">
+        <h2 className="text-lg font-semibold text-gray-500">
           {currentMonth.toLocaleDateString('pt-BR', {
             month: 'long',
             year: 'numeric',
@@ -79,7 +87,7 @@ export function Calendar({ selectedDate, onDateSelect }: CalendarProps) {
         </h2>
         <button
           onClick={handleNextMonth}
-          className="p-2 hover:bg-blue-50 rounded-full transition-colors duration-200 text-blue-600"
+          className="p-2 hover:bg-kai-primary/10 rounded-full transition-colors duration-200 text-kai-primary"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -110,12 +118,11 @@ export function Calendar({ selectedDate, onDateSelect }: CalendarProps) {
                 className={`
                   w-full h-full flex items-center justify-center rounded-lg
                   text-sm font-medium transition-all duration-200
-                  ${
-                    isSelectedDate(day)
-                      ? 'bg-blue-600 text-white shadow-md scale-105'
-                      : isPastDate(day)
-                      ? 'text-gray-300 cursor-not-allowed'
-                      : 'hover:bg-blue-50 hover:text-blue-600 text-gray-700'
+                  ${isSelectedDate(day)
+                    ? theme.palette.mode === 'light' ? 'bg-kai-primary text-white shadow-md scale-105' : 'bg-kai-primary text-black scale-105'
+                    : isPastDate(day)
+                      ? theme.palette.mode === 'light' ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 cursor-not-allowed'
+                      : theme.palette.mode === 'light' ? 'hover:bg-kai-primary/10 hover:text-kai-primary text-gray-800' : 'hover:bg-kai-primary/10 hover:text-kai-primary text-gray-300'
                   }
                 `}
               >

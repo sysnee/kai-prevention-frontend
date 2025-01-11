@@ -17,7 +17,7 @@ export const RESOURCE_TRANSLATIONS = {
   [ResourceType.WORKFLOW_PLANNED]: 'Workflow - Planejado',
   [ResourceType.WORKFLOW_WAITING]: 'Workflow - Aguardando',
   [ResourceType.WORKFLOW_STARTED]: 'Workflow - Iniciado',
-  [ResourceType.WORKFLOW_ONHOLD]: 'Workflow - Em Espera',
+  [ResourceType.WORKFLOW_ON_HOLD]: 'Workflow - Em Espera',
   [ResourceType.WORKFLOW_COMPLETED]: 'Workflow - Concluído',
   [ResourceType.WORKFLOW_TRANSCRIPTION]: 'Workflow - Transcrição',
   [ResourceType.WORKFLOW_SIGNED]: 'Workflow - Assinado'

@@ -2,7 +2,6 @@
 
 import { ReactNode } from 'react'
 import { Box, CssBaseline } from '@mui/material'
-import { Theme } from '@mui/material/styles'
 import SideMenu from './SideMenu'
 import AppNavbar from './AppNavbar'
 import Header from './Header'
@@ -14,6 +13,7 @@ import { chartsCustomizations } from '../theme/customizations/charts'
 import { dataGridCustomizations } from '../theme/customizations/dataGrid'
 import { treeViewCustomizations } from '../theme/customizations/treeView'
 import { datePickersCustomizations } from '../theme/customizations/datePickers'
+import { useTheme } from '@mui/system'
 
 const DRAWER_WIDTH = 280
 
@@ -25,6 +25,8 @@ const xThemeComponents = {
 }
 
 function BaseLayout({ children, session }: { children: ReactNode; session?: Session }) {
+  const theme = useTheme();
+
   return (
     <SessionProvider session={session}>
       <div suppressHydrationWarning>
@@ -41,12 +43,11 @@ function BaseLayout({ children, session }: { children: ReactNode; session?: Sess
                   display: 'flex',
                   flexDirection: 'column',
                   width: '100%',
-                  maxWidth: '100%',
                   overflow: 'hidden',
                   position: 'relative',
                   boxSizing: 'border-box',
                   p: 2,
-                  marginRight: 5
+                  backgroundColor: theme.palette.mode === 'dark' ? 'background.paper' : 'background.default'
                 }}>
                 <AppNavbar />
                 <Header />

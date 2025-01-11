@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Clock, User, AlertCircle, CalendarX } from 'lucide-react';
-import api from '@/src/lib/api';
 import { CircularProgress } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import api from '@/lib/api';
 
 interface CalendarViewProps {
-  date: Date;
+  dateRange: [Date | null, Date | null];
 }
 
 interface Appointment {
@@ -18,9 +19,10 @@ interface Appointment {
   createdAt: string;
 }
 
-export function CalendarView({ date }: CalendarViewProps) {
+export function CalendarView({ dateRange }: CalendarViewProps) {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
 
   const translateStatus = (status: string): string => {
     const translations: { [key: string]: string } = {
@@ -42,7 +44,15 @@ export function CalendarView({ date }: CalendarViewProps) {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const { data } = await api.get("service-requests");
+      const startDate = dateRange[0] ? formatDateForApi(dateRange[0]) : ''
+      const endDate = dateRange[1] ? formatDateForApi(dateRange[1]) : ''
+
+      const { data } = await api.get("service-requests", {
+        params: {
+          startDate,
+          endDate
+        }
+      });
       setAppointments(data);
     } catch (err) {
       console.error("Erro ao buscar os dados:", err);
@@ -51,9 +61,18 @@ export function CalendarView({ date }: CalendarViewProps) {
     }
   };
 
+  const formatDateForApi = (date: Date): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   useEffect(() => {
-    fetchAppointments();
-  }, [date]);
+    if (dateRange[0] && dateRange[1]) {
+      fetchAppointments();
+    }
+  }, [dateRange[0], dateRange[1]]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -68,12 +87,33 @@ export function CalendarView({ date }: CalendarViewProps) {
     }
   };
 
-  const formattedDate = formatDate(date);
+  const filterAppointmentsByDateRange = (appointments: Appointment[]) => {
+    if (!dateRange[0] || !dateRange[1]) return appointments
 
-  const filteredAppointments = appointments?.filter(
-    (appointment) =>
-      appointment.dateTime.startsWith(formattedDate)
-  ) || [];
+    const startDate = new Date(dateRange[0])
+    const endDate = new Date(dateRange[1])
+
+    startDate.setHours(0, 0, 0, 0)
+    endDate.setHours(23, 59, 59, 999)
+
+    return appointments.filter(appointment => {
+      const [datePart, timePart] = appointment.dateTime.split(', ')
+      const [day, month, year] = datePart.split('/')
+      const [hours, minutes] = timePart.split(':')
+
+      const appointmentDate = new Date(
+        parseInt(year),
+        parseInt(month) - 1,
+        parseInt(day),
+        parseInt(hours),
+        parseInt(minutes)
+      )
+
+      return appointmentDate >= startDate && appointmentDate <= endDate
+    })
+  }
+
+  const filteredAppointments = filterAppointmentsByDateRange(appointments)
 
   if (loading) {
     return <CircularProgress />;
@@ -82,21 +122,32 @@ export function CalendarView({ date }: CalendarViewProps) {
 
   if (filteredAppointments.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+      <div
+        className="rounded-lg p-12 text-center"
+        style={{
+          border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)"
+        }}
+      >
         <CalendarX className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-gray-500 mb-2">
           Nenhum agendamento encontrado
         </h3>
         <p className="text-gray-500">
-          Não há agendamentos para esta data ou filtro aplicado.
+          Não há agendamentos para esta data.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200">
-      <div className="grid grid-cols-1 divide-y divide-gray-200">
+    <div
+      className="rounded-lg"
+      style={{
+        border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)"
+      }}
+    >
+      <div className={`grid grid-cols-1 divide-y ${theme.palette.mode === 'light' ? 'divide-gray-200' : 'divide-gray-800'}`}
+      >
         {filteredAppointments.map((appointment) => {
 
           return (
@@ -104,10 +155,15 @@ export function CalendarView({ date }: CalendarViewProps) {
               key={appointment.id}
               className={`min-h-[80px] grid grid-cols-[120px,1fr]`}
             >
-              <div className="p-4 border-r border-gray-200 flex items-center">
+              <div
+                className="p-4 flex items-center"
+                style={{
+                  borderRight: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)"
+                }}
+              >
                 <Clock className={`w-4 h-4 mr-2 'text-gray-400'}`} />
                 <span className={`font-medium 'text-gray-600'}`}>
-                  {appointment.dateTime.split(', ')[1]}
+                  {appointment.dateTime}
                 </span>
               </div>
               <div className="p-2">

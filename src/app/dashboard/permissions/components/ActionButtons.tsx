@@ -1,8 +1,6 @@
 "use client";
 
-import { IconButton, Tooltip } from "@mui/material";
-import { useTheme } from "@mui/system";
-import { Eye, PenLine, Trash2 } from "lucide-react";
+import { Eye, Edit2, Trash2 } from 'lucide-react';
 
 interface ActionButtonsProps {
   onView: () => void;
@@ -10,52 +8,27 @@ interface ActionButtonsProps {
   onDelete: () => void;
 }
 
-export default function ActionButtons({
-  onView,
-  onEdit,
-  onDelete,
-  size = "small",
-}: ActionButtonsProps & { size?: "small" | "medium" | "large" }) {
-  const theme = useTheme();
+export default function ActionButtons({ onView, onEdit, onDelete }: ActionButtonsProps) {
   return (
-    <div className="flex gap-1">
-      <Tooltip title="View">
-        <IconButton
-          sx={{
-            color: theme.palette.action.active,
-            "&:hover": { color: theme.palette.primary.main },
-          }}
-          size={size}
-          onClick={onView}
-        >
-          <Eye size={18} />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Edit">
-        <IconButton
-          sx={{
-            color: theme.palette.action.active,
-            "&:hover": { color: theme.palette.success.main },
-          }}
-          size={size}
-          onClick={onEdit}
-        >
-          <PenLine size={18} />
-        </IconButton>
-      </Tooltip>
-      <Tooltip title="Delete">
-        <IconButton
-          sx={{
-            color: theme.palette.action.active,
-            "&:hover": { color: theme.palette.error.main },
-          }}
-          size={size}
-          color="error"
-          onClick={onDelete}
-        >
-          <Trash2 size={18} />
-        </IconButton>
-      </Tooltip>
+    <div className="flex gap-4">
+      <button
+        onClick={onView}
+        className="hover:opacity-70"
+      >
+        <Eye className="w-5 h-5 text-kai-primary" />
+      </button>
+      <button
+        onClick={onEdit}
+        className="hover:opacity-70"
+      >
+        <Edit2 className="w-5 h-5 text-kai-primary" />
+      </button>
+      <button
+        onClick={onDelete}
+        className="hover:opacity-70"
+      >
+        <Trash2 className="w-5 h-5 text-kai-primary" />
+      </button>
     </div>
   );
 }

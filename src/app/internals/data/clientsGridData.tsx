@@ -1,11 +1,33 @@
 import { GridColDef, GridRowsProp } from "@mui/x-data-grid";
 import { Box } from "@mui/material";
-import ActionButtons from "../../dashboard/permissions/components/ActionButtons";
+import { useTheme } from "@mui/material/styles";
+import { Eye, Edit2 } from "lucide-react";
+
+function ViewEditButtons({ onView, onEdit }: {
+  onView: () => void
+  onEdit: () => void
+}) {
+  return (
+    <div className="flex gap-4">
+      <button
+        onClick={onView}
+        className="hover:opacity-70"
+      >
+        <Eye className="w-5 h-5 text-kai-primary" />
+      </button>
+      <button
+        onClick={onEdit}
+        className="hover:opacity-70"
+      >
+        <Edit2 className="w-5 h-5 text-kai-primary" />
+      </button>
+    </div>
+  )
+}
 
 export const colum = (
   onView: (cliente: any) => void,
   onEdit: (cliente: any) => void,
-  onDelete: (cliente: any) => void
 ): GridColDef[] => [
     {
       field: "name",
@@ -23,6 +45,7 @@ export const colum = (
             width: "100%",
             borderRight: `1px solid ${theme.palette.divider}`,
             boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
           })}
         >
           {params.row.name}
@@ -45,6 +68,7 @@ export const colum = (
             width: "100%",
             borderRight: `1px solid ${theme.palette.divider}`,
             boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
           })}
         >
           {params.row.cpf}
@@ -67,6 +91,7 @@ export const colum = (
             width: "100%",
             borderRight: `1px solid ${theme.palette.divider}`,
             boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
           })}
         >
           {params.row.email}
@@ -89,12 +114,12 @@ export const colum = (
             width: "100%",
             borderRight: `1px solid ${theme.palette.divider}`,
             boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
           })}
         >
-          <ActionButtons
+          <ViewEditButtons
             onView={() => onView(params.row)}
             onEdit={() => onEdit(params.row)}
-            onDelete={() => onDelete(params.row)}
           />
         </Box>
       ),

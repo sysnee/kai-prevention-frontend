@@ -3,7 +3,20 @@ import toast from 'react-hot-toast';
 //import { pacsService } from '../services/pacsService';
 import { WorkflowNote, WorkflowTransition } from '../types/workflow/workflow';
 import { ServiceStatus } from '../types/pemissions/permissions';
-import api from '@/src/lib/api';
+import api from '@/lib/api';
+
+export const STAGE_ORDER = {
+  PLANNED: 0,
+  WAITING: 1,
+  STARTED: 2,
+  ON_HOLD: 3,
+  COMPLETED: 4,
+  IN_TRANSCRIPTION: 5,
+  IN_REVISION: 6,
+  RELEVANT_FINDINGS: 7,
+  SIGNED: 8,
+  CANCELED: 9
+} as const
 
 interface Appointment {
   id: string;
@@ -20,9 +33,11 @@ export interface ServiceRequest {
   id: string;
   code: number;
   clientName: string;
+  clientBirthdate: string;
+  clientGender: string;
+  clientCpf: string;
   patientId: string;
   examType: string;
-  priority: 'low' | 'medium' | 'high';
   status: ServiceStatus | string;
   timeInStage: string;
   doctor: string;
@@ -33,8 +48,21 @@ export interface ServiceRequest {
   notes?: string;
   exams: Array<{
     id: string;
-    name: string;
+    modality: string;
+    description: string;
     room: string;
+    status: string;
+    reportId?: string;
+    report: {
+      id: string;
+      status: string;
+      createdAt: string;
+      updatedAt: string;
+      createdBy: {
+        id: string;
+        name: string;
+      }
+    }
   }>;
   workflowNotes: WorkflowNote[];
   transitions: WorkflowTransition[];
@@ -55,7 +83,7 @@ export interface ServiceRequest {
 
 interface WorkflowStore {
   serviceRequests: ServiceRequest[];
-  appointment: Appointment | null;
+  appointment: ServiceRequest | null;
   setServiceRequests: (serviceRequests: any[]) => void
   addExam: (exam: ServiceRequest) => void;
   updateExam: (examId: string, data: Partial<ServiceRequest>) => void;
@@ -63,7 +91,7 @@ interface WorkflowStore {
   addWorkflowNote: (examId: string, note: Omit<WorkflowNote, 'id' | 'createdAt'>) => void;
   cancelExam: (examId: string, reason: string) => void;
   rescheduleExam: (examId: string, newDate: Date, newTime: string, reason: string) => void;
-  setSelectedAppointment: (appointment: Appointment) => void;
+  setSelectedAppointment: (appointment: ServiceRequest) => void;
   clearAppointment: () => void;
 }
 
@@ -71,7 +99,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
   serviceRequests: [],
   appointment: null,
 
-  setSelectedAppointment: (appointment: Appointment) => {
+  setSelectedAppointment: (appointment: ServiceRequest) => {
     set({ appointment });
   },
 
@@ -101,12 +129,10 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
     }
 
     try {
-      // Garantir que transitions é sempre um array
       const updatedTransitions = Array.isArray(exam.transitions)
         ? [...exam.transitions]
         : [];
 
-      // Adicionar a nova transição
       const transition: WorkflowTransition = {
         from: fromStage,
         to: toStage,
@@ -117,7 +143,6 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
 
       updatedTransitions.push(transition);
 
-      // Salvar o estado original para possível rollback
       const originalStatus = exam.status;
       const originalTransitions = [...updatedTransitions];
 
@@ -126,49 +151,51 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
         serviceRequests: state.serviceRequests.map((e) =>
           e.id === examId
             ? {
-                ...e,
-                status: toStage as ServiceStatus,
-                transitions: updatedTransitions,
-              }
+              ...e,
+              status: toStage as ServiceStatus,
+              transitions: updatedTransitions,
+            }
             : e
         ),
       }));
 
-      // Realizar requisição para a API se o destino for STARTED
-      if (toStage === "STARTED") {
+      // Realizar requisição para a API se o destino for STARTED ou a transição for de PLANNED para WAITING
+      if (toStage === "STARTED" || (fromStage === "PLANNED" && toStage === "WAITING")) {
         try {
-          const response = await api.put(
-            `service-requests/${exam.id}/status/forward/started`
-          );
+          const endpoint = toStage === "STARTED"
+            ? `service-requests/${exam.id}/status/forward/started`
+            : `service-requests/${exam.id}/status/forward/waiting`;
+
+          const response = await api.put(endpoint);
 
           if (!response) {
             const errorMessage = await response.text();
-            throw new Error(`Erro da API: ${errorMessage}`);
+            throw new Error(`Erro: ${errorMessage}`);
           }
 
-          toast.success(`Exame movido para ${toStage} e atualizado na API`);
+          toast.success(`Exames atualizados com sucesso`);
         } catch (apiError) {
-          console.error("Erro ao atualizar o status na API:", apiError);
+          console.error("Erro ao atualizar:", apiError);
 
           // Reverter o status e as transições no caso de falha
           set((state) => ({
             serviceRequests: state.serviceRequests.map((e) =>
               e.id === examId
                 ? {
-                    ...e,
-                    status: originalStatus,
-                    transitions: originalTransitions,
-                  }
+                  ...e,
+                  status: originalStatus,
+                  transitions: originalTransitions,
+                }
                 : e
             ),
           }));
 
           toast.error(
-            "Falha ao atualizar status para STARTED na API. O exame foi revertido."
+            `Falha ao atualizar status. O exame foi revertido.`
           );
         }
       } else {
-        toast.success(`Exame movido para ${toStage}`);
+        toast.success(`Exames atualizados com sucesso`);
       }
     } catch (error) {
       console.error("Erro ao mover exame:", error);

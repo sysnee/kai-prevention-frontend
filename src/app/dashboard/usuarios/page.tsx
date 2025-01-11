@@ -1,36 +1,32 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Plus, Search, Edit2, Trash2, Key, Shield } from 'lucide-react'
+
 import api from '../../../lib/api'
 import { UserForm } from './components/user-form'
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton
-} from '@mui/material'
+import { Box, Typography, TextField, Button, CircularProgress } from '@mui/material'
+import { DataGrid, GridRowsProp, GridColDef, GridRenderCellParams } from '@mui/x-data-grid'
 import { User } from '../../types/user'
 import { Role } from '../../types/permissions'
-import { TABLE_HEADERS, USER_MANAGEMENT, getProfessionalTypeName } from '../../constants/translations'
-import { showToast } from '../../../lib/toast'
+import toast from 'react-hot-toast'
 import { useTheme } from '@mui/system'
+import { getProfessionalTypeName } from '../../constants/translations'; // Ajuste o caminho conforme necessário
+import ActionButtons from '../permissions/components/ActionButtons'
+import { Plus, Search } from 'lucide-react'
+import { PlusOne } from '@mui/icons-material'
+import { ConfirmationModal } from '../../components/shared/ConfirmationModal'
 
 export default function UserManagement() {
   const [users, setUsers] = useState<User[]>([])
   const [roles, setRoles] = useState<Role[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [showUserForm, setShowUserForm] = useState(false)
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [formMode, setFormMode] = useState<'edit' | 'view' | 'create'>('create')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [formErrors, setFormErrors] = useState<{ cpf?: string; email?: string }>({})
 
   useEffect(() => {
     fetchUsers()
@@ -65,7 +61,172 @@ export default function UserManagement() {
       user.email.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const handleView = (user: User) => {
+    setSelectedUser(user)
+    setFormMode('view')
+    setShowUserForm(true)
+  }
+
+  const handleEdit = (user: User) => {
+    setSelectedUser(user)
+    setFormMode('edit')
+    setShowUserForm(true)
+  }
+
+  const handleClose = () => {
+    setShowUserForm(false)
+    setFormErrors({})
+    setSelectedUser(null)
+    setFormMode('create')
+  }
+
+  const handleDeleteClick = (user: User) => {
+    setSelectedUser(user)
+    setShowConfirmationModal(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    try {
+      if (!selectedUser?.id) return
+      setIsDeleting(true)
+
+      await api.delete(`/users/${selectedUser.id}`)
+      toast.success('Usuário deletado com sucesso')
+      fetchUsers()
+      setShowConfirmationModal(false)
+      setSelectedUser(null)
+    } catch (error) {
+      console.error('Erro ao deletar usuário:', error)
+      toast.error('Erro ao deletar usuário')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const columns: GridColDef[] = [
+    {
+      field: 'fullName',
+      headerName: 'Nome',
+      flex: 0.4,
+      minWidth: 250,
+      renderCell: (params) => (
+        <Box
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
+        >
+          {params.row.fullName}
+        </Box>
+      ),
+    },
+    {
+      field: 'email',
+      headerName: 'Email',
+      flex: 0.4,
+      minWidth: 250,
+      renderCell: (params) => (
+        <Box
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
+        >
+          {params.row.email}
+        </Box>
+      ),
+    },
+    {
+      field: 'role',
+      headerName: 'Perfil',
+      flex: 0.4,
+      minWidth: 150,
+      renderCell: (params: any) => (
+        <Box
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
+        >
+          {params.row.role?.name}
+        </Box>
+      ),
+    },
+    {
+      field: 'professionalType',
+      headerName: 'Profissão',
+      flex: 0.4,
+      minWidth: 150,
+      renderCell: (params: GridRenderCellParams) => (
+        <Box
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
+        >
+          {getProfessionalTypeName(params.value)}
+        </Box>
+      ),
+    },
+    {
+      field: 'actions',
+      headerName: 'Ações',
+      flex: 0.4,
+      minWidth: 200,
+      renderCell: (params) => (
+        <Box
+          sx={(theme) => ({
+            padding: "0 .8em",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "start",
+            height: "100%",
+            width: "100%",
+            borderRight: `1px solid ${theme.palette.divider}`,
+            boxSizing: "border-box",
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+          })}
+        >
+          <ActionButtons
+            onView={() => handleView(params.row)}
+            onEdit={() => handleEdit(params.row)}
+            onDelete={() => handleDeleteClick(params.row)}
+          />
+        </Box>
+      ),
+    },
+  ]
+
   const handleSave = async (user: User) => {
+    setFormErrors({})
     try {
       if (selectedUser) {
         await api.patch(`/users/${selectedUser.id}`, user)
@@ -73,66 +234,42 @@ export default function UserManagement() {
         await api.post('/users', user)
       }
 
-      showToast.success('Usuário salvo com sucesso')
+      toast.success('Usuário salvo com sucesso')
       fetchUsers()
+      setFormErrors({})
       setShowUserForm(false)
       setSelectedUser(null)
-    } catch (error) {
-      console.error('Error saving user:', error)
-    }
-  }
+    } catch (error: any) {
+      console.error('Erro ao salvar usuário:', error)
 
-  const handleDelete = async (userId: number) => {
-    try {
-      await api.delete(`/users/${userId}`)
-      showToast.success('Usuário deletado com sucesso')
-      fetchUsers()
-    } catch (error) {
-      console.error('Error deleting user:', error)
-    }
-  }
+      try {
+        const parsedError = JSON.parse(error.message.replace('API Error: ', ''));
+        const errorMessage = parsedError.message?.message || 'Erro desconhecido';
 
-  const onSubmit = async (data: User) => {
-    try {
-      const submitData = {
-        fullName: data.fullName,
-        birthDate: data.birthDate,
-        gender: data.gender,
-        cpf: data.cpf,
-        phone: data.phone,
-        email: data.email,
-        status: data.status,
-        roleId: data.roleId,
-        isHealthcareProfessional: data.isHealthcareProfessional,
-        professionalType: data.professionalType,
-        registrationNumber: data.isHealthcareProfessional ? data.registrationNumber : null
+        if (errorMessage.includes('CPF already exists')) {
+          setFormErrors({ cpf: 'CPF já cadastrado' })
+        } else if (errorMessage.includes('Email already exists')) {
+          setFormErrors({ email: 'Email já cadastrado' })
+        } else {
+          toast.error(errorMessage);
+        }
+      } catch (parseError) {
+        console.error('Erro ao interpretar a mensagem de erro:', parseError);
+        toast.error('Erro inesperado ao salvar usuário');
       }
-
-      debugger
-      await handleSave(submitData)
-    } catch (error) {
-      console.error('Error submitting form:', error)
     }
   }
 
   return (
     <Box sx={{ width: '100%', boxSizing: 'border-box' }}>
       <Typography variant='h4' component='h1' sx={{ fontWeight: 'bold', marginBottom: 3 }}>
-        {USER_MANAGEMENT.title}
+        Gerenciamento de Usuários
       </Typography>
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: 2,
-          marginBottom: 3,
-          flexWrap: 'wrap'
-        }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, marginBottom: 3, flexWrap: 'wrap' }}>
         <TextField
           variant='outlined'
-          placeholder={USER_MANAGEMENT.searchPlaceholder}
+          placeholder='Buscar usuários...'
           size='medium'
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
@@ -145,90 +282,75 @@ export default function UserManagement() {
             setSelectedUser(null)
             setShowUserForm(true)
           }}
-          className={`flex items-center px-4 py-2 rounded-lg text-white
-            ${theme.palette.mode === 'light' ? 'bg-kai-primary hover:bg-kai-primary/40' : 'bg-gray-600 hover:bg-gray-700'}
-          `}
+          className="flex items-center px-4 py-2 rounded-lg text-white bg-kai-primary hover:bg-kai-primary/70"
+          style={{
+            color: theme.palette.mode === 'light' ? '#fff' : '#000'
+          }}
           startIcon={<Plus />}>
-          {USER_MANAGEMENT.newUser}
+          Novo Usuário
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ width: '25%' }}>{TABLE_HEADERS.name}</TableCell>
-              <TableCell sx={{ width: '25%' }}>{TABLE_HEADERS.email}</TableCell>
-              <TableCell sx={{ width: '20%' }}>{TABLE_HEADERS.profile}</TableCell>
-              <TableCell sx={{ width: '15%' }}>{TABLE_HEADERS.profession}</TableCell>
-              <TableCell sx={{ width: '15%' }} align='right'>
-                {TABLE_HEADERS.actions}
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={5} align='center'>
-                  {USER_MANAGEMENT.loading}
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredUsers.map(user => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <Typography variant='subtitle1'>{user.fullName}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant='body2'>{user.email}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Shield className='text-primary' size={16} />
-                      <span>{user.role.name}</span>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant='body2'>{getProfessionalTypeName(user.professionalType)}</Typography>
-                  </TableCell>
-                  <TableCell align='right'>
-                    <IconButton
-                      onClick={() => {
-                        setSelectedUser(user)
-                        setShowUserForm(true)
-                      }}
-                      color='primary'
-                      size='small'>
-                      <Edit2 />
-                    </IconButton>
-                    <IconButton
-                      onClick={() => {
-                        if (window.confirm(USER_MANAGEMENT.deleteConfirmation)) {
-                          handleDelete(user.id)
-                        }
-                      }}
-                      color='error'
-                      size='small'>
-                      <Trash2 />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {isLoading ? (
+        <CircularProgress />
+      ) : (
+        filteredUsers.length > 0 &&
+        <DataGrid
+          rows={filteredUsers}
+          columns={columns}
+          pageSizeOptions={[5, 10, 20]}
+          initialState={{
+            pagination: { paginationModel: { pageSize: 10 } },
+          }}
+          disableRowSelectionOnClick
+          sx={{
+            '.MuiDataGrid-columnHeaders': {
+              fontSize: '15px',
+            },
+            '.MuiDataGrid-columnHeader': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            },
+            '.MuiDataGrid-columnHeaderTitle': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            },
+            '.MuiDataGrid-footerContainer': {
+              backgroundColor: 'transparent !important',
+              fontSize: '15px',
+            },
+            '.MuiDataGrid-cell': {
+              fontSize: '15px',
+            },
+            backgroundColor: theme.palette.mode === 'dark' ? '#2D2925' : 'inherit',
+            borderColor: theme.palette.mode === 'dark' ? 'hsla(220, 20%, 25%, 0.6)' : 'inherit',
+          }}
+          localeText={{
+            MuiTablePagination: {
+              labelDisplayedRows: ({ from, to, count }) => `${from}–${to} de ${count !== -1 ? count : `mais que ${to}`}`,
+              labelRowsPerPage: "Linhas por página",
+            },
+          }}
+        />
+      )}
 
       {showUserForm && (
         <UserForm
           user={selectedUser}
           roles={roles}
-          onSave={handleSave}
-          onCancel={() => {
-            setShowUserForm(false)
-            setSelectedUser(null)
-          }}
-          onSubmit={onSubmit}
+          onCancel={handleClose}
+          onSubmit={handleSave}
+          readOnly={formMode === 'view'}
+          formErrors={formErrors}
+        />
+      )}
+
+      {showConfirmationModal && (
+        <ConfirmationModal
+          isOpen={showConfirmationModal}
+          onClose={() => setShowConfirmationModal(false)}
+          onConfirm={handleConfirmDelete}
+          itemName={selectedUser?.fullName || ''}
+          itemType="usuário"
+          isDeleting={isDeleting}
         />
       )}
     </Box>

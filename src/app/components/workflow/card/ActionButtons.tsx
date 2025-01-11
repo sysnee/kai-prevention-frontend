@@ -1,6 +1,6 @@
 import React from 'react';
 import { Calendar, XCircle, PlayCircle, PauseCircle, ArrowRightCircle } from 'lucide-react';
-import { ServiceStatus } from '@/src/app/types/pemissions/permissions';
+import { ServiceStatus } from '@/app/types/pemissions/permissions';
 
 interface ActionButtonsProps {
   status: ServiceStatus;
@@ -55,7 +55,7 @@ export function ActionButtons({
         </button>
       )}
 
-      {status === 'ONHOLD' ? (
+      {status === 'ON_HOLD' ? (
         <div className="flex-1">
           {showResumeInput ? (
             <div className="flex space-x-2">

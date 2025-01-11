@@ -13,7 +13,7 @@ import {
     Avatar,
     CircularProgress
 } from '@mui/material'
-import api from '@/src/lib/api'
+import api from '@/lib/api'
 
 interface PatientSelectorProps {
     onSelectPatient: (patient: any) => void

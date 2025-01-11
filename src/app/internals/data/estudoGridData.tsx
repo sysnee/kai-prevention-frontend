@@ -1,5 +1,5 @@
 import { GridColDef, GridRowsProp } from "@mui/x-data-grid";
-import { Box, Avatar, Button } from "@mui/material";
+import { Box, Avatar, Button, Typography } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
@@ -119,15 +119,22 @@ export const columns: GridColDef[] = [
     renderCell: (params) => (
       <Link href={params.value.url} passHref>
         <Button
-          variant="contained"
           size="small"
-          color="primary"
-          endIcon={<ChevronRightRoundedIcon />}
-          sx={{
+          className="bg-kai-primary hover:bg-kai-primary/70"
+          endIcon={
+            <ChevronRightRoundedIcon sx={(theme) => ({ color: theme.palette.mode === 'light' ? '#fff' : '#000' })} />
+          }
+          sx={(theme) => ({
             width: "100%",
-          }}
+          })}
         >
-          {params.value.label}
+          <Typography
+            sx={(theme) => ({
+              color: theme.palette.mode === 'light' ? '#fff' : '#000'
+            })}
+          >
+            {params.value.label}
+          </Typography>
         </Button>
       </Link>
     ),

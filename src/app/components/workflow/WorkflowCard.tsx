@@ -8,6 +8,7 @@ import { WorkflowCardModal } from './WorkflowCardModal';
 import { Draggable } from '@hello-pangea/dnd';
 import { useTheme } from '@mui/material';
 import { useWorkflowStore } from '../../stores/workflowStore';
+import { useRouter, useSearchParams } from 'next/navigation'
 
 interface WorkflowCardProps {
   exam: any;
@@ -15,6 +16,8 @@ interface WorkflowCardProps {
 }
 
 export function WorkflowCard({ exam, index }: WorkflowCardProps) {
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const [showModal, setShowModal] = useState(false);
   const theme = useTheme();
 
@@ -30,10 +33,26 @@ export function WorkflowCard({ exam, index }: WorkflowCardProps) {
   const { appointment, clearAppointment } = useWorkflowStore();
 
   useEffect(() => {
-    if (appointment && appointment.id === exam.id) {
-      setShowModal(true);
+    // Abre o modal se o code na URL corresponder ao exam.code
+    const codeParam = searchParams.get('code')
+    if ((codeParam && codeParam === String(exam.code)) || (appointment?.id === exam.id)) {
+      setShowModal(true)
     }
-  }, [appointment, exam]);
+  }, [searchParams, exam.code, appointment, exam.id])
+
+  const handleCloseModal = () => {
+    setShowModal(false)
+    clearAppointment()
+
+    // Se o modal foi aberto via URL param, redireciona de volta para agendamentos
+    const codeParam = searchParams.get('code')
+    if (codeParam) {
+      router.push('/dashboard/agendamentos')
+    }
+  }
+
+  // Update the condition to hide pendencies for COMPLETED status
+  const shouldShowPendencies = hasDocumentsPending && exam.status !== 'COMPLETED';
 
   return (
     <Draggable draggableId={exam.id} index={index}>
@@ -49,7 +68,7 @@ export function WorkflowCard({ exam, index }: WorkflowCardProps) {
             style={{
               backgroundColor: theme.palette.background.default,
               border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)",
-              borderLeft: hasDocumentsPending && exam.stage !== 'started' ? '4px solid #F59E0B'
+              borderLeft: shouldShowPendencies ? '4px solid #F59E0B'
                 : (theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)")
             }}
           >
@@ -71,7 +90,7 @@ export function WorkflowCard({ exam, index }: WorkflowCardProps) {
               {exam.examType}
             </div>
 
-            {hasDocumentsPending && exam.stage !== 'started' && (
+            {shouldShowPendencies && (
               <div className="mb-3 p-2 rounded-lg"
                 style={{
                   border: theme.palette.mode === 'light' ? "1px solid rgba(229,231,235,255)" : "1px solid hsla(220, 20%, 25%, 0.6)"
@@ -96,10 +115,7 @@ export function WorkflowCard({ exam, index }: WorkflowCardProps) {
           {showModal && (
             <WorkflowCardModal
               exam={exam}
-              onClose={() => {
-                setShowModal(false)
-                clearAppointment();
-              }}
+              onClose={handleCloseModal}
             />
           )}
         </div>

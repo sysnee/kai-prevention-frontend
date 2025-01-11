@@ -3,6 +3,7 @@ import { User, Loader2 } from 'lucide-react';
 import { Patient, PatientSelector } from './PatientSelector'
 import { Button, Stack } from '@mui/material'
 import { UserPlus, Users } from 'lucide-react'
+import { useTheme } from '@mui/material';
 
 interface PatientFormProps {
   onSubmit: (data: any) => void;
@@ -39,6 +40,7 @@ interface PatientFormData {
 }
 
 export function PatientForm({ onSubmit, mode = 'select' }: PatientFormProps) {
+  const theme = useTheme();
   const [formData, setFormData] = useState({
     name: '',
     birthDate: '',
@@ -173,14 +175,19 @@ export function PatientForm({ onSubmit, mode = 'select' }: PatientFormProps) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow p-6 space-y-6">
+      <div className="rounded-lg shadow p-6 space-y-6"
+        style={{
+          border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d",
+          backgroundColor: theme.palette.mode === 'light' ? "#fff" : "#111827"
+        }}
+      >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <User className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-kai-primary/10 rounded-lg">
+              <User className="w-6 h-6 text-kai-primary" />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-bold text-gray-500">
                 {currentMode === 'create' ? 'Novo Paciente' : 'Selecionar Paciente'}
               </h3>
               <p className="text-sm text-gray-500">
@@ -194,14 +201,20 @@ export function PatientForm({ onSubmit, mode = 'select' }: PatientFormProps) {
 
           <Stack direction="row" spacing={1}>
             <Button
-              variant={currentMode === 'select' ? 'contained' : 'outlined'}
+              className={`${currentMode === 'select' ? `bg-kai-primary hover:bg-kai-primary/70 ${theme.palette.mode === 'light' ? 'text-white' : 'text-black'}` : 'text-gray-400 hover:bg-kai-primary/10'}`}
+              style={{
+                border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d",
+              }}
               onClick={handleSwitchToSelect}
               startIcon={<Users />}
             >
               Selecionar
             </Button>
             <Button
-              variant={currentMode === 'create' ? 'contained' : 'outlined'}
+              className={`${currentMode === 'create' ? `bg-kai-primary hover:bg-kai-primary/70 ${theme.palette.mode === 'light' ? 'text-white' : 'text-black'}` : 'text-gray-400 hover:bg-kai-primary/10'}`}
+              style={{
+                border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d",
+              }}
               onClick={handleCreateNew}
               startIcon={<UserPlus />}
             >
@@ -424,7 +437,10 @@ export function PatientForm({ onSubmit, mode = 'select' }: PatientFormProps) {
             <div className="flex justify-end">
               <Button
                 type="submit"
-                variant="contained"
+                className="bg-kai-primary hover:bg-kai-primary/70"
+                style={{
+                  color: theme.palette.mode === 'light' ? "#fff" : "#000"
+                }}
                 disabled={done}
               >
                 {done ? 'Salvo!' : 'Salvar'}
