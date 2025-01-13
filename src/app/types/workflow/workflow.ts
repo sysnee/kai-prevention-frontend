@@ -1,3 +1,5 @@
+import { ServiceStatus } from "../pemissions/permissions";
+
 export interface WorkflowNote {
   id: string;
   text: string;
@@ -5,9 +7,11 @@ export interface WorkflowNote {
   createdBy: {
     id: string;
     name: string;
-    avatar?: string;
   };
-  mentions: string[];
+  mentions: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 export interface WorkflowStage {
@@ -22,5 +26,18 @@ export interface WorkflowTransition {
   to: string;
   timestamp: string;
   userId: string;
-  reason?: string
+  reason?: string;
+}
+
+export interface User {
+  fullName: string;
+}
+
+export interface ServiceRequestNote {
+  id: string;
+  content: string;
+  createdAtStatus: ServiceStatus;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: User;
 }
