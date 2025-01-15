@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Human Body Silhouette</title>
+    <style>
+        canvas {
+            border: 1px solid #ccc;
+            margin: 20px;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="humanCanvas" width="300" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('humanCanvas')
+        const ctx = canvas.getContext('2d')
+
+        // Set the fill and stroke styles
+        ctx.fillStyle = '#00000010'
+        ctx.strokeStyle = '#666'
+        ctx.lineWidth = 2
+
+        function drawHumanBody() {
+            ctx.beginPath()
+
+            // Head
+            ctx.arc(150, 60, 25, 0, Math.PI * 2)
+
+            // Neck
+            ctx.moveTo(140, 85)
+            ctx.lineTo(140, 100)
+            ctx.lineTo(160, 100)
+            ctx.lineTo(160, 85)
+
+            // Body - more anatomical shape
+            ctx.moveTo(140, 100)
+            ctx.bezierCurveTo(120, 150, 120, 200, 120, 250) // left side
+            ctx.lineTo(180, 250) // bottom
+            ctx.bezierCurveTo(180, 200, 180, 150, 160, 100) // right side
+            ctx.closePath()
+
+            // Arms - straighter with slight curves
+            // Left arm
+            ctx.moveTo(120, 110)
+            ctx.bezierCurveTo(110, 140, 100, 170, 100, 200)
+
+            // Right arm
+            ctx.moveTo(180, 110)
+            ctx.bezierCurveTo(190, 140, 200, 170, 200, 200)
+
+            // Legs - straighter with slight anatomical curve
+            // Left leg
+            ctx.moveTo(120, 250)
+            ctx.bezierCurveTo(120, 300, 120, 400, 130, 450)
+
+            // Right leg
+            ctx.moveTo(180, 250)
+            ctx.bezierCurveTo(180, 300, 180, 400, 170, 450)
+
+            // Stroke the entire path
+            ctx.stroke()
+
+            // Fill with very light color
+            ctx.fill()
+        }
+
+        // Draw the silhouette
+        drawHumanBody()
+    </script>
+</body>
+
+</html>

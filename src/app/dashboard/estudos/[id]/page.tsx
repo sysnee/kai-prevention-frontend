@@ -15,6 +15,8 @@ import AddIcon from '@mui/icons-material/Add'
 import { BodySystemSelector } from "@/app/components/BodySystemSelector"
 import { useState } from "react"
 import { Finding, Severity } from "@/types/findings"
+import { HumanBodyIllustration } from '@/app/components/HumanBodyIllustration'
+import { humanBodyPositions } from '@/app/constants/human-body-positions'
 
 function getHighestSeverity(findings: Array<{ severity: Severity }>) {
     if (findings.some(f => f.severity === Severity.SEVERE)) return Severity.SEVERE
@@ -302,6 +304,15 @@ export default function EstudoResumoPage() {
                     </Grid>
                 </Grid>
             </Box>
+
+            <HumanBodyIllustration
+                data={humanBodyPositions}
+                selectedSystem={selectedSystem?.split('/')[0]}
+                selectedOrgan={selectedSystem?.split('/')[1]}
+                onSelectOrgan={(system, organ) => {
+                    setSelectedSystem(`${system}/${organ}`)
+                }}
+            />
         </Box>
     )
 }
