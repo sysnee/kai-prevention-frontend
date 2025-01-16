@@ -22,6 +22,7 @@ interface ActionButtonsProps {
 }
 
 const CANCELABLE_STATUS = ["PLANNED", "WAITING", "STARTED", "ON_HOLD"];
+const RESCHEDULABLE_STATUS = ["PLANNED", "WAITING"];
 
 export function ActionButtons({
   status,
@@ -37,13 +38,15 @@ export function ActionButtons({
 }: ActionButtonsProps) {
   return (
     <div className="flex space-x-4">
-      <button
-        onClick={onReschedule}
-        className="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
-      >
-        <Calendar className="w-4 h-4 mr-2 inline" />
-        Reagendar
-      </button>
+      {RESCHEDULABLE_STATUS.includes(status) && (
+        <button
+          onClick={onReschedule}
+          className="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+        >
+          <Calendar className="w-4 h-4 mr-2 inline" />
+          Reagendar
+        </button>
+      )}
 
       {CANCELABLE_STATUS.includes(status) && (
         <button
