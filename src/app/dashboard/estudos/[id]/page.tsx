@@ -15,6 +15,8 @@ import AddIcon from '@mui/icons-material/Add'
 import { BodySystemSelector } from "@/app/components/BodySystemSelector"
 import { useState } from "react"
 import { Finding, Severity } from "@/types/findings"
+import humanIllustration from '@/app/assets/imagens/3d-human-bg-black.webp'
+import humanIllustrationPng from '@/app/assets/imagens/3d-human-bg-black.png'
 
 function getHighestSeverity(findings: Array<{ severity: Severity }>) {
     if (findings.some(f => f.severity === Severity.SEVERE)) return Severity.SEVERE
@@ -221,6 +223,39 @@ export default function EstudoResumoPage() {
                             borderRadius: '20px',
                             padding: 3
                         })}>
+                            <Box sx={(theme) => ({
+                                position: 'relative',
+                                width: '100%',
+                                maxWidth: '500px',
+                                margin: '0 auto',
+                                height: '300px',
+                                [theme.breakpoints.up('lg')]: {
+                                    height: '400px',
+                                },
+                                [theme.breakpoints.up('xl')]: {
+                                    height: '500px',
+                                },
+                                marginBottom: 2,
+                                borderRadius: '10px',
+                                overflow: 'hidden',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            })}
+                            >
+                                <Image
+                                    src={humanIllustration}
+                                    alt="Report summary illustration"
+                                    fill
+                                    style={{
+                                        objectFit: 'cover',
+                                        maxWidth: '500px',
+                                        margin: '0 auto'
+                                    }}
+                                    priority
+                                />
+                            </Box>
+
                             <Box
                                 component="h2"
                                 sx={(theme) => ({
@@ -231,6 +266,7 @@ export default function EstudoResumoPage() {
                             >
                                 Resumo do laudo
                             </Box>
+
                             <Box
                                 sx={(theme) => ({
                                     backgroundColor: theme.palette.mode === 'light' ? "#f5f6fa" : "#0c1017",
