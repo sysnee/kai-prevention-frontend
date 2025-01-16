@@ -244,6 +244,7 @@ export default function EstudoResumoPage() {
                                 <HumanBodyMap
                                     selectedOrgan={selectedSystem}
                                     onOrganClick={(organ) => setSelectedSystem(organ)}
+                                    findings={findings}
                                 />
                             </Box>
 

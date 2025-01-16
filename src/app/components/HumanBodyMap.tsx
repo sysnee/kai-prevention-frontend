@@ -4,19 +4,62 @@ import { useEffect, useRef, useState } from 'react'
 import { humanBodyPositions } from '@/app/constants/human-body-positions'
 import Image from 'next/image'
 import humanIllustration from '@/app/assets/imagens/3d-human-bg-black.webp'
+import { Finding, Severity } from '@/types/findings'
 
-const LG_BREAKPOINT = 900 // Tailwind lg breakpoint
-const OFFSET_RATIO = 800 // 1px right per 400px increase
+const LG_BREAKPOINT = 900
+const OFFSET_RATIO = 800
 
 interface HumanBodyMapProps {
     selectedOrgan?: string
     onOrganClick?: (organ: string) => void
+    findings?: Finding[]
 }
 
-export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps) {
+function getSeverityColor(severity: Severity): string {
+    switch (severity) {
+        case Severity.LOW:
+            return 'rgba(253, 224, 71, 0.8)'
+        case Severity.MEDIUM:
+            return 'rgba(245, 158, 11, 0.8)'
+        case Severity.HIGH:
+            return 'rgba(244, 63, 94, 0.8)'
+        case Severity.SEVERE:
+            return 'rgba(0, 0, 0, 0.8)'
+        case Severity.NONE:
+            return 'rgba(147, 197, 253, 0.8)'
+        default:
+            return 'rgba(255, 255, 255, 0.5)'
+    }
+}
+
+function getStrokeColor(severity: Severity): string {
+    switch (severity) {
+        case Severity.LOW:
+            return 'rgba(253, 224, 71, 1)'
+        case Severity.MEDIUM:
+            return 'rgba(245, 158, 11, 1)'
+        case Severity.HIGH:
+            return 'rgba(244, 63, 94, 1)'
+        case Severity.SEVERE:
+            return 'rgba(0, 0, 0, 1)'
+        case Severity.NONE:
+            return 'rgba(147, 197, 253, 1)'
+        default:
+            return 'rgba(255, 255, 255, 0.8)'
+    }
+}
+
+export function HumanBodyMap({ selectedOrgan, onOrganClick, findings = [] }: HumanBodyMapProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const containerRef = useRef<HTMLDivElement>(null)
     const [hoveredOrgan, setHoveredOrgan] = useState<string>()
+
+    const organSeverityMap = findings.reduce((acc, finding) => {
+        if (!acc[finding.organ] || finding.severity > acc[finding.organ]) {
+            acc[finding.organ] = finding.severity
+        }
+        return acc
+    }, {} as Record<string, Severity>)
 
     useEffect(() => {
         const canvas = canvasRef.current
@@ -35,9 +78,8 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps)
 
         const calculateXOffset = (screenWidth: number): number => {
             if (screenWidth < LG_BREAKPOINT) return 0
-
             const extraWidth = screenWidth - LG_BREAKPOINT
-            return Math.floor(extraWidth / OFFSET_RATIO) // 1px right per 200px increase
+            return Math.floor(extraWidth / OFFSET_RATIO)
         }
 
         const drawOrgans = () => {
@@ -46,9 +88,11 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps)
 
             Object.entries(humanBodyPositions).forEach(([system, organs]) => {
                 Object.entries(organs).forEach(([organ, data]) => {
-                    const { x, y, radius } = data.position
+                    if (!organSeverityMap[organ] && organ !== selectedOrgan && organ !== hoveredOrgan) {
+                        return
+                    }
 
-                    // Apply the x-offset to the position
+                    const { x, y, radius } = data.position
                     const adjustedX = x + xOffset
                     const pixelX = (adjustedX / 100) * canvas.width
                     const pixelY = (y / 100) * canvas.height
@@ -62,12 +106,19 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps)
                         ctx.strokeStyle = 'rgba(0, 150, 255, 1)'
                         ctx.lineWidth = 1
                     } else if (organ === hoveredOrgan) {
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 1)'
+                        const severity = organSeverityMap[organ]
+                        if (severity) {
+                            ctx.fillStyle = getSeverityColor(severity)
+                            ctx.strokeStyle = getStrokeColor(severity)
+                        } else {
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 1)'
+                        }
                         ctx.lineWidth = 1
                     } else {
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'
+                        const severity = organSeverityMap[organ]
+                        ctx.fillStyle = getSeverityColor(severity)
+                        ctx.strokeStyle = getStrokeColor(severity)
                         ctx.lineWidth = 0.5
                     }
 
@@ -103,6 +154,8 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps)
             let found = false
             Object.entries(humanBodyPositions).forEach(([system, organs]) => {
                 Object.entries(organs).forEach(([organ, data]) => {
+                    if (!organSeverityMap[organ]) return
+
                     const { x: orgX, y: orgY, radius } = data.position
                     const adjustedX = orgX + xOffset
                     const distance = Math.sqrt(Math.pow(x - adjustedX, 2) + Math.pow(y - orgY, 2))
@@ -123,6 +176,8 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps)
 
             Object.entries(humanBodyPositions).forEach(([system, organs]) => {
                 Object.entries(organs).forEach(([organ, data]) => {
+                    if (!organSeverityMap[organ]) return
+
                     const { x: orgX, y: orgY, radius } = data.position
                     const adjustedX = orgX + xOffset
                     const distance = Math.sqrt(Math.pow(x - adjustedX, 2) + Math.pow(y - orgY, 2))
@@ -145,7 +200,7 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps)
             canvas.removeEventListener('mousemove', handleMouseMove)
             canvas.removeEventListener('mouseleave', () => setHoveredOrgan(undefined))
         }
-    }, [selectedOrgan, hoveredOrgan, onOrganClick])
+    }, [selectedOrgan, hoveredOrgan, onOrganClick, findings])
 
     return (
         <div ref={containerRef} className="relative w-full h-full">
