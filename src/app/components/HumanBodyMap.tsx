@@ -5,6 +5,8 @@ import { humanBodyPositions } from '@/app/constants/human-body-positions'
 import Image from 'next/image'
 import humanIllustration from '@/app/assets/imagens/3d-human-bg-black.webp'
 
+const LG_BREAKPOINT = 900 // Tailwind lg breakpoint
+const OFFSET_RATIO = 800 // 1px right per 400px increase
 
 interface HumanBodyMapProps {
     selectedOrgan?: string
@@ -31,54 +33,64 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps)
             drawOrgans()
         }
 
+        const calculateXOffset = (screenWidth: number): number => {
+            if (screenWidth < LG_BREAKPOINT) return 0
+
+            const extraWidth = screenWidth - LG_BREAKPOINT
+            return Math.floor(extraWidth / OFFSET_RATIO) // 1px right per 200px increase
+        }
+
         const drawOrgans = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height)
+            const xOffset = calculateXOffset(window.innerWidth)
 
-            Object.entries(humanBodyPositions).forEach(([organ, data]) => {
-                const { x, y, radius } = data.position
+            Object.entries(humanBodyPositions).forEach(([system, organs]) => {
+                Object.entries(organs).forEach(([organ, data]) => {
+                    const { x, y, radius } = data.position
 
-                const pixelX = (x / 100) * canvas.width
-                const pixelY = (y / 100) * canvas.height
-                const pixelRadius = (radius / 100) * Math.min(canvas.width, canvas.height)
+                    // Apply the x-offset to the position
+                    const adjustedX = x + xOffset
+                    const pixelX = (adjustedX / 100) * canvas.width
+                    const pixelY = (y / 100) * canvas.height
+                    const pixelRadius = (radius / 100) * Math.min(canvas.width, canvas.height)
 
-                // Draw smaller visible circle
-                ctx.beginPath()
-                ctx.arc(pixelX, pixelY, pixelRadius, 0, Math.PI * 2)
+                    ctx.beginPath()
+                    ctx.arc(pixelX, pixelY, pixelRadius, 0, Math.PI * 2)
 
-                if (organ === selectedOrgan) {
-                    ctx.fillStyle = 'rgba(0, 150, 255, 0.8)'
-                    ctx.strokeStyle = 'rgba(0, 150, 255, 1)'
-                    ctx.lineWidth = 1
-                } else if (organ === hoveredOrgan) {
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 1)'
-                    ctx.lineWidth = 1
-                } else {
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
-                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'
-                    ctx.lineWidth = 0.5
-                }
+                    if (organ === selectedOrgan) {
+                        ctx.fillStyle = 'rgba(0, 150, 255, 0.8)'
+                        ctx.strokeStyle = 'rgba(0, 150, 255, 1)'
+                        ctx.lineWidth = 1
+                    } else if (organ === hoveredOrgan) {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)'
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 1)'
+                        ctx.lineWidth = 1
+                    } else {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)'
+                        ctx.lineWidth = 0.5
+                    }
 
-                ctx.fill()
-                ctx.stroke()
+                    ctx.fill()
+                    ctx.stroke()
 
-                // Draw label if organ is selected or hovered
-                if (organ === selectedOrgan || organ === hoveredOrgan) {
-                    ctx.font = '12px Arial'
-                    ctx.fillStyle = 'white'
-                    ctx.textAlign = 'center'
-                    ctx.textBaseline = 'bottom'
+                    if (organ === selectedOrgan || organ === hoveredOrgan) {
+                        ctx.font = '12px Arial'
+                        ctx.fillStyle = 'white'
+                        ctx.textAlign = 'center'
+                        ctx.textBaseline = 'bottom'
 
-                    const words = organ.split(' ')
-                    const lineHeight = 14
-                    words.forEach((word, i) => {
-                        ctx.fillText(
-                            word,
-                            pixelX,
-                            pixelY - 10 - (words.length - 1 - i) * lineHeight
-                        )
-                    })
-                }
+                        const words = organ.split(' ')
+                        const lineHeight = 14
+                        words.forEach((word, i) => {
+                            ctx.fillText(
+                                word,
+                                pixelX,
+                                pixelY - 10 - (words.length - 1 - i) * lineHeight
+                            )
+                        })
+                    }
+                })
             })
         }
 
@@ -86,15 +98,19 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps)
             const rect = canvas.getBoundingClientRect()
             const x = (e.clientX - rect.left) / canvas.width * 100
             const y = (e.clientY - rect.top) / canvas.height * 100
+            const xOffset = calculateXOffset(window.innerWidth)
 
             let found = false
-            Object.entries(humanBodyPositions).forEach(([organ, data]) => {
-                const { x: orgX, y: orgY, radius } = data.position
-                const distance = Math.sqrt(Math.pow(x - orgX, 2) + Math.pow(y - orgY, 2))
-                if (distance <= radius) {
-                    setHoveredOrgan(organ)
-                    found = true
-                }
+            Object.entries(humanBodyPositions).forEach(([system, organs]) => {
+                Object.entries(organs).forEach(([organ, data]) => {
+                    const { x: orgX, y: orgY, radius } = data.position
+                    const adjustedX = orgX + xOffset
+                    const distance = Math.sqrt(Math.pow(x - adjustedX, 2) + Math.pow(y - orgY, 2))
+                    if (distance <= radius) {
+                        setHoveredOrgan(organ)
+                        found = true
+                    }
+                })
             })
             if (!found) setHoveredOrgan(undefined)
         }
@@ -103,13 +119,17 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick }: HumanBodyMapProps)
             const rect = canvas.getBoundingClientRect()
             const x = (e.clientX - rect.left) / canvas.width * 100
             const y = (e.clientY - rect.top) / canvas.height * 100
+            const xOffset = calculateXOffset(window.innerWidth)
 
-            Object.entries(humanBodyPositions).forEach(([organ, data]) => {
-                const { x: orgX, y: orgY, radius } = data.position
-                const distance = Math.sqrt(Math.pow(x - orgX, 2) + Math.pow(y - orgY, 2))
-                if (distance <= radius) {
-                    onOrganClick?.(organ)
-                }
+            Object.entries(humanBodyPositions).forEach(([system, organs]) => {
+                Object.entries(organs).forEach(([organ, data]) => {
+                    const { x: orgX, y: orgY, radius } = data.position
+                    const adjustedX = orgX + xOffset
+                    const distance = Math.sqrt(Math.pow(x - adjustedX, 2) + Math.pow(y - orgY, 2))
+                    if (distance <= radius) {
+                        onOrganClick?.(organ)
+                    }
+                })
             })
         }
 
