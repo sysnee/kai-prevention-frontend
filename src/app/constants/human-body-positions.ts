@@ -1,57 +1,560 @@
 export const humanBodyPositions = {
     "Sistema Nervoso": {
-        "Cérebro": { position: { x: 51, y: 5, radius: 3 } },
-        "Coluna": { position: { x: 51, y: 40, radius: 3 } }
+        "Cérebro": {
+            position: { x: 51, y: 5, radius: 3 },
+            patologies: [
+                "Schwannoma acústico",
+                "Cisto aracnoide",
+                "Malformação arteriovenosa",
+                "Esclerose concêntrica de Balo",
+                "Abscesso cerebral",
+                "Aneurisma cerebral",
+                "Hemorragia cerebral",
+                "Infarto cerebral",
+                "Massa cerebral",
+                "Metástases cerebrais",
+                "Anatomia variante do Círculo de Willis",
+                "Anomalia venosa do desenvolvimento",
+                "Volume cerebral generalizado",
+                "Glioma",
+                "Microangiopatia hipertensiva",
+                "Lesão indeterminada do cérebro",
+                "Variante de Marburg da esclerose múltipla",
+                "Meningioma",
+                "Esclerose múltipla/Doença desmielinizante",
+                "Neurocisticercose",
+                "Manchas brancas não específicas/Relacionadas à idade",
+                "Espaço perivascular",
+                "Cisto pineal",
+                "Massa pituitária",
+                "Cisto da fenda de Rathke",
+                "Isquemia de pequenos vasos",
+                "Lesão desmielinizante tumefativa",
+                "Doença da substância branca"
+            ]
+        },
+        "Coluna": {
+            position: { x: 51, y: 40, radius: 3 },
+            patologies: [
+                "Hemangioma",
+                "Espondiloartropatia da coluna cervical",
+                "Espondiloartropatia da coluna lombar",
+                "Espondiloartropatia da coluna torácica",
+                "Nível do cone medular",
+                "Cifose / Lordose",
+                "Número de vértebras",
+                "Encefalomielite disseminada aguda (ADEM)",
+                "Número anômalo de costelas",
+                "Cisto ósseo da coluna",
+                "Ilhota óssea da coluna",
+                "Edema da medula óssea da coluna",
+                "Metástases ósseas",
+                "Estreitamento congênito do canal espinhal",
+                "Placa desmielinizante",
+                "Lesão óssea indeterminada da coluna",
+                "Lesão indeterminada da medula espinhal",
+                "Nódulo de Schmorl",
+                "Escoliose",
+                "Edema de tecidos moles",
+                "Infarto da medula espinhal",
+                "Metástases da medula espinhal",
+                "Fratura espinhal",
+                "Estenose espinhal",
+                "Malformação de cordão dividido",
+                "Espondilolistese",
+                "Siringe",
+                "Cisto de Tarlov / perineural",
+                "Cordão medular preso",
+                "Vértebra transicional",
+                "Mielite transversa"
+            ]
+        }
     },
 
     "Sistema Respiratório": {
-        "Seios paranasais e mastoides": { position: { x: 51, y: 9, radius: 3 } },
-        "Hipofaringe": { position: { x: 51, y: 15, radius: 3 } },
-        "Pulmões e mediastino": { position: { x: 51, y: 25, radius: 3 } },
-        "Faringe nasal": { position: { x: 51, y: 12, radius: 3 } }
+        "Seios paranasais e mastoides": {
+            position: { x: 51, y: 9, radius: 3 },
+            patologies: [
+                "Desvio do septo nasal",
+                "Granuloma do ouvido interno ou células aéreas da mastoide",
+                "Lesão indeterminada do seio paranasal",
+                "Linfoma dos seios paranasais",
+                "Mastoidite",
+                "Mucocele",
+                "Cisto de retenção de muco",
+                "Pansinusalite",
+                "Polipose das vias aéreas nasais e/ou seios paranasais",
+                "Pólipo nasal do seio",
+                "Sinusite"
+            ]
+        },
+        "Hipofaringe": {
+            position: { x: 51, y: 15, radius: 3 },
+            patologies: [
+                "Cisto na hipofaringe",
+                "Cisto hemorrágico da hipofaringe",
+                "Lesão cística indeterminada da hipofaringe",
+                "Nódulo indeterminado da hipofaringe",
+                "Lesão sólida conhecida na hipofaringe",
+                "Metástases da hipofaringe"
+            ]
+        },
+        "Pulmões e mediastino": {
+            position: { x: 51, y: 25, radius: 3 },
+            patologies: [
+                "Atelectasia",
+                "Lobo da veia ázigos",
+                "Hamartoma dos pulmões e mediastino",
+                "Nódulo indeterminado do pulmão",
+                "Consolidação pulmonar",
+                "Metástases pulmonares",
+                "Nódulo pulmonar",
+                "Linfadenopatia torácica",
+                "Derrame pleural",
+                "Sarcoidose",
+                "Cicatriz pulmonar",
+                "Tumor dos pulmões e mediastino"
+            ]
+        },
+        "Faringe nasal": {
+            position: { x: 51, y: 12, radius: 3 },
+            patologies: [
+                "Cisto da faringe nasal",
+                "Aumento na faringe nasal",
+                "Cisto hemorrágico da faringe nasal",
+                "Lesão cística indeterminada da faringe nasal",
+                "Nódulo indeterminado da faringe nasal",
+                "Inflamação na faringe nasal",
+                "Massa sólida conhecida na faringe nasal",
+                "Linfoma na faringe nasal",
+                "Metástases na faringe nasal"
+            ]
+        }
     },
 
     "Sistema Circulatório": {
-        "Cadeia de linfonodos cervicais": { position: { x: 51, y: 18, radius: 3 } },
-        "Coração e grandes vasos": { position: { x: 53, y: 28, radius: 3 } },
-        "Baço": { position: { x: 57, y: 34, radius: 3 } }
+        "Cadeia de linfonodos cervicais": {
+            position: { x: 51, y: 18, radius: 3 },
+            patologies: [
+                "Observações Clínicas Adicionais - Cadeia de linfonodos cervicais",
+                "Aumento dos linfonodos no pescoço",
+                "Lesão cística indeterminada nos linfonodos do pescoço",
+                "Linfoma nos linfonodos do pescoço",
+                "Metástases nos linfonodos do pescoço",
+                "Linfonodos reativos ou inflamatórios no pescoço"
+            ]
+        },
+        "Coração e grandes vasos": {
+            position: { x: 53, y: 28, radius: 3 },
+            patologies: [
+                "Dilatação/aneurisma da aorta",
+                "Metástases cardíacas",
+                "Coração aumentado",
+                "Lesão cardíaca indeterminada",
+                "Mixoma",
+                "Derrame pericárdico",
+                "Gordura pericárdica"
+            ]
+        },
+        "Baço": {
+            position: { x: 57, y: 34, radius: 3 },
+            patologies: [
+                "Baço acessório",
+                "Hemangioma do baço",
+                "Lesão esplênica indeterminada",
+                "Poliesplenia",
+                "Aparência do baço",
+                "Esplenectomia",
+                "Aneurisma da artéria esplênica",
+                "Cisto esplênico",
+                "Esplenomegalia",
+                "Baço errante"
+            ]
+        }
     },
 
     "Sistema Endócrino": {
-        "Adrenais": { position: { x: 45, y: 38, radius: 3 } },
-        "Tireoide": { position: { x: 51, y: 16, radius: 3 } }
+        "Adrenais": {
+            position: { x: 45, y: 38, radius: 3 },
+            patologies: [
+                "Abscesso adrenal",
+                "Adenoma adrenal",
+                "Carcinoma cortical adrenal",
+                "Cisto adrenal",
+                "Hemorragia/calcificação adrenal",
+                "Linfoma adrenal",
+                "Metástases adrenais",
+                "Pseudocisto adrenal",
+                "Hiperplasia cortical",
+                "Hemangioma da glândula adrenal",
+                "Lesão indeterminada das adrenais",
+                "Feocromocitoma"
+            ]
+        },
+        "Tireoide": {
+            position: { x: 51, y: 16, radius: 3 },
+            patologies: [
+                "Tireoide diminuta",
+                "Aumento da tireoide",
+                "Cisto hemorrágico da tireoide",
+                "Aparência heterogênea da tireoide",
+                "Nódulo indeterminado da tireoide",
+                "Inflamação da tireoide",
+                "Lesão cística irregular da tireoide",
+                "Linfoma na tireoide",
+                "Massa sólida da tireoide",
+                "Aparência da tireoide",
+                "Cisto tireoidiano",
+                "Metástases na tireoide",
+                "Tireoidectomia"
+            ]
+        }
     },
 
     "Sistema Urinário": {
-        "Rins": { position: { x: 45, y: 41, radius: 3 } },
-        "Bexiga e ureteres": { position: { x: 51, y: 50, radius: 3 } }
+        "Rins": {
+            position: { x: 45, y: 41, radius: 3 },
+            patologies: [
+                "Cisto simples do rim",
+                "Rim ausente",
+                "Rim atrofiado",
+                "Rim duplo",
+                "Rim em ferradura",
+                "Hidronefrose",
+                "Lesão cística indeterminada do rim",
+                "Lesão renal contendo gordura indeterminada",
+                "Lesão sólida indeterminada do rim",
+                "Cálculo renal",
+                "Malrotação do rim",
+                "Rim pélvico",
+                "Doença renal policística",
+                "Cisto proteináceo",
+                "Angiomiolipoma renal",
+                "Carcinoma de células renais",
+                "Leiomioma renal",
+                "Lipoma renal",
+                "Oncocitoma renal",
+                "Adenoma papilífero renal",
+                "Carcinoma de células transicionais do rim",
+                "Pielonefrite xantogranulomatosa"
+            ]
+        },
+        "Bexiga e ureteres": {
+            position: { x: 51, y: 50, radius: 3 },
+            patologies: [
+                "Divertículos da bexiga",
+                "Obstrução da bexiga",
+                "Pólipo da bexiga",
+                "Espessamento da parede da bexiga",
+                "Cálculo na bexiga/ureter",
+                "Câncer da bexiga e ureteres",
+                "Cistocele",
+                "Ureter duplo",
+                "Hérnia da bexiga",
+                "Lesão indeterminada da bexiga e ureteres",
+                "Septação na bexiga e ureteres",
+                "Tamanho total da bexiga",
+                "Remanescente uracal",
+                "Ureterocele",
+                "Metástases no trato urinário"
+            ]
+        }
     },
 
     "Sistema Reprodutivo": {
-        "Próstata e órgãos reprodutivos masculinos": { position: { x: 51, y: 52, radius: 3 } },
-        "Ovários": { position: { x: 47, y: 50, radius: 3 } },
-        "Trompas de Falópio": { position: { x: 47, y: 51, radius: 3 } },
-        "Útero": { position: { x: 51, y: 48, radius: 3 } },
-        "Vagina e Vulva": { position: { x: 51, y: 52, radius: 3 } },
-        "Glândulas Mamárias": { position: { x: 58, y: 28, radius: 3 } }
+        "Próstata e órgãos reprodutivos masculinos": {
+            position: { x: 51, y: 52, radius: 3 },
+            patologies: [
+                "Tamanho total da próstata",
+                "Hiperplasia prostática benigna (HPB)",
+                "Calcificação da próstata",
+                "Próstata heterogênea",
+                "Lesão indeterminada da próstata",
+                "Abscesso prostático",
+                "Câncer de próstata",
+                "Cisto prostático",
+                "Visibilidade da próstata",
+                "Prostatectomia",
+                "Prostatite"
+            ]
+        },
+        "Ovários": {
+            position: { x: 47, y: 50, radius: 3 },
+            patologies: [
+                "Cistos ovarianos",
+                "Síndrome dos ovários policísticos (SOP)",
+                "Tumores ovarianos (benignos e malignos)",
+                "Torsão ovariana",
+                "Insuficiência ovariana precoce"
+            ]
+        },
+        "Trompas de Falópio": {
+            position: { x: 47, y: 51, radius: 3 },
+            patologies: [
+                "Salpingite",
+                "Hidrossalpinge",
+                "Gravidez ectópica",
+                "Tumores de trompas (raros)"
+            ]
+        },
+        "Útero": {
+            position: { x: 51, y: 48, radius: 3 },
+            patologies: [
+                "Miomas uterinos",
+                "Adenomiose",
+                "Endometriose",
+                "Hiperplasia endometrial",
+                "Câncer de endométrio",
+                "Câncer de colo do útero",
+                "Pólipos uterinos",
+                "Síndrome de Asherman"
+            ]
+        },
+        "Vagina e Vulva": {
+            position: { x: 51, y: 52, radius: 3 },
+            patologies: [
+                "Vaginite (ex.: candidíase, vaginose bacteriana)",
+                "Vulvite",
+                "Câncer vaginal e vulvar",
+                "Abscessos (ex.: glândulas de Bartholin)"
+            ]
+        },
+        "Glândulas Mamárias": {
+            position: { x: 58, y: 28, radius: 3 },
+            patologies: [
+                "Mastite",
+                "Fibroadenoma",
+                "Cistos mamários",
+                "Câncer de mama"
+            ]
+        }
     },
 
     "Sistema Digestivo": {
-        "Intestino": { position: { x: 51, y: 40, radius: 3 } },
-        "Esôfago": { position: { x: 51, y: 22, radius: 3 } },
-        "Vesícula biliar e sistema biliar": { position: { x: 47, y: 35, radius: 3 } },
-        "Fígado": { position: { x: 45, y: 35, radius: 3 } },
-        "Faringe oral": { position: { x: 51, y: 14, radius: 3 } },
-        "Pâncreas": { position: { x: 49, y: 36, radius: 3 } },
-        "Estômago": { position: { x: 51, y: 36, radius: 3 } }
+        "Intestino": {
+            position: { x: 51, y: 40, radius: 3 },
+            patologies: [
+                "Linfonodos do abdômen e pelve",
+                "Apendicite",
+                "Adenocarcinoma intestinal",
+                "Carcinoide intestinal",
+                "Linfoma intestinal",
+                "Massa intestinal",
+                "Pólipo intestinal",
+                "Colite",
+                "Doença de Crohn",
+                "Doença diverticular",
+                "Enterite",
+                "Hérnia",
+                "Lesão indeterminada do intestino",
+                "Espessamento da mucosa",
+                "Colite ulcerativa"
+            ]
+        },
+        "Esôfago": {
+            position: { x: 51, y: 22, radius: 3 },
+            patologies: [
+                "Leiomioma benigno do esôfago",
+                "Malignidade do esôfago",
+                "Pólipo esofágico",
+                "Tumor estromal gastrointestinal (GIST)",
+                "Lesão indeterminada do esôfago",
+                "Espessamento da mucosa"
+            ]
+        },
+        "Vesícula biliar e sistema biliar": {
+            position: { x: 47, y: 35, radius: 3 },
+            patologies: [
+                "Adenomiomatose",
+                "Dilatação do ducto biliar",
+                "Estenose do ducto biliar",
+                "Câncer biliar",
+                "Colecistite",
+                "Cisto coledocal",
+                "Coledocolitíase",
+                "Aparência da vesícula biliar",
+                "Septação da vesícula biliar",
+                "Cálculos biliares",
+                "Lesão biliar indeterminada",
+                "Tampa frígia"
+            ]
+        },
+        "Fígado": {
+            position: { x: 45, y: 35, radius: 3 },
+            patologies: [
+                "Agenesia do fígado",
+                "Angiossarcoma do fígado",
+                "Fígado em cauda de castor",
+                "Cistadenocarcinoma biliar",
+                "Cistadenoma biliar",
+                "Hamartoma biliar do fígado",
+                "Doença de Caroli",
+                "Metástases hepáticas císticas",
+                "Fígado aumentado",
+                "Deposição de gordura no fígado",
+                "Hiperplasia nodular focal",
+                "Adenoma hemorrágico",
+                "Adenoma hepático",
+                "Biloma hepático",
+                "Carcinoma hepatocelular",
+                "Cisto hidático",
+                "Lesão heterogênea indeterminada do fígado",
+                "Lesão indeterminada do fígado",
+                "Deposição de ferro",
+                "Abscesso hepático",
+                "Hemangioma hepático",
+                "Metástases hepáticas",
+                "Linfangioma do fígado",
+                "Fígado parcialmente ressecado",
+                "Doença hepática policística",
+                "Lobo de Riedel",
+                "Fígado encolhido",
+                "Cisto simples do fígado",
+                "Anatomia variante dos vasos hepáticos"
+            ]
+        },
+        "Faringe oral": {
+            position: { x: 51, y: 14, radius: 3 },
+            patologies: [
+                "Cisto da faringe oral",
+                "Aumento da faringe oral",
+                "Cisto hemorrágico da faringe oral",
+                "Nódulo indeterminado da faringe oral",
+                "Inflamação na faringe oral",
+                "Massa cística irregular da faringe oral",
+                "Massa sólida conhecida da faringe oral",
+                "Linfoma da faringe oral",
+                "Metástases da faringe oral",
+                "Via aérea estreitada"
+            ]
+        },
+        "Pâncreas": {
+            position: { x: 49, y: 36, radius: 3 },
+            patologies: [
+                "Adenocarcinoma ductal",
+                "Tumor endócrino pancreático",
+                "Infiltração gordurosa do pâncreas",
+                "Lesão cística indeterminada do pâncreas",
+                "Neoplasia mucinosa papilar intraductal",
+                "Cistadenocarcinoma mucinoso",
+                "Cistadenoma mucinoso",
+                "Pâncreas divisum",
+                "Pseudocisto pancreático",
+                "Pancreatite",
+                "Cistadenoma seroso"
+            ]
+        },
+        "Estômago": {
+            position: { x: 51, y: 36, radius: 3 },
+            patologies: [
+                "Adenocarcinoma gástrico",
+                "Tumor estromal gastrointestinal (GIST)",
+                "Hérnia de hiato",
+                "Lesão gástrica indeterminada"
+            ]
+        }
     },
 
     "Sistema Musculoesquelético": {
-        "Articulações sacroilíacas": { position: { x: 51, y: 43, radius: 3 } },
-        "Esqueleto ósseo e tecido mole": { position: { x: 60, y: 60, radius: 3 } },
-        "Ombros": { position: { x: 35, y: 22, radius: 3 } },
-        "Tornozelos": { position: { x: 44, y: 91, radius: 3 } },
-        "Joelhos": { position: { x: 44, y: 72, radius: 3 } },
-        "Pelvis e quadris": { position: { x: 56, y: 47, radius: 3 } }
+        "Articulações sacroilíacas": {
+            position: { x: 51, y: 43, radius: 3 },
+            patologies: [
+                "Edema da medula óssea da articulação sacroilíaca",
+                "Espondilite anquilosante",
+                "Osteíte condensante ilíaca",
+                "Osteoartrite",
+                "Fratura anterior da articulação sacroilíaca",
+                "Fratura recente da articulação sacroilíaca",
+                "Artrite reumatoide",
+                "Sacroileíte"
+            ]
+        },
+        "Esqueleto ósseo e tecido mole": {
+            position: { x: 60, y: 60, radius: 3 },
+            patologies: [
+                "Observações Clínicas Adicionais - Esqueleto ósseo e tecido mole",
+                "Cisto ósseo do esqueleto ósseo",
+                "Fratura óssea",
+                "Ilhota óssea do esqueleto ósseo",
+                "Edema da medula óssea do esqueleto ósseo",
+                "Metástases ósseas",
+                "Hemangioma do esqueleto ósseo",
+                "Lesão óssea indeterminada",
+                "Atrofia muscular com substituição gordurosa",
+                "Ruptura muscular do esqueleto ósseo",
+                "Anormalidade de tecido mole",
+                "Tumor do esqueleto ósseo e/ou tecido mole"
+            ]
+        },
+        "Ombros": {
+            position: { x: 35, y: 22, radius: 3 },
+            patologies: [
+                "Observações Clínicas Adicionais - Ombros",
+                "Cisto ósseo do ombro",
+                "Ilhota óssea do ombro",
+                "Edema da medula óssea do ombro",
+                "Bursite do ombro",
+                "Degeneração do ombro",
+                "Derrame no ombro",
+                "Atrofia muscular com substituição gordurosa no ombro",
+                "Ruptura muscular ou tendínea do ombro",
+                "Impacto do ombro",
+                "Hemangioma do ombro",
+                "Metástases no ombro",
+                "Tumor no ombro"
+            ]
+        },
+        "Tornozelos": {
+            position: { x: 44, y: 91, radius: 3 },
+            patologies: [
+                "Hemangioma do tornozelo",
+                "Metástases no tornozelo",
+                "Tumor no tornozelo",
+                "Cisto ósseo do tornozelo",
+                "Ilhota óssea do tornozelo",
+                "Edema da medula óssea do tornozelo",
+                "Bursite do tornozelo",
+                "Degeneração do tornozelo",
+                "Derrame no tornozelo",
+                "Atrofia muscular com substituição gordurosa do tornozelo",
+                "Ruptura muscular do tornozelo"
+            ]
+        },
+        "Joelhos": {
+            position: { x: 44, y: 72, radius: 3 },
+            patologies: [
+                "Cisto de Baker",
+                "Cisto ósseo do joelho",
+                "Ilhota óssea do joelho",
+                "Edema da medula óssea do joelho",
+                "Bursite do joelho",
+                "Degeneração do joelho",
+                "Derrame no joelho",
+                "Hemangioma do joelho",
+                "Metástases no joelho",
+                "Substituição do joelho",
+                "Atrofia muscular com substituição gordurosa do joelho",
+                "Ruptura muscular do joelho",
+                "Tumor no joelho"
+            ]
+        },
+        "Pelvis e quadris": {
+            position: { x: 56, y: 47, radius: 3 },
+            patologies: [
+                "Cisto ósseo da pelve e quadris",
+                "Ilhota óssea da pelve e quadris",
+                "Edema da medula óssea da pelve e quadris",
+                "Bursite da pelve e quadris",
+                "Degeneração da pelve e quadris",
+                "Derrame na pelve e quadris",
+                "Hemangioma da pelve e quadris",
+                "Impacto do quadril",
+                "Substituição do quadril",
+                "Atrofia muscular com substituição gordurosa",
+                "Ruptura muscular ou tendínea da pelve e quadris",
+                "Metástases na pelve e quadris",
+                "Tumor da pelve e quadris"
+            ]
+        }
     }
 } 
