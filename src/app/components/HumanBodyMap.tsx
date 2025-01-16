@@ -54,6 +54,11 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick, findings = [] }: Hum
     const containerRef = useRef<HTMLDivElement>(null)
     const [hoveredOrgan, setHoveredOrgan] = useState<string>()
 
+    const organFindingsMap = findings.reduce((acc, finding) => {
+        acc[finding.organ] = (acc[finding.organ] || 0) + 1
+        return acc
+    }, {} as Record<string, number>)
+
     const organSeverityMap = findings.reduce((acc, finding) => {
         if (!acc[finding.organ] || finding.severity > acc[finding.organ]) {
             acc[finding.organ] = finding.severity
@@ -125,6 +130,19 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick, findings = [] }: Hum
                     ctx.fill()
                     ctx.stroke()
 
+                    const findingsCount = organFindingsMap[organ]
+                    if (findingsCount) {
+                        ctx.font = '10px Arial'
+                        ctx.fillStyle = 'white'
+                        ctx.textAlign = 'center'
+                        ctx.textBaseline = 'middle'
+                        ctx.fillText(
+                            findingsCount.toString(),
+                            pixelX,
+                            pixelY
+                        )
+                    }
+
                     if (organ === selectedOrgan || organ === hoveredOrgan) {
                         ctx.font = '12px Arial'
                         ctx.fillStyle = 'white'
@@ -165,7 +183,9 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick, findings = [] }: Hum
                     }
                 })
             })
-            if (!found) setHoveredOrgan(undefined)
+            if (!found) {
+                setHoveredOrgan(undefined)
+            }
         }
 
         const handleClick = (e: MouseEvent) => {
@@ -188,17 +208,21 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick, findings = [] }: Hum
             })
         }
 
+        const handleMouseLeave = () => {
+            setHoveredOrgan(undefined)
+        }
+
         updateCanvasSize()
         window.addEventListener('resize', updateCanvasSize)
         canvas.addEventListener('click', handleClick)
         canvas.addEventListener('mousemove', handleMouseMove)
-        canvas.addEventListener('mouseleave', () => setHoveredOrgan(undefined))
+        canvas.addEventListener('mouseleave', handleMouseLeave)
 
         return () => {
             window.removeEventListener('resize', updateCanvasSize)
             canvas.removeEventListener('click', handleClick)
             canvas.removeEventListener('mousemove', handleMouseMove)
-            canvas.removeEventListener('mouseleave', () => setHoveredOrgan(undefined))
+            canvas.removeEventListener('mouseleave', handleMouseLeave)
         }
     }, [selectedOrgan, hoveredOrgan, onOrganClick, findings])
 
