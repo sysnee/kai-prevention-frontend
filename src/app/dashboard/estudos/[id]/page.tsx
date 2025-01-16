@@ -15,8 +15,10 @@ import AddIcon from '@mui/icons-material/Add'
 import { BodySystemSelector } from "@/app/components/BodySystemSelector"
 import { useState } from "react"
 import { Finding, Severity } from "@/types/findings"
-import { HumanBodyIllustration } from '@/app/components/HumanBodyIllustration'
 import { humanBodyPositions } from '@/app/constants/human-body-positions'
+import humanIllustration from '@/app/assets/imagens/3d-human-bg-black.webp'
+import humanIllustrationPng from '@/app/assets/imagens/3d-human-bg-black.png'
+import { HumanBodyMap } from '@/app/components/HumanBodyMap'
 
 function getHighestSeverity(findings: Array<{ severity: Severity }>) {
     if (findings.some(f => f.severity === Severity.SEVERE)) return Severity.SEVERE
@@ -223,6 +225,28 @@ export default function EstudoResumoPage() {
                             borderRadius: '20px',
                             padding: 3
                         })}>
+                            <Box sx={(theme) => ({
+                                position: 'relative',
+                                width: '100%',
+                                maxWidth: '500px',
+                                margin: '0 auto',
+                                height: '300px',
+                                [theme.breakpoints.up('lg')]: {
+                                    height: '400px',
+                                },
+                                [theme.breakpoints.up('xl')]: {
+                                    height: '500px',
+                                },
+                                marginBottom: 2,
+                                borderRadius: '10px',
+                                overflow: 'hidden'
+                            })}>
+                                <HumanBodyMap
+                                    selectedOrgan={selectedSystem}
+                                    onOrganClick={(organ) => setSelectedSystem(organ)}
+                                />
+                            </Box>
+
                             <Box
                                 component="h2"
                                 sx={(theme) => ({
@@ -233,6 +257,7 @@ export default function EstudoResumoPage() {
                             >
                                 Resumo do laudo
                             </Box>
+
                             <Box
                                 sx={(theme) => ({
                                     backgroundColor: theme.palette.mode === 'light' ? "#f5f6fa" : "#0c1017",
@@ -304,15 +329,6 @@ export default function EstudoResumoPage() {
                     </Grid>
                 </Grid>
             </Box>
-
-            <HumanBodyIllustration
-                data={humanBodyPositions}
-                selectedSystem={selectedSystem?.split('/')[0]}
-                selectedOrgan={selectedSystem?.split('/')[1]}
-                onSelectOrgan={(system, organ) => {
-                    setSelectedSystem(`${system}/${organ}`)
-                }}
-            />
         </Box>
     )
 }

@@ -13,7 +13,3 @@ export interface OrganSystem {
     organs: Record<string, BodyPart>
     conditions?: string[] // System-level conditions
 }
-
-export interface HumanBodyData {
-    systems: Record<string, OrganSystem>
-} 
