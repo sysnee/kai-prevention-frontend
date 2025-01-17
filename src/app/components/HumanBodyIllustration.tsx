@@ -1,11 +1,22 @@
 "use client"
 
 import { useState } from 'react'
-import { Position, HumanBodyData } from '../constants/types'
 import { organPaths } from '../constants/organ-paths'
 
+interface OrganData {
+    position: { x: number; y: number }
+}
+
+interface SystemData {
+    organs: Record<string, OrganData>
+}
+
+interface IllustrationData {
+    systems: Record<string, SystemData>
+}
+
 interface HumanBodyIllustrationProps {
-    data: HumanBodyData
+    data: IllustrationData
     onSelectOrgan?: (system: string, organ: string) => void
     selectedSystem?: string
     selectedOrgan?: string
