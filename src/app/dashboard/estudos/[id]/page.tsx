@@ -5,7 +5,7 @@ import { KeyboardArrowLeft } from "@mui/icons-material"
 import Link from "next/link"
 import Image from "next/image"
 import { useTheme } from "@mui/material"
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { getFindingsByReportId } from '@/services/findings'
 import { getReportById } from '@/services/reports'
@@ -43,6 +43,7 @@ export default function EstudoResumoPage() {
     const params = useParams()
     const reportId = params.id as string
     const [selectedSystem, setSelectedSystem] = useState<string>()
+    const router = useRouter()
 
     // Fetch report data
     const {
@@ -142,13 +143,16 @@ export default function EstudoResumoPage() {
                 {/* Header with back button and title */}
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: "1.5em" }}>
-                        <Link href={`/`}>
-                            <Button className="bg-kai-primary hover:bg-kai-primary/70">
-                                <KeyboardArrowLeft sx={(theme) => ({
-                                    color: theme.palette.mode === 'light' ? '#fff' : '#000'
-                                })} />
-                            </Button>
-                        </Link>
+                        <Button
+
+                            onClick={() => router.push('/dashboard/estudos')}
+                            sx={(theme) => ({
+                                color: theme.palette.text.primary
+                            })}
+                            className="bg-kai-primary hover:bg-kai-primary/70 text-white"
+                        >
+                            <KeyboardArrowLeft sx={{ fontSize: "17px" }} />
+                        </Button>
 
                         <Stack>
                             <Box component="h2" sx={(theme) => ({
