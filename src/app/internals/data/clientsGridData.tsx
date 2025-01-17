@@ -12,12 +12,14 @@ function ViewEditButtons({ onView, onEdit }: {
       <button
         onClick={onView}
         className="hover:opacity-70"
+        data-testid="view-button"
       >
         <Eye className="w-5 h-5 text-kai-primary" />
       </button>
       <button
         onClick={onEdit}
         className="hover:opacity-70"
+        data-testid="edit-button"
       >
         <Edit2 className="w-5 h-5 text-kai-primary" />
       </button>

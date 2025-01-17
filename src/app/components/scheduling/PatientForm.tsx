@@ -211,6 +211,7 @@ export function PatientForm({ onSubmit, mode = 'select' }: PatientFormProps) {
               Selecionar
             </Button>
             <Button
+              data-testid="novo"
               className={`${currentMode === 'create' ? `bg-kai-primary hover:bg-kai-primary/70 ${theme.palette.mode === 'light' ? 'text-white' : 'text-black'}` : 'text-gray-400 hover:bg-kai-primary/10'}`}
               style={{
                 border: theme.palette.mode === 'light' ? "1px solid #e5e7eb" : "1px solid #333b4d",

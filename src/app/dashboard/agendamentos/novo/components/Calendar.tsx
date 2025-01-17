@@ -105,6 +105,7 @@ export function Calendar({ selectedDate, onDateSelect }: CalendarProps) {
           <div key={index} className="aspect-square p-1">
             {day && (
               <button
+                data-testid="calendar-day"
                 onClick={() =>
                   onDateSelect(
                     new Date(

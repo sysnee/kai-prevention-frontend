@@ -10,7 +10,7 @@ import RolesTable from './components/RolesTable'
 import RolePermissionForm from './components/forms/RolePermissionForm'
 import api from '../../../lib/api'
 import { ConfirmationModal } from '../../components/shared/ConfirmationModal'
-import { showToast } from '@/lib/toast'
+import toast from 'react-hot-toast'
 
 export default function PermissionsManagement() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
@@ -64,10 +64,10 @@ export default function PermissionsManagement() {
       await fetchRoles() // Refresh the roles list
       setDeleteModalOpen(false)
       setRoleToDelete(null)
-      showToast.success('Perfil deletado com sucesso')
+      toast.success('Perfil deletado com sucesso')
     } catch (error) {
       console.error('Error deleting role:', error)
-      // Handle error (show notification, etc.)
+      toast.error('Erro ao deletar perfil')
     } finally {
       setIsSaving(false)
     }
