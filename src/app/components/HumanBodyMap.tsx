@@ -144,20 +144,33 @@ export function HumanBodyMap({ selectedOrgan, onOrganClick, findings = [] }: Hum
                     }
 
                     if (organ === selectedOrgan || organ === hoveredOrgan) {
-                        ctx.font = '12px Arial'
+                        const words = organ.split(' ')
+                        const text = words.join(' ')
+                        ctx.font = 'bold 12px Arial'
+                        const textMetrics = ctx.measureText(text)
+                        const padding = 6
+                        const textWidth = textMetrics.width + padding * 2
+                        const textHeight = 20
+
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'
+                        ctx.beginPath()
+                        ctx.roundRect(
+                            pixelX - textWidth / 2,
+                            pixelY + pixelRadius + 5,
+                            textWidth,
+                            textHeight,
+                            4
+                        )
+                        ctx.fill()
+
                         ctx.fillStyle = 'white'
                         ctx.textAlign = 'center'
-                        ctx.textBaseline = 'bottom'
-
-                        const words = organ.split(' ')
-                        const lineHeight = 14
-                        words.forEach((word, i) => {
-                            ctx.fillText(
-                                word,
-                                pixelX,
-                                pixelY - 10 - (words.length - 1 - i) * lineHeight
-                            )
-                        })
+                        ctx.textBaseline = 'middle'
+                        ctx.fillText(
+                            text,
+                            pixelX,
+                            pixelY + pixelRadius + 5 + textHeight / 2
+                        )
                     }
                 })
             })
