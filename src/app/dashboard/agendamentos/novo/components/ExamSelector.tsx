@@ -61,6 +61,7 @@ export function ExamSelector({ selectedExam, onExamSelect }: ExamSelectorProps) 
         {filteredExams.map((exam) => (
           <button
             key={exam.id}
+            data-testid="exam-option"
             onClick={() => onExamSelect(exam)}
             className={`text-left p-4 rounded-xl transition-all ${selectedExam?.id === exam.id
               ? 'ring-2 ring-kai-primary bg-kai-primary/10'

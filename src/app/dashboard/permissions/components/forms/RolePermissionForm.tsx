@@ -26,7 +26,7 @@ import { X } from 'lucide-react'
 import api from '../../../../../lib/api'
 import { Role } from '@/app/types/permissions'
 import { PermissionType } from '@/app/types/permissions'
-import { showToast } from '@/lib/toast'
+import toast from 'react-hot-toast'
 import { PERMISSION_TRANSLATIONS, RESOURCE_TRANSLATIONS } from '@/app/constants/translations'
 import { ResourceType } from '@/app/types/permissions'
 
@@ -108,12 +108,13 @@ export default function RolePermissionForm({ open, onClose, role, mode, onSave }
         await api.patch(`/roles/${role.id}`, payload)
       }
 
-      showToast.success('Perfil salvo com sucesso')
+      toast.success('Perfil salvo com sucesso')
 
       onSave(formData)
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao salvar o perfil')
+      toast.error('Erro ao salvar perfil')
     } finally {
       setIsLoading(false)
     }

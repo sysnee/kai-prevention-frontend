@@ -52,7 +52,7 @@ const userFormSchema = z.object({
   isHealthcareProfessional: z.boolean().optional(),
   isOtherProfessional: z.boolean().optional(),
   registrationNumber: z.string().optional(),
-  roleId: z.string().optional()
+  roleId: z.string().min(1, 'Função é obrigatória')
 })
 
 type UserFormData = z.infer<typeof userFormSchema>
@@ -279,14 +279,16 @@ export function UserForm({ user, roles, onCancel, onSubmit, readOnly = false, fo
                 <Controller
                   name='roleId'
                   control={control}
-                  render={({ field }) => (
-                    <FormControl fullWidth error={!!errors.roleId}>
+                  rules={{ required: 'Função é obrigatória' }}
+                  render={({ field, fieldState: { error } }) => (
+                    <FormControl fullWidth error={!!error}>
                       <InputLabel>Função</InputLabel>
                       <Select
                         {...field}
                         value={field.value || ''}
                         onChange={e => field.onChange(String(e.target.value))}
                         disabled={readOnly}
+                        data-testid="role-select"
                       >
                         {roles.map(role => (
                           <MenuItem key={role.id} value={String(role.id)}>
@@ -294,7 +296,7 @@ export function UserForm({ user, roles, onCancel, onSubmit, readOnly = false, fo
                           </MenuItem>
                         ))}
                       </Select>
-                      {errors.roleId && <FormHelperText>{errors.roleId.message}</FormHelperText>}
+                      {error && <FormHelperText>{error.message}</FormHelperText>}
                     </FormControl>
                   )}
                 />
@@ -308,6 +310,7 @@ export function UserForm({ user, roles, onCancel, onSubmit, readOnly = false, fo
                       onChange={handleProfessionalTypeChange}
                       name='isHealthcareProfessional'
                       disabled={readOnly}
+                      data-testid="healthcare-checkbox"
                     />
                   }
                   label='Profissional de Saúde'
@@ -319,6 +322,7 @@ export function UserForm({ user, roles, onCancel, onSubmit, readOnly = false, fo
                       onChange={handleProfessionalTypeChange}
                       name='isOtherProfessional'
                       disabled={readOnly}
+                      data-testid="other-professional-checkbox"
                     />
                   }
                   label='Outro Profissional'
@@ -339,6 +343,7 @@ export function UserForm({ user, roles, onCancel, onSubmit, readOnly = false, fo
                           defaultValue={field.value || ''}
                           onChange={e => field.onChange(e)}
                           disabled={readOnly}
+                          data-testid="professional-type-select"
                         >
                           {PROFESSIONAL_TYPES.map(type => (
                             <MenuItem key={type.id} value={type.id}>
@@ -382,6 +387,7 @@ export function UserForm({ user, roles, onCancel, onSubmit, readOnly = false, fo
                         defaultValue={field.value || ''}
                         onChange={e => field.onChange(e)}
                         disabled={readOnly}
+                        data-testid="professional-type-select"
                       >
                         {OTHER_PROFESSIONAL_ROLES.map(type => (
                           <MenuItem key={type.id} value={type.id}>

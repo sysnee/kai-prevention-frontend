@@ -151,7 +151,7 @@ export function Scheduling() {
       window.location.href = '/dashboard/agendamentos';
     } catch (error) {
       console.error('Error creating appointment:', error);
-      toast.error('Erro ao criar agendamento. Tente novamente.');
+      toast.error('Já existe um agendamento para este horário.');
     } finally {
       setIsLoading(false);
     }

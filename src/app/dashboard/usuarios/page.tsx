@@ -12,7 +12,7 @@ import toast from 'react-hot-toast'
 import { useTheme } from '@mui/system'
 import { getProfessionalTypeName } from '../../constants/translations'; // Ajuste o caminho conforme necessário
 import ActionButtons from '../permissions/components/ActionButtons'
-import { Plus, Search } from 'lucide-react'
+import { Plus, Search, Users } from 'lucide-react'
 import { PlusOne } from '@mui/icons-material'
 import { ConfirmationModal } from '../../components/shared/ConfirmationModal'
 
@@ -293,8 +293,7 @@ export default function UserManagement() {
 
       {isLoading ? (
         <CircularProgress />
-      ) : (
-        filteredUsers.length > 0 &&
+      ) : filteredUsers.length > 0 ? (
         <DataGrid
           rows={filteredUsers}
           columns={columns}
@@ -330,6 +329,23 @@ export default function UserManagement() {
             },
           }}
         />
+      ) : (
+        <Box
+          sx={(theme) => ({
+            padding: 3,
+            textAlign: 'center',
+            border: `1px solid ${theme.palette.mode === 'light' ? 'rgba(229,231,235,255)' : 'hsla(220, 20%, 25%, 0.6)'}`,
+            borderRadius: 2
+          })}
+        >
+          <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+          <Typography variant="h6" sx={{ color: 'text.secondary', mb: 1 }}>
+            Nenhum usuário encontrado
+          </Typography>
+          <Typography color="text.secondary">
+            Não há usuários cadastrados no sistema.
+          </Typography>
+        </Box>
       )}
 
       {showUserForm && (
