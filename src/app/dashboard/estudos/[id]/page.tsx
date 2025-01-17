@@ -5,7 +5,7 @@ import { KeyboardArrowLeft } from "@mui/icons-material"
 import Link from "next/link"
 import Image from "next/image"
 import { useTheme } from "@mui/material"
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { getFindingsByReportId } from '@/services/findings'
 import { getReportById } from '@/services/reports'
@@ -15,6 +15,10 @@ import AddIcon from '@mui/icons-material/Add'
 import { BodySystemSelector } from "@/app/components/BodySystemSelector"
 import { useState } from "react"
 import { Finding, Severity } from "@/types/findings"
+import { humanBodyPositions } from '@/app/constants/human-body-positions'
+import humanIllustration from '@/app/assets/imagens/3d-human-bg-black.webp'
+import humanIllustrationPng from '@/app/assets/imagens/3d-human-bg-black.png'
+import { HumanBodyMap } from '@/app/components/HumanBodyMap'
 
 function getHighestSeverity(findings: Array<{ severity: Severity }>) {
     if (findings.some(f => f.severity === Severity.SEVERE)) return Severity.SEVERE
@@ -39,6 +43,7 @@ export default function EstudoResumoPage() {
     const params = useParams()
     const reportId = params.id as string
     const [selectedSystem, setSelectedSystem] = useState<string>()
+    const router = useRouter()
 
     // Fetch report data
     const {
@@ -138,13 +143,16 @@ export default function EstudoResumoPage() {
                 {/* Header with back button and title */}
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                     <Box sx={{ display: "flex", alignItems: "center", gap: "1.5em" }}>
-                        <Link href={`/`}>
-                            <Button className="bg-kai-primary hover:bg-kai-primary/70">
-                                <KeyboardArrowLeft sx={(theme) => ({
-                                    color: theme.palette.mode === 'light' ? '#fff' : '#000'
-                                })} />
-                            </Button>
-                        </Link>
+                        <Button
+
+                            onClick={() => router.push('/dashboard/estudos')}
+                            sx={(theme) => ({
+                                color: theme.palette.text.primary
+                            })}
+                            className="bg-kai-primary hover:bg-kai-primary/70 text-white"
+                        >
+                            <KeyboardArrowLeft sx={{ fontSize: "17px" }} />
+                        </Button>
 
                         <Stack>
                             <Box component="h2" sx={(theme) => ({
@@ -221,6 +229,29 @@ export default function EstudoResumoPage() {
                             borderRadius: '20px',
                             padding: 3
                         })}>
+                            <Box sx={(theme) => ({
+                                position: 'relative',
+                                width: '100%',
+                                maxWidth: '500px',
+                                margin: '0 auto',
+                                height: '300px',
+                                [theme.breakpoints.up('lg')]: {
+                                    height: '400px',
+                                },
+                                [theme.breakpoints.up('xl')]: {
+                                    height: '500px',
+                                },
+                                marginBottom: 2,
+                                borderRadius: '10px',
+                                overflow: 'hidden'
+                            })}>
+                                <HumanBodyMap
+                                    selectedOrgan={selectedSystem}
+                                    onOrganClick={(organ) => setSelectedSystem(organ)}
+                                    findings={findings}
+                                />
+                            </Box>
+
                             <Box
                                 component="h2"
                                 sx={(theme) => ({
@@ -231,6 +262,7 @@ export default function EstudoResumoPage() {
                             >
                                 Resumo do laudo
                             </Box>
+
                             <Box
                                 sx={(theme) => ({
                                     backgroundColor: theme.palette.mode === 'light' ? "#f5f6fa" : "#0c1017",
@@ -239,56 +271,26 @@ export default function EstudoResumoPage() {
                                     marginY: 2
                                 })}
                             >
-                                <Box
-                                    component="p"
-                                    sx={(theme) => ({
-                                        color: theme.palette.text.primary
-                                    })}
-                                >
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,
-                                    molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum
-                                    numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium
-                                    optio, eaque rerum! Provident similique accusantium nemo autem. Veritatis
-                                    obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam
-                                    nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit,
-                                    tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit,
-                                    quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos
-                                    sapiente officiis modi at sunt excepturi expedita sint? Sed quibusdam
-                                    recusandae alias error harum maxime adipisci amet laborum. Perspiciatis
-                                    minima nesciunt dolorem! Officiis iure rerum voluptates a cumque velit
-                                    quibusdam sed amet tempora. Sit laborum ab, eius fugit doloribus tenetur
-                                    fugiat, temporibus enim commodi iusto libero magni deleniti quod quam
-                                    consequuntur! Commodi minima excepturi repudiandae velit hic maxime
-                                    doloremque. Quaerat provident commodi consectetur veniam similique ad
-                                    earum omnis ipsum saepe, voluptas, hic voluptates pariatur est explicabo
-                                    fugiat, dolorum eligendi quam cupiditate excepturi mollitia maiores labore
-                                    suscipit quas? Nulla, placeat. Voluptatem quaerat non architecto ab laudantium
-                                    modi minima sunt esse temporibus sint culpa, recusandae aliquam numquam
-                                    totam ratione voluptas quod exercitationem fuga. Possimus quis earum veniam
-                                    quasi aliquam eligendi, placeat qui corporis. lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,
-                                    molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum
-                                    numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium
-                                    optio, eaque rerum! Provident similique accusantium nemo autem. Veritatis
-                                    obcaecati tenetur iure eius earum ut molestias architecto voluptate aliquam
-                                    nihil, eveniet aliquid culpa officia aut! Impedit sit sunt quaerat, odit,
-                                    tenetur error, harum nesciunt ipsum debitis quas aliquid. Reprehenderit,
-                                    quia. Quo neque error repudiandae fuga? Ipsa laudantium molestias eos
-                                    sapiente officiis modi at sunt excepturi expedita sint? Sed quibusdam
-                                    recusandae alias error harum maxime adipisci amet laborum. Perspiciatis
-                                    minima nesciunt dolorem! Officiis iure rerum voluptates a cumque velit
-                                    quibusdam sed amet tempora. Sit laborum ab, eius fugit doloribus tenetur
-                                    fugiat, temporibus enim commodi iusto libero magni deleniti quod quam
-                                    consequuntur! Commodi minima excepturi repudiandae velit hic maxime
-                                    doloremque. Quaerat provident commodi consectetur veniam similique ad
-                                    earum omnis ipsum saepe, voluptas, hic voluptates pariatur est explicabo
-                                    fugiat, dolorum eligendi quam cupiditate excepturi mollitia maiores labore
-                                    suscipit quas? Nulla, placeat. Voluptatem quaerat non architecto ab laudantium
-                                    modi minima sunt esse temporibus sint culpa, recusandae aliquam numquam
-                                    totam ratione voluptas quod exercitationem fuga. Possimus quis earum veniam
-                                    quasi aliquam eligendi, placeat qui corporis!
-                                </Box>
+                                <textarea
+                                    disabled
+                                    placeholder="Digite aqui o resumo do laudo"
+                                    style={{
+                                        width: '100%',
+                                        backgroundColor: theme.palette.mode === 'light' ? "#f5f6fa" : "#0c1017",
+                                        borderRadius: '5px',
+                                        padding: '8px',
+                                        margin: '16px 0',
+                                        color: theme.palette.text.primary,
+                                        border: 'none',
+                                        resize: 'none',
+                                        fontFamily: 'inherit',
+                                        fontSize: 'inherit',
+                                        lineHeight: 'inherit',
+                                    }}
+                                />
                             </Box>
                             <Button
+                                disabled
                                 sx={(theme) => ({
                                     width: "100%",
                                     fontSize: "12px",

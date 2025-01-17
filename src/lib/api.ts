@@ -4,11 +4,17 @@ import jwt from 'jsonwebtoken'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/v1'
 
-async function handleResponse(response: any) {
+async function handleResponse(response: Response) {
+  if (response.status === 401 || response.status === 403) {
+    signIn('auth0')
+    return
+  }
+
   if (!response.ok) {
     const errorMessage = await response.text()
     throw new Error(errorMessage || `Error: ${response.status}`)
   }
+
   const contentType = response.headers.get('content-type')
   if (contentType && contentType.includes('application/json')) {
     return response.json()

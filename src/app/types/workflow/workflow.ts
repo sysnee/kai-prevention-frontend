@@ -1,17 +1,17 @@
 import { ServiceStatus } from "../pemissions/permissions";
 
+interface WorkflowNoteUser {
+  id: string;
+  name: string;
+  avatar?: string;
+}
+
 export interface WorkflowNote {
   id: string;
   text: string;
   createdAt: string;
-  createdBy: {
-    id: string;
-    name: string;
-  };
-  mentions: Array<{
-    id: string;
-    name: string;
-  }>;
+  createdBy: WorkflowNoteUser;
+  mentions?: string[];
 }
 
 export interface WorkflowStage {

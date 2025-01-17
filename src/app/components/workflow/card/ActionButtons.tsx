@@ -1,6 +1,12 @@
-import React from 'react';
-import { Calendar, XCircle, PlayCircle, PauseCircle, ArrowRightCircle } from 'lucide-react';
-import { ServiceStatus } from '@/app/types/pemissions/permissions';
+import React from "react";
+import {
+  Calendar,
+  XCircle,
+  PlayCircle,
+  PauseCircle,
+  ArrowRightCircle,
+} from "lucide-react";
+import { ServiceStatus } from "@/app/types/pemissions/permissions";
 
 interface ActionButtonsProps {
   status: ServiceStatus;
@@ -15,6 +21,9 @@ interface ActionButtonsProps {
   onShowResumeInput?: () => void;
 }
 
+const CANCELABLE_STATUS = ["PLANNED", "WAITING", "STARTED", "ON_HOLD"];
+const RESCHEDULABLE_STATUS = ["PLANNED", "WAITING"];
+
 export function ActionButtons({
   status,
   onReschedule,
@@ -25,27 +34,31 @@ export function ActionButtons({
   resumeReason,
   showResumeInput,
   onResumeReasonChange,
-  onShowResumeInput
+  onShowResumeInput,
 }: ActionButtonsProps) {
   return (
     <div className="flex space-x-4">
-      <button
-        onClick={onReschedule}
-        className="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
-      >
-        <Calendar className="w-4 h-4 mr-2 inline" />
-        Reagendar
-      </button>
+      {RESCHEDULABLE_STATUS.includes(status) && (
+        <button
+          onClick={onReschedule}
+          className="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100"
+        >
+          <Calendar className="w-4 h-4 mr-2 inline" />
+          Reagendar
+        </button>
+      )}
 
-      <button
-        onClick={onCancel}
-        className="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
-      >
-        <XCircle className="w-4 h-4 mr-2 inline" />
-        Cancelar
-      </button>
+      {CANCELABLE_STATUS.includes(status) && (
+        <button
+          onClick={onCancel}
+          className="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100"
+        >
+          <XCircle className="w-4 h-4 mr-2 inline" />
+          Cancelar
+        </button>
+      )}
 
-      {status === 'STARTED' && onPause && (
+      {status === "STARTED" && onPause && (
         <button
           onClick={onPause}
           className="flex-1 px-4 py-2 bg-orange-50 text-orange-600 rounded-lg hover:bg-orange-100"
@@ -55,7 +68,7 @@ export function ActionButtons({
         </button>
       )}
 
-      {status === 'ON_HOLD' ? (
+      {status === "ON_HOLD" ? (
         <div className="flex-1">
           {showResumeInput ? (
             <div className="flex space-x-2">
@@ -84,7 +97,8 @@ export function ActionButtons({
           )}
         </div>
       ) : (
-        status !== 'COMPLETED' && onProceed && (
+        status !== "COMPLETED" &&
+        onProceed && (
           <button
             onClick={onProceed}
             className="flex-1 px-4 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100"

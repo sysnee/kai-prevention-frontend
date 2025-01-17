@@ -23,7 +23,7 @@ import { Box } from "@mui/system";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Imagem } from "@/app/types/types";
-import { humanBodyData } from "../constants/human-body-data";
+import { humanBodyPositions } from "../constants/human-body-positions";
 import { Severity } from '@/types/findings'
 
 // Add this common style object for all Autocompletes
@@ -138,9 +138,8 @@ export default function AchadoForm({
   // Update organs when sistema changes
   useEffect(() => {
     if (formData.sistema) {
-      const organs = Object.keys(humanBodyData[formData.sistema as keyof typeof humanBodyData] || {});
+      const organs = Object.keys(humanBodyPositions[formData.sistema as keyof typeof humanBodyPositions] || {});
       setAvailableOrgans(organs);
-      // Clear organ and patologies when sistema changes
       setFormData(prev => ({ ...prev, orgao: "", patologias: [] }));
     }
   }, [formData.sistema]);
@@ -148,10 +147,9 @@ export default function AchadoForm({
   // Update patologies when orgao changes
   useEffect(() => {
     if (formData.sistema && formData.orgao) {
-      const patologies = humanBodyData[formData.sistema as keyof typeof humanBodyData]?.[formData.orgao] || [];
+      const patologies = humanBodyPositions[formData.sistema as keyof typeof humanBodyPositions]?.[formData.orgao]?.patologies || [];
       setAvailablePatologies(patologies);
       setFilteredPatologies(patologies);
-      // Clear patologies and their details when orgao changes
       setFormData(prev => ({
         ...prev,
         patologias: [],
@@ -310,7 +308,7 @@ export default function AchadoForm({
         <FormControl fullWidth>
           <Autocomplete
             id="sistema"
-            options={Object.keys(humanBodyData)}
+            options={Object.keys(humanBodyPositions)}
             value={formData.sistema}
             onChange={(_, newValue) => {
               setFormData(prev => ({

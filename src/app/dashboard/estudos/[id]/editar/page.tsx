@@ -163,7 +163,7 @@ export default function AchadosPage() {
         >
             <Stack spacing={1} sx={{ mb: 4 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Link href={`/`}>
+                    <Link href={`/dashboard/estudos/${reportId}`}>
                         <Button className="bg-kai-primary hover:bg-kai-primary/70">
                             <KeyboardArrowLeft sx={(theme) => ({
                                 color: theme.palette.mode === 'light' ? '#fff' : '#000'

@@ -4,7 +4,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { humanBodyData } from "../constants/human-body-data"
+import { humanBodyPositions } from "../constants/human-body-positions"
 import { ChevronDown, ChevronRight, Check, X } from "lucide-react"
 import { Severity } from "@/types/findings"
 
@@ -116,11 +116,10 @@ export function BodySystemSelector({
             </pre> */}
             <ScrollArea className="h-[calc(100vh-100px)] w-full rounded-md border">
                 <div className="p-4">
-                    {Object.entries(humanBodyData).map(([system, organs]) => {
+                    {Object.entries(humanBodyPositions).map(([system, organs]) => {
                         const systemData = findings[system]
                         const isExpanded = expandedSystem === system
                         const isSelected = selectedSystem === system
-
                         const systemSeverity = systemData?.severity || Severity.NONE
 
                         return (
@@ -154,7 +153,7 @@ export function BodySystemSelector({
 
                                 {isExpanded && (
                                     <div className="ml-4 space-y-1">
-                                        {Object.entries(organs).map(([organ, pathologies]) => {
+                                        {Object.entries(organs).map(([organ, organData]) => {
                                             const organFindings = findings[`${system}/${organ}`]
                                             const isOrganExpanded = expandedOrgan === organ
                                             const isOrganSelected = selectedSystem === `${system}/${organ}`
@@ -190,7 +189,7 @@ export function BodySystemSelector({
 
                                                     {isOrganExpanded && (
                                                         <div className="ml-10 space-y-1 py-1">
-                                                            {pathologies.map((pathology: string) => {
+                                                            {organData.patologies.map((pathology: string) => {
                                                                 const pathologyKey = `${system}/${organ}/${pathology}`
                                                                 const pathologyFindings = findings[pathologyKey]
                                                                 const isPathologySelected = selectedSystem === `${system}/${organ}/${pathology}`
